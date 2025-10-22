@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">LotteryEventApp</string>
+    <string name="events">Events</string>
 </resources>
