@@ -2,16 +2,16 @@ package com.example.lotteryeventapp;
 
 public class Event {
 
-    private String[] date_time;
+    private String date_time;
     private String location;
-    private String[] registration_deadline;
+    private String registration_deadline;
     private String details;
     private boolean track_geolocation;
     private boolean redraw;
     private int waitlist_limit;
     private int attendee_limit;
     private boolean drawn;
-    private Event(String[] date_time, String location, String[] registration_deadline, String details,
+    public Event(String date_time, String location, String registration_deadline, String details,
                   boolean track_geolocation,boolean redraw, int waitlist_limit, int attendee_limit){
         this.date_time = date_time;
         this.location = location;
@@ -24,11 +24,11 @@ public class Event {
         this.drawn = false;
     }
 
-    public String[] getDate_time() {
+    public String getDate_time() {
         return date_time;
     }
 
-    public void setDate_time(String[] date_time) {
+    public void setDate_time(String date_time) {
         this.date_time = date_time;
     }
 
@@ -40,11 +40,11 @@ public class Event {
         this.location = location;
     }
 
-    public String[] getRegistration_deadline() {
+    public String getRegistration_deadline() {
         return registration_deadline;
     }
 
-    public void setRegistration_deadline(String[] registration_deadline) {
+    public void setRegistration_deadline(String registration_deadline) {
         this.registration_deadline = registration_deadline;
     }
 
@@ -96,7 +96,7 @@ public class Event {
         this.drawn = drawn;
     }
 
-    public void editEvent(String[] date_time, String location, String[] registration_deadline, String details,
+    public void editEvent(String date_time, String location, String registration_deadline, String details,
                           boolean track_geolocation, boolean redraw, int waitlist_limit, int attendee_limit){
         setDate_time(date_time);
         setLocation(location);
