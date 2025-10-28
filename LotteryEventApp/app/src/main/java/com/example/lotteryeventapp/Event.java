@@ -1,5 +1,7 @@
 package com.example.lotteryeventapp;
 
+import java.util.ArrayList;
+
 public class Event {
 
     private String date_time;
@@ -10,6 +12,9 @@ public class Event {
     private boolean redraw;
     private int waitlist_limit;
     private int attendee_limit;
+    private ArrayList<Entrant> waitlist;
+    private ArrayList<Entrant> attendee_list;
+    private ArrayList<Entrant> cancelled_list;
     private boolean drawn;
     public Event(String date_time, String location, String registration_deadline, String details,
                   boolean track_geolocation,boolean redraw, int waitlist_limit, int attendee_limit){
@@ -21,6 +26,9 @@ public class Event {
         this.redraw = redraw;
         this.waitlist_limit = waitlist_limit;
         this.attendee_limit = attendee_limit;
+        this.waitlist = new ArrayList<>();
+        this.attendee_list = new ArrayList<>();
+        this.cancelled_list = new ArrayList<>();
         this.drawn = false;
     }
 
@@ -86,6 +94,27 @@ public class Event {
 
     public void setAttendee_limit(int attendee_limit) {
         this.attendee_limit = attendee_limit;
+    }
+
+    public ArrayList<Entrant> getWaitlist() {
+        return waitlist;
+    }
+
+    public ArrayList<Entrant> getAttendee_list() {
+        return attendee_list;
+    }
+
+    public ArrayList<Entrant> getCancelled_list() {
+        return cancelled_list;
+    }
+    public void waitlistAdd(Entrant entrant){
+        waitlist.add(entrant);
+    }
+    public void attendeeListAdd(Entrant entrant){
+        attendee_list.add(entrant);
+    }
+    public void cancelledListAdd(Entrant entrant){
+        cancelled_list.add(entrant);
     }
 
     public boolean isDrawn() {
