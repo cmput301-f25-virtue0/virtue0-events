@@ -17,7 +17,7 @@ public class Event {
     private ArrayList<Entrant> cancelled_list;
     private boolean drawn;
     public Event(String date_time, String location, String registration_deadline, String details,
-                  boolean track_geolocation,boolean redraw, int waitlist_limit, int attendee_limit){
+                  boolean track_geolocation, boolean redraw, int waitlist_limit, int attendee_limit){
         this.date_time = date_time;
         this.location = location;
         this.registration_deadline = registration_deadline;
