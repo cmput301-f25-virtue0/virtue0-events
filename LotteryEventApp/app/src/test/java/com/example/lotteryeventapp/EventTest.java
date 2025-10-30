@@ -21,7 +21,7 @@ public class EventTest {
         assertEquals("Denny's",event.getLocation());
         assertEquals("12pm, February 14,2024",event.getRegistration_deadline());
         assertEquals("Stuff wont happen",event.getDetails());
-        assertTrue(event.isTrack_geolocation());
+        assertTrue(event.willTrack_geolocation());
         assertTrue(event.isRedraw());
         assertEquals(10,event.getWaitlist_limit());
         assertEquals(15,event.getAttendee_limit());
