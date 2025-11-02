@@ -13,6 +13,7 @@ public class Invitation extends Notification{
      * @param entrant the Entrant that could sign up for the Event
      */
     public Invitation(Event event, Entrant entrant){
+        super(event, entrant);
         this.event = event;
         this.entrant = entrant;
     }
@@ -46,6 +47,7 @@ public class Invitation extends Notification{
      */
     public void decline(){
         this.event.cancelledListAdd(this.entrant);
+        this.event.handleInvitationCancelled(this.entrant);
         this.entrant.removeNotification(this);
     }
 }
