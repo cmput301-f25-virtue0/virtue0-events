@@ -1,13 +1,27 @@
 package com.example.lotteryeventapp;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Entrant {
     private Profile profile;
-    private ArrayList<Notification> notifications;
-    public Entrant(){
-        this.notifications = new ArrayList<>();
+    private final String id; //String for now, implement id by mobile device later
+
+    private ArrayList<Notification> notifications = new ArrayList<>();
+    public Entrant(String id, Profile profile){
+
+        this.id = Objects.requireNonNull(id, "id");
+        this.profile = Objects.requireNonNull(profile, "profile");
     }
+
+    public String getId() {
+        return id;
+    }
+    public Profile getProfile() {
+        return profile;
+    }
+
+
 
     public ArrayList<Notification> getNotifications() {
         return notifications;
@@ -21,7 +35,7 @@ public class Entrant {
     }
 
     // ============================= Profile ===============================
-    public static class Profile{  //Would organizer and administrator also have profiles??
+    public static class Profile{
         private String name;
         private String email;
         private String phone;//Keep the phone number as string type?
@@ -67,4 +81,23 @@ public class Entrant {
 
     public void deleteProfile() {
     }
+
+    //============================Accept/Decline Invitation==============
+    private boolean acceptInvitation(Notification notification) {
+        return notification != null && notification.accept(this); //Add accept in notification class
+    }
+
+    private boolean declineInvitation(Notification notification) {
+        return notification != null && notification.decline(this); //Add decline in notification class
+    }
+
+    //===========================Method for comparing entrants==========
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Entrant)) return false;
+        return id.equals(((Entrant) o).id);
+    }
+
+
 }
