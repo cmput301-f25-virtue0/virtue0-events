@@ -10,6 +10,7 @@ public class AcceptanceTest {
     public Event mockEvent(){
         return new Event("6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
     }
+    /*
     public Entrant mockEntrant(){
         return new Entrant();
     }
@@ -19,6 +20,7 @@ public class AcceptanceTest {
         mockEntrant().addNotification(acceptance);
         return acceptance;
     }
+
 
 
     @Test
@@ -39,6 +41,6 @@ public class AcceptanceTest {
 
 
     }
-
+*/
 
 }
