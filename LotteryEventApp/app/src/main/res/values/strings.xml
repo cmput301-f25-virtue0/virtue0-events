@@ -1,4 +1,31 @@
 <resources>
     <string name="app_name">LotteryEventApp</string>
     <string name="events">Events</string>
+    <string name="create_event">Create event</string>
+    <string name="poster_optional">Optional Poster</string>
+    <string name="tap_to_upload">Tap to upload</string>
+    <string name="event_name">Event name</string>
+    <string name="event_description">Event description</string>
+    <string name="location">Location</string>
+    <string name="date_time">Date and time</string>
+    <string name="registration_opens">Registration opens</string>
+    <string name="registration_deadline">Registration deadline</string>
+    <string name="capacity">Capacity</string>
+    <string name="sample_size">Sample size</string>
+    <string name="optional_waitlist_limit">Optional waitlist limit</string>
+    <string name="require_geolocation">Require geolocation</string>
+    <string name="geo_help">Geolocation help</string>
+    <string name="save_draft">Save draft</string>
+    <string name="publish_generate_qr">Publish and generate QR code</string>
+    <string name="edit_event">Edit event</string>
+    <string name="download_qr_code">Download QR code</string>
+    <string name="save_changes">Save changes</string>
+    <string name="map">Map</string>
+    <string name="do_lottery">Do lottery</string>
+    <string name="chosen">Chosen</string>
+    <string name="enrolled">Enrolled</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="applicants">Applicants list</string>
+    <string name="do_lottery_redraw">Draw lottery</string>
+    <string name="export_csv">Export CSV</string>
 </resources>
