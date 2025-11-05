@@ -103,7 +103,7 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.newEventButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent());
+                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(0));
                 }
             });
         }

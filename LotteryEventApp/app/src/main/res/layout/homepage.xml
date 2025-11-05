@@ -91,14 +91,15 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/filterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginBottom="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:srcCompat="@drawable/filter"/>
+        android:id="@+id/filterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:maxImageSize="40dp"
+        app:srcCompat="@drawable/filter" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/QRCodeButton"
@@ -109,18 +110,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/filterButton"
             app:srcCompat="@drawable/qr_code"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/newEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="8dp"
         android:tint="@color/colorToolBar"
         app:backgroundTint="#FFFFFF"
+        app:fabCustomSize="50dp"
         app:fabSize="auto"
         app:layout_constraintBottom_toBottomOf="@+id/Profile"
         app:layout_constraintEnd_toEndOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/Profile"
         app:maxImageSize="30dp"
-        app:srcCompat="@drawable/add"/>
+        app:srcCompat="@drawable/add" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

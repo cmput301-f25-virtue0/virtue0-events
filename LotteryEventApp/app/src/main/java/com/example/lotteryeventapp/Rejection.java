@@ -33,5 +33,10 @@ public class Rejection extends Notification{
         return entrant;
     }
 
+    @Override
+    public String getMessage() {
+        return "";
+    }
+
 
 }
