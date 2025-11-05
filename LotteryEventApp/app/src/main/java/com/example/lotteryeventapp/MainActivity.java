@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp;
 
 import android.os.Bundle;
+import android.provider.Settings;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             showFragment(new F_SelectRole());
         }
+
+        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        Entrant.Profile profile = new Entrant.Profile("Daniel", "dk8@ualberta.ca", "123-456-7890");
+        Entrant entrant = new Entrant(deviceID, profile);
     }
 
     public void showFragment(Fragment newFragment) {

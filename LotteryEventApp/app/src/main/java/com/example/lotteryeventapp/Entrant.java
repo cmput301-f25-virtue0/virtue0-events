@@ -1,5 +1,7 @@
 package com.example.lotteryeventapp;
 
+import android.provider.Settings;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
