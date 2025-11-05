@@ -25,7 +25,6 @@ public class F_Profile extends Fragment {
             @Override
             public void onClick(View view) {
                 ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
-            }
-        });
+            }});
     }
 }

@@ -106,6 +106,7 @@ public class F_CreateEditEvent extends Fragment {
                 myText = view.findViewById(R.id.etWaitlistLimit);
                 int waitlist_limit = Integer.parseInt(Objects.requireNonNull(myText.getText()).toString());
                 MaterialSwitch mySwitch = view.findViewById(R.id.switchGeo);
+
                 //Create the new event object
                 boolean track_geo = mySwitch.isChecked();
                 Event makeEvent = new Event(title, date_time, location, registration_deadline,
