@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.tabs.TabLayout;
 
 public class F_HomePage extends Fragment {
     private int role;
@@ -26,6 +29,36 @@ public class F_HomePage extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
+        ViewPager2 pager = view.findViewById(R.id.view_pager);
+        TabLayout tabs = view.findViewById(R.id.tab_layout);
+        pager.setAdapter(new ViewPagerAdapter(this));
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                pager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                tabs.getTabAt(position).select();
+            }
+        });
+
+
         // Set up page based on role
         if (role == 0) {
             view.findViewById(R.id.Notification).setVisibility(View.VISIBLE);
