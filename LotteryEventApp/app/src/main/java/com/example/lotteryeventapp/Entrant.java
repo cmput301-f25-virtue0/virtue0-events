@@ -8,7 +8,8 @@ public class Entrant {
     private final String id; //String for now, implement id by mobile device later
 
     private ArrayList<Notification> notifications = new ArrayList<>();
-    public Entrant(String id, Profile profile){
+
+    public Entrant(String id, Profile profile) {
 
         this.id = Objects.requireNonNull(id, "id");
         this.profile = Objects.requireNonNull(profile, "profile");
@@ -17,25 +18,26 @@ public class Entrant {
     public String getId() {
         return id;
     }
+
     public Profile getProfile() {
         return profile;
     }
-
 
 
     public ArrayList<Notification> getNotifications() {
         return notifications;
     }
 
-    public void removeNotification(Notification notification){
+    public void removeNotification(Notification notification) {
         this.notifications.remove(notification);
     }
-    public void addNotification(Notification notification){
+
+    public void addNotification(Notification notification) {
         this.notifications.add(notification);
     }
 
     // ============================= Profile ===============================
-    public static class Profile{
+    public static class Profile {
         private String name;
         private String email;
         private String phone;//Keep the phone number as string type?
@@ -45,6 +47,7 @@ public class Entrant {
             setEmail(email);
             setPhone(phone);
         }
+
         public String name() {
             return name;
         }
@@ -72,6 +75,7 @@ public class Entrant {
 
         }
     }
+
     //==========================Updating Profile========================
     public void updateProfile(String name, String email, String phone) {
         profile.setName(name);
@@ -82,16 +86,8 @@ public class Entrant {
     public void deleteProfile() {
     }
 
-    //============================Accept/Decline Invitation==============
-    private boolean acceptInvitation(Notification notification) {
-        return notification != null && notification.accept(this); //Add accept in notification class
-    }
 
-    private boolean declineInvitation(Notification notification) {
-        return notification != null && notification.decline(this); //Add decline in notification class
-    }
-
-    //===========================Method for comparing entrants==========
+    //===========================Method for comparing entrants if ever needed
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
