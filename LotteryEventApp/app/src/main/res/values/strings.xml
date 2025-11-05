@@ -34,4 +34,11 @@
     <string name="entrant">Entrant</string>
     <string name="organizer">Organizer</string>
     <string name="admin">Administrator</string>
+    <string name="choose_a_role_to_continue">Choose a role to continue</string>
+    <string name="sign_in_as">Sign in as</string>
+    <string name="browse_events">Browse Events\n</string>
+    <string name="my_events">My Events</string>
+    <string name="add_events">Add events</string>
+    <string name="notifications">Notifications</string>
+    <string name="profile">Profile</string>
 </resources>

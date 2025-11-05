@@ -7,6 +7,7 @@ import java.util.Random;
  * This class contains all of the information and functionality of an Event
  */
 public class Event {
+    private String title;
 
     private String date_time;
     private String location;
@@ -33,8 +34,9 @@ public class Event {
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public Event(String date_time, String location, String registration_deadline, String details,
+    public Event(String title, String date_time, String location, String registration_deadline, String details,
                   boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+        this.title = title;
         this.date_time = date_time;
         this.location = location;
         this.registration_deadline = registration_deadline;
@@ -50,10 +52,20 @@ public class Event {
         this.drawn = false;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     /**
      * get date and time of Event
      * @return date and time of event
      */
+
+
     public String getDate_time() {
         return date_time;
     }
