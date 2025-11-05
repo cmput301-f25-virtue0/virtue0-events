@@ -202,8 +202,8 @@
                             android:id="@+id/etWhen"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:focusable="false"
                             android:clickable="true"
+                            android:focusable="true"
                             tools:text="Mon, Jan 6 · 6:00–7:30 PM" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -226,8 +226,8 @@
                                 android:id="@+id/etRegOpens"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:focusable="false"
                                 android:clickable="true"
+                                android:focusable="true"
                                 tools:text="Dec 1, 2024" />
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -249,8 +249,8 @@
                                 android:id="@+id/etRegCloses"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:focusable="false"
                                 android:clickable="true"
+                                android:focusable="true"
                                 tools:text="Dec 15, 2024" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
