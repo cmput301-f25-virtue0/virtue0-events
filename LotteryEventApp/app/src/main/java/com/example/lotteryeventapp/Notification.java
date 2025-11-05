@@ -14,10 +14,8 @@ public abstract class Notification {
 
     /**
      * Constructs a generic notification.
-     * @param event the event this notification is about
-     * @param entrant the entrant receiving the notification
      */
-    public Notification(Event event, Entrant entrant) {
+    public Notification() {
         this.event = event;
         this.entrant = entrant;
         this.sent = false;

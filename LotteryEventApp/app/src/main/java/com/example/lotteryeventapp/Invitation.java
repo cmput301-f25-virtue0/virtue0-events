@@ -13,7 +13,7 @@ public class Invitation extends Notification{
      * @param entrant the Entrant that could sign up for the Event
      */
     public Invitation(Event event, Entrant entrant){
-        super(event, entrant);
+        super();
         this.event = event;
         this.entrant = entrant;
     }
@@ -32,6 +32,11 @@ public class Invitation extends Notification{
      */
     public Entrant getEntrant() {
         return entrant;
+    }
+
+    @Override
+    public String getMessage() {
+        return "";
     }
 
     /**
