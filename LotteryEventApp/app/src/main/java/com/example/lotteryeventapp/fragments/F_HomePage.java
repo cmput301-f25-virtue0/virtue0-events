@@ -1,4 +1,4 @@
-package com.example.lotteryeventapp;
+package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.R;
+import com.example.lotteryeventapp.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class F_HomePage extends Fragment {
