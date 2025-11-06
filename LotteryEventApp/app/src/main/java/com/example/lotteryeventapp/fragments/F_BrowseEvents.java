@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
+import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +36,23 @@ public class F_BrowseEvents extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
 
+        if (role != 2) {
+            v.findViewById(R.id.toolbar).setVisibility(View.GONE);
+
+        }
+
+        MaterialToolbar toolbar = v.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(role));
+            }
+        });
+
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+
 
         // Demo "global" events
         List<Event> data = Arrays.asList(
@@ -48,9 +65,6 @@ public class F_BrowseEvents extends Fragment {
         );
 
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
-                Toast.makeText(requireContext(),
-                        "Browse tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()*/
         { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);
