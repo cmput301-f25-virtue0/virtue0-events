@@ -24,11 +24,9 @@ public class Entrant {
      * @throws NullPointerException if id or profile is null
      */
     public Entrant(String id, Profile profile) {
-
         this.id = Objects.requireNonNull(id, "id");
         this.profile = Objects.requireNonNull(profile, "profile");
     }
-
 
     /**
      * @return entrant's String type ID

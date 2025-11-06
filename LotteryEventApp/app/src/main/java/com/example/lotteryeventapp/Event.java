@@ -8,7 +8,7 @@ import java.util.Random;
  */
 public class Event {
     private String title;
-
+    private String uid;
     private String date_time;
     private String location;
     private String registration_deadline;
@@ -34,8 +34,27 @@ public class Event {
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public Event(String title, String date_time, String location, String registration_deadline, String details,
+    public Event(String title, String uid, String date_time, String location, String registration_deadline, String details,
                   boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+        this.title = title;
+        this.uid = uid;
+        this.date_time = date_time;
+        this.location = location;
+        this.registration_deadline = registration_deadline;
+        this.details = details;
+        this.track_geolocation = track_geolocation;
+        this.will_automatically_redraw = will_automatically_redraw;
+        this.waitlist_limit = waitlist_limit;
+        this.attendee_limit = attendee_limit;
+        this.waitlist = new ArrayList<>();
+        this.attendee_list = new ArrayList<>();
+        this.cancelled_list = new ArrayList<>();
+        this.invited_list = new ArrayList<>();
+        this.drawn = false;
+    }
+
+    public Event(String title, String date_time, String location, String registration_deadline, String details,
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
         this.title = title;
         this.date_time = date_time;
         this.location = location;
@@ -64,8 +83,6 @@ public class Event {
      * get date and time of Event
      * @return date and time of event
      */
-
-
     public String getDate_time() {
         return date_time;
     }

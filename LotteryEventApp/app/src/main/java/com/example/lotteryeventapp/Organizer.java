@@ -6,11 +6,16 @@ import java.util.ArrayList;
  * This class contains a collection of events created by an organizer
  */
 public class Organizer {
+    private String uid;
     private ArrayList<Event> events;
 
     /**
      * An Organizer is created with no Events
      */
+    public Organizer(String uid){
+        this.uid = uid;
+        this.events = new ArrayList<>();
+    }
     public Organizer(){
         this.events = new ArrayList<>();
     }

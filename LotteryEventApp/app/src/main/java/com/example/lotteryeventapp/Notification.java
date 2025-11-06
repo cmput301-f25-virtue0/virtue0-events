@@ -6,21 +6,13 @@ package com.example.lotteryeventapp;
  * should extend this class.
  */
 public abstract class Notification {
-
+    private String uid;
     protected Event event;
     protected Entrant entrant;
     private boolean sent;
     private boolean read;
 
-    /**
-     * Constructs a generic notification.
-     */
-    public Notification() {
-        this.event = event;
-        this.entrant = entrant;
-        this.sent = false;
-        this.read = false;
-    }
+
 
     /** Gets the event this notification refers to. */
     public Event getEvent() {

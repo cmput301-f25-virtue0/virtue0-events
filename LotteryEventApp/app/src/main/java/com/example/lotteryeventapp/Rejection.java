@@ -4,6 +4,7 @@ package com.example.lotteryeventapp;
  * This class is a Notification that the Entrant was rejected from the Event
  */
 public class Rejection extends Notification{
+    private String uid;
     private Event event;
     private Entrant entrant;
 
@@ -12,6 +13,12 @@ public class Rejection extends Notification{
      * @param event the Event the Entrant was rejected from
      * @param entrant the Entrant the Event rejected
      */
+    public Rejection(Event event, Entrant entrant,String uid){
+        this.uid = uid;
+        this.event = event;
+        this.entrant = entrant;
+    }
+
     public Rejection(Event event, Entrant entrant){
         this.event = event;
         this.entrant = entrant;
