@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 public class OrganizerTest {
     public Event mockEvent(){
-        return new Event("6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
+        return new Event("Shopping","6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
 
     }
     public Organizer mockOrganizer(){
