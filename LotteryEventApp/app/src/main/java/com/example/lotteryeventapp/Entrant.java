@@ -102,6 +102,7 @@ public class Entrant {
             setPhone(phone);
         }
 
+
         public String getName() {
             return name;
         }
