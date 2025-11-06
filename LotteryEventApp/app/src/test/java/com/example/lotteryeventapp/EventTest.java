@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class EventTest {
     public Event mockEvent(){
-        return new Event("6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
+        return new Event("Shopping","6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
 
     }
 
@@ -22,7 +22,7 @@ public class EventTest {
         assertEquals("12pm, February 14,2024",event.getRegistration_deadline());
         assertEquals("Stuff wont happen",event.getDetails());
         assertTrue(event.willTrack_geolocation());
-        assertTrue(event.isRedraw());
+        assertTrue(event.willAutomaticallyRedraw());
         assertEquals(10,event.getWaitlist_limit());
         assertEquals(15,event.getAttendee_limit());
 

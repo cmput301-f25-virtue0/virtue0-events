@@ -150,18 +150,20 @@
 
             <!-- Capacity / Join row -->
             <LinearLayout
+                android:id="@+id/layoutEntrant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/joinButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="join waiting list"
-                    app:cornerRadius="24dp"/>
+                    app:cornerRadius="24dp" />
+
                 <TextView
                     android:id="@+id/waitingListSize"
                     android:layout_width="wrap_content"
@@ -170,6 +172,32 @@
                     android:textAppearance="?attr/textAppearanceBody2"
                     tools:text="12 / 20" />
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutOrganizer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editEventBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Edit Event"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/applicantsBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="1"
+                    android:text="Applicants"
+                    app:cornerRadius="8dp" />
             </LinearLayout>
 
         </LinearLayout>

@@ -4,6 +4,7 @@ package com.example.lotteryeventapp;
  * This class is a notification that the Entrant has been accepted into the Event
  */
 public class Invitation extends Notification{
+    private String uid;
     private Event event;
     private Entrant entrant;
 
@@ -12,6 +13,11 @@ public class Invitation extends Notification{
      * @param event the Event the Entrant could sign up for
      * @param entrant the Entrant that could sign up for the Event
      */
+    public Invitation(Event event, Entrant entrant,String uid){
+        this.uid = uid;
+        this.event = event;
+        this.entrant = entrant;
+    }
     public Invitation(Event event, Entrant entrant){
         this.event = event;
         this.entrant = entrant;
@@ -33,6 +39,11 @@ public class Invitation extends Notification{
         return entrant;
     }
 
+    @Override
+    public String getMessage() {
+        return "";
+    }
+
     /**
      * Entrant chooses to join the attending list
      */
@@ -46,6 +57,7 @@ public class Invitation extends Notification{
      */
     public void decline(){
         this.event.cancelledListAdd(this.entrant);
+        this.event.handleInvitationCancelled(this.entrant);
         this.entrant.removeNotification(this);
     }
 }

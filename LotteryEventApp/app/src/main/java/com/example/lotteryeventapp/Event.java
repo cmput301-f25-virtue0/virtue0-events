@@ -1,23 +1,26 @@
 package com.example.lotteryeventapp;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * This class contains all of the information and functionality of an Event
  */
 public class Event {
-
+    private String title;
+    private String uid;
     private String date_time;
     private String location;
     private String registration_deadline;
     private String details;
     private boolean track_geolocation;
-    private boolean redraw;
+    private boolean will_automatically_redraw;
     private int waitlist_limit;
     private int attendee_limit;
     private ArrayList<Entrant> waitlist;
     private ArrayList<Entrant> attendee_list;
     private ArrayList<Entrant> cancelled_list;
+    private ArrayList<Entrant> invited_list;
     private boolean drawn;
 
     /**
@@ -27,24 +30,53 @@ public class Event {
      * @param registration_deadline registration deadline of an event
      * @param details details and information about an Event such as: topic, difficulty, age range etc.
      * @param track_geolocation whether the Event would like to track the waitlist Entrants location
-     * @param redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
+     * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public Event(String date_time, String location, String registration_deadline, String details,
-                  boolean track_geolocation, boolean redraw, int waitlist_limit, int attendee_limit){
+    public Event(String title, String uid, String date_time, String location, String registration_deadline, String details,
+                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+        this.title = title;
+        this.uid = uid;
         this.date_time = date_time;
         this.location = location;
         this.registration_deadline = registration_deadline;
         this.details = details;
         this.track_geolocation = track_geolocation;
-        this.redraw = redraw;
+        this.will_automatically_redraw = will_automatically_redraw;
         this.waitlist_limit = waitlist_limit;
         this.attendee_limit = attendee_limit;
         this.waitlist = new ArrayList<>();
         this.attendee_list = new ArrayList<>();
         this.cancelled_list = new ArrayList<>();
+        this.invited_list = new ArrayList<>();
         this.drawn = false;
+    }
+
+    public Event(String title, String date_time, String location, String registration_deadline, String details,
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+        this.title = title;
+        this.date_time = date_time;
+        this.location = location;
+        this.registration_deadline = registration_deadline;
+        this.details = details;
+        this.track_geolocation = track_geolocation;
+        this.will_automatically_redraw = will_automatically_redraw;
+        this.waitlist_limit = waitlist_limit;
+        this.attendee_limit = attendee_limit;
+        this.waitlist = new ArrayList<>();
+        this.attendee_list = new ArrayList<>();
+        this.cancelled_list = new ArrayList<>();
+        this.invited_list = new ArrayList<>();
+        this.drawn = false;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     /**
@@ -128,14 +160,20 @@ public class Event {
     }
 
 
-    public boolean isRedraw() {
-        return redraw;
+    public boolean willAutomaticallyRedraw() {
+        return will_automatically_redraw;
     }
 
-    public void setRedraw(boolean redraw) {
-        this.redraw = redraw;
+    public void setWillAutomaticallyRedraw(boolean will_automatically_redraw) {
+        this.will_automatically_redraw = will_automatically_redraw;
     }
-
+    /**
+     * Returns the current number of Entrants in the waitlist.
+     * @return number of Entrants in waitlist
+     */
+    public int getWaitlistAmount() {
+        return waitlist.size();
+    }
     /**
      * gets the waitlist limit
      * @return the waitlist limit
@@ -191,6 +229,12 @@ public class Event {
     public ArrayList<Entrant> getCancelled_list() {
         return cancelled_list;
     }
+    /**
+     * gets the invited list containing Entrants who have been drawn
+     * but haven't confirmed attendance and invites are pending
+     * @return list of invited Entrants invited to the Event
+     */
+    public ArrayList<Entrant> getInvited_list() { return invited_list; }
 
     /**
      * add an Entrant to the waitlist of the Event
@@ -209,13 +253,49 @@ public class Event {
     }
 
     /**
-     * add an Entrant to the cancelled_list
+     * add an Entrant to the cancelled_list and redraws automaticallu after selected Entrant cancels
      * @param entrant Entrant to be added to the cancelled_list
      */
-    public void cancelledListAdd(Entrant entrant){
+    public void cancelledListAdd(Entrant entrant) {
         cancelled_list.add(entrant);
+        attendee_list.remove(entrant);
     }
 
+    /**
+     * adds an Entrant to the invited list
+     * @param cancelledEntrant Entrant to be added to the invited list
+     */
+    public void handleInvitationCancelled(Entrant cancelledEntrant) {
+        invited_list.remove(cancelledEntrant);
+        cancelledListAdd(cancelledEntrant);
+
+        if (will_automatically_redraw && !waitlist.isEmpty()) {
+            Entrant replacement = waitlist.remove(0);
+            invited_list.add(replacement);
+        }
+    }
+    /**
+     * Conducts a lottery draw: randomly selects a number of entrants from
+     * the waitlist (up to available attendee spots), removes them from the waitlist,
+     * and moves them to the invited list.
+     */
+    public void doLottery() {
+        if (waitlist.isEmpty()) {
+            System.out.println("No entrants on the waitlist to draw from.");
+            return;
+        }
+
+        Random rand = new Random();
+        int numToDraw = Math.min(attendee_limit - invited_list.size(), waitlist.size());
+
+        for (int i = 0; i < numToDraw; i++) {
+            int randomIndex = rand.nextInt(waitlist.size());
+            Entrant drawnEntrant = waitlist.remove(randomIndex);
+            invited_list.add(drawnEntrant);
+        }
+
+        drawn = true;
+    }
     /**
      * tells whether the Event has already drawn names yet
      * @return whether the Event has already drawn names
@@ -239,18 +319,18 @@ public class Event {
      * @param registration_deadline registration deadline of an event
      * @param details details and information about an Event such as: topic, difficulty, age range etc.
      * @param track_geolocation whether the Event would like to track the waitlist Entrants location
-     * @param redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
+     * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
     public void editEvent(String date_time, String location, String registration_deadline, String details,
-                          boolean track_geolocation, boolean redraw, int waitlist_limit, int attendee_limit){
+                          boolean track_geolocation, boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
         setDate_time(date_time);
         setLocation(location);
         setRegistration_deadline(registration_deadline);
         setDetails(details);
         setTrack_geolocation(track_geolocation);
-        setRedraw(redraw);
+        setWillAutomaticallyRedraw(will_automatically_redraw);
         setWaitlist_limit(waitlist_limit);
         setAttendee_limit(attendee_limit);
     }
