@@ -56,6 +56,7 @@ public class Event {
     public Event(String title, String date_time, String location, String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
         this.title = title;
+        this.uid = "";
         this.date_time = date_time;
         this.location = location;
         this.registration_deadline = registration_deadline;
@@ -69,6 +70,14 @@ public class Event {
         this.cancelled_list = new ArrayList<>();
         this.invited_list = new ArrayList<>();
         this.drawn = false;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getTitle() {

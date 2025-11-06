@@ -20,6 +20,10 @@ public class Organizer {
         this.events = new ArrayList<>();
     }
 
+    public String getUid() {
+        return uid;
+    }
+
     /**
      * add an Event to the Organizer
      * @param event the Event to be added to the Organizer

@@ -13,26 +13,26 @@ import java.util.Objects;
 
 public class Entrant {
     private Profile profile;
-    private final String id;
+    private final String uid;
     private ArrayList<Notification> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
 
     /**
      * Constructs a new entrant
-     * @param id a unique identifier from their device
+     * @param uid a unique identifier from their device
      * @param profile a profile object containing contact information
      * @throws NullPointerException if id or profile is null
      */
-    public Entrant(String id, Profile profile) {
-        this.id = Objects.requireNonNull(id, "id");
+    public Entrant(String uid, Profile profile) {
+        this.uid = Objects.requireNonNull(uid, "uid");
         this.profile = Objects.requireNonNull(profile, "profile");
     }
 
     /**
      * @return entrant's String type ID
      */
-    public String getId() {
-        return id;
+    public String getUid() {
+        return uid;
     }
 
     /**
@@ -102,15 +102,15 @@ public class Entrant {
             setPhone(phone);
         }
 
-        public String name() {
+        public String getName() {
             return name;
         }
 
-        public String email() {
+        public String getEmail() {
             return email;
         }
 
-        public String phone() {
+        public String getPhone() {
             return phone;
         }
 
@@ -171,7 +171,7 @@ public class Entrant {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Entrant)) return false;
-        return id.equals(((Entrant) o).id);
+        return uid.equals(((Entrant) o).uid);
     }
 
     /**
@@ -180,7 +180,7 @@ public class Entrant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(uid);
     }
 
 }

@@ -23,9 +23,9 @@ public class EntrantTest {
         Entrant entrant = new Entrant("device-123", mockProfile("Alice", "a@b.com", "111"));
         entrant.updateProfile("Bob", "bob@example.com", "222");
 
-        assertEquals("Bob", entrant.getProfile().name());
-        assertEquals("bob@example.com", entrant.getProfile().email());
-        assertEquals("222", entrant.getProfile().phone());
+        assertEquals("Bob", entrant.getProfile().getName());
+        assertEquals("bob@example.com", entrant.getProfile().getEmail());
+        assertEquals("222", entrant.getProfile().getPhone());
     }
 
     @Test

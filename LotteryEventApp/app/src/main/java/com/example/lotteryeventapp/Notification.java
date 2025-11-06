@@ -9,10 +9,39 @@ public abstract class Notification {
     private String uid;
     protected Event event;
     protected Entrant entrant;
+    private String message;
     private boolean sent;
     private boolean read;
 
+    public Notification(String uid, Event event, Entrant entrant, String msg) {
+        this.uid = uid;
+        this.event = event;
+        this.entrant = entrant;
+        this.message = msg;
+    }
 
+    public Notification(Event event, Entrant entrant, String msg) {
+        this.uid = "";
+        this.event = event;
+        this.entrant = entrant;
+        this.message = msg;
+    }
+
+    @Deprecated
+    public Notification(Event event, Entrant entrant) {
+        this.uid = "";
+        this.event = event;
+        this.entrant = entrant;
+        this.message = "";
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
     /** Gets the event this notification refers to. */
     public Event getEvent() {
@@ -59,5 +88,11 @@ public abstract class Notification {
      * Defines the message content of this notification.
      * Each subclass must override this to provide a message.
      */
-    public abstract String getMessage();
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void setMessage(String msg) {
+        this.message = msg;
+    }
 }

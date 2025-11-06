@@ -15,7 +15,7 @@ public class InvitationTest {
     }
 
     public Invitation mockInvitation(){
-        Invitation invitation =  new Invitation(mockEvent(),mockEntrant());
+        Invitation invitation =  new Invitation(mockEvent(),mockEntrant(), "");
         mockEntrant().addNotification(invitation);
         return invitation;
     }
