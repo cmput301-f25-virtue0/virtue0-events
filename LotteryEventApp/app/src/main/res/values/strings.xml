@@ -12,7 +12,7 @@
     <string name="registration_deadline">Registration deadline</string>
     <string name="capacity">Capacity</string>
     <string name="sample_size">Sample size</string>
-    <string name="optional_waitlist_limit">Optional waitlist limit</string>
+    <string name="optional_waitlist_limit">Waitlist limit</string>
     <string name="require_geolocation">Require geolocation</string>
     <string name="geo_help">Geolocation help</string>
     <string name="save_draft">Save draft</string>
