@@ -9,13 +9,20 @@ import com.example.lotteryeventapp.fragments.F_MyEvents;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
+    private int role;
+
+    public ViewPagerAdapter(@NonNull Fragment parent, int role) {
+        super(parent);
+        this.role = role;
+    }
+
     public ViewPagerAdapter(@NonNull Fragment parent) {
         super(parent);
     }
 
     @NonNull @Override
     public Fragment createFragment(int position) {
-        if (position == 0) return new F_BrowseEvents();
+        if (position == 0) return new F_BrowseEvents(role);
         return new F_MyEvents();
     }
 

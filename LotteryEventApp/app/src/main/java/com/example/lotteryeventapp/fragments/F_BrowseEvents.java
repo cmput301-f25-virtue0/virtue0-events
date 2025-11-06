@@ -20,7 +20,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_BrowseEvents extends Fragment {
+
+    private int role;
+
+    public F_BrowseEvents(int myRole) {
+        this.role = myRole;
+    }
+
     public F_BrowseEvents() {}
+
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
@@ -29,6 +37,7 @@ public class F_BrowseEvents extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
+
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -42,7 +51,7 @@ public class F_BrowseEvents extends Fragment {
                         "2024-12-20", "Paddling & safety essentials.", false, true, 60, 12)
         );
 
-        EventAdapter adapter = new EventAdapter(data, (event, pos) ->
+        EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
                 Toast.makeText(requireContext(),
                         "Browse tapped: " + event.getTitle(),
                         Toast.LENGTH_SHORT).show()

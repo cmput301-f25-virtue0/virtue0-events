@@ -1,40 +1,36 @@
 package com.example.lotteryeventapp.fragments;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
 
-public class F_Notification extends Fragment {
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
+public class F_ImagesList extends Fragment {
     private int role;
 
-    public F_Notification(int myRole) {
+    public F_ImagesList(int myRole) {
         this.role = myRole;
     }
 
-
-    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment & get the count text view
-        return inflater.inflate(R.layout.notifications, container, false);
+        return inflater.inflate(R.layout.admin_image_list, container, false);
+
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        // Detect button presses
-        view.findViewById(R.id.backArrowNotif).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
+                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
             }
         });
     }
