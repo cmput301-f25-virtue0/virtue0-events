@@ -15,7 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_BrowseEvents extends Fragment {
-    public F_BrowseEvents() {}
+    private int role;
+    public F_BrowseEvents(int myRole) {
+        this.role = myRole;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
@@ -38,9 +41,10 @@ public class F_BrowseEvents extends Fragment {
         );
 
         EventAdapter adapter = new EventAdapter(data, (event, pos) ->
-                Toast.makeText(requireContext(),
+                /*Toast.makeText(requireContext(),
                         "Browse tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_SHORT).show()*/
+        { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);
     }

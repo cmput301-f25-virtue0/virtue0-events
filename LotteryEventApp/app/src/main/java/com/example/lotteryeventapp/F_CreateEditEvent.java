@@ -52,7 +52,7 @@ public class F_CreateEditEvent extends Fragment {
             //Location
             myText = view.findViewById(R.id.etLocation);
             myText.setText(event.getLocation());
-            //Date
+            //DateTime
             myText = view.findViewById(R.id.etWhen);
             myText.setText(event.getDate_time());
             //Registration Start
