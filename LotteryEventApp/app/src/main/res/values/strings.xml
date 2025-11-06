@@ -41,4 +41,7 @@
     <string name="add_events">Add events</string>
     <string name="notifications">Notifications</string>
     <string name="profile">Profile</string>
+    <string name="profiles">Profiles</string>
+    <string name="images">Images</string>
+    <string name="delete">Delete</string>
 </resources>
