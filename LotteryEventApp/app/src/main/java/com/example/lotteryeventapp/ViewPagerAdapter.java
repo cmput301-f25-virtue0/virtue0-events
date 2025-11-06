@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.example.lotteryeventapp.fragments.F_BrowseEvents;
+import com.example.lotteryeventapp.fragments.F_MyEvents;
+
 public class ViewPagerAdapter extends FragmentStateAdapter {
     private int role;
 

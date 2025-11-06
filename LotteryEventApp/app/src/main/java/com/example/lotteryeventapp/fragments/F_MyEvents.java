@@ -1,5 +1,5 @@
-// F_BrowseEvents.java
-package com.example.lotteryeventapp;
+// F_MyEvents.java
+package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,12 +11,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.EventAdapter;
+import com.example.lotteryeventapp.R;
+
 import java.util.Arrays;
 import java.util.List;
 
-public class F_BrowseEvents extends Fragment {
+public class F_MyEvents extends Fragment {
     private int role;
-    public F_BrowseEvents(int myRole) {
+    public F_MyEvents(int myRole) {
         this.role = myRole;
     }
 
@@ -30,19 +35,17 @@ public class F_BrowseEvents extends Fragment {
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Demo "global" events
+        // Demo "my events" (different set)
         List<Event> data = Arrays.asList(
-                new Event("Swim Lessons (Beginners)", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
-                        "2024-12-15", "Learn to swim safely.", false, true, 100, 20),
-                new Event("Intro to Piano", "Wed Jan 8 · 5:30–6:30 PM", "Music Room B",
-                        "2024-12-15", "Basics of piano playing.", false, false, 100, 25),
-                new Event("Canoe Safety Workshop", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
-                        "2024-12-20", "Paddling & safety essentials.", false, true, 60, 12)
+                new Event("My Registered: Swim Lessons", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
+                        "2024-12-15", "You’re on the waitlist.", false, true, 100, 20),
+                new Event("My Registered: Canoe Safety", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
+                        "2024-12-20", "Invitation pending.", false, true, 60, 12)
         );
 
         EventAdapter adapter = new EventAdapter(data, (event, pos) ->
                 /*Toast.makeText(requireContext(),
-                        "Browse tapped: " + event.getTitle(),
+                        "My Events tapped: " + event.getTitle(),
                         Toast.LENGTH_SHORT).show()*/
         { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );

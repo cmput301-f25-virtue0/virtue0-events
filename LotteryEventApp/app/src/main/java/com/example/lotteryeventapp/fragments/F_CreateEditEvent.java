@@ -1,16 +1,18 @@
-package com.example.lotteryeventapp;
+package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.R;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 
