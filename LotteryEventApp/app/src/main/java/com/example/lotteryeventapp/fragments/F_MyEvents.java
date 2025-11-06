@@ -20,11 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_MyEvents extends Fragment {
-
     private int role;
-
-
-    public F_MyEvents() {}
+    public F_MyEvents(int myRole) {
+        this.role = myRole;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
@@ -47,7 +46,8 @@ public class F_MyEvents extends Fragment {
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
                 Toast.makeText(requireContext(),
                         "My Events tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_SHORT).show()*/
+        { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);
     }

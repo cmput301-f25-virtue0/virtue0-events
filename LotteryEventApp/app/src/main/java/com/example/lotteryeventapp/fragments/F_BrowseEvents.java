@@ -20,14 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_BrowseEvents extends Fragment {
-
     private int role;
-
     public F_BrowseEvents(int myRole) {
         this.role = myRole;
     }
-
-    public F_BrowseEvents() {}
 
 
     @Nullable @Override
@@ -54,7 +50,8 @@ public class F_BrowseEvents extends Fragment {
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
                 Toast.makeText(requireContext(),
                         "Browse tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_SHORT).show()*/
+        { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);
     }

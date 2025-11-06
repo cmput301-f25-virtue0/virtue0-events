@@ -61,6 +61,13 @@ public class F_HomePage extends Fragment {
             }
         });
 
+        //Back button
+        view.findViewById(R.id.backButtonHome).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) requireActivity()).showFragment(new F_SelectRole());
+            }
+        });
 
         // Set up page based on role
         if (role == 0) {
