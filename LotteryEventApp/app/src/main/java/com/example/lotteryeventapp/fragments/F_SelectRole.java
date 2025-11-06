@@ -1,4 +1,4 @@
-package com.example.lotteryeventapp;
+package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.R;
 
 public class F_SelectRole extends Fragment {
     @Override

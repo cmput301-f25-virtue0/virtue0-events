@@ -1,4 +1,4 @@
-package com.example.lotteryeventapp;
+package com.example.lotteryeventapp.fragments;
 
 import android.app.Notification;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.R;
 
 public class F_Acceptance extends Fragment {
     private Notification notif;
