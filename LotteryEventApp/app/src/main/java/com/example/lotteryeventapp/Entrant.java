@@ -14,7 +14,7 @@ import java.util.Objects;
 public class Entrant {
     private Profile profile;
     private final String uid;
-    private ArrayList<Notification> notifications = new ArrayList<>();
+    private ArrayList<String> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
 
     /**
@@ -45,14 +45,14 @@ public class Entrant {
     /**
      * @return array of notification objects
      */
-    public ArrayList<Notification> getNotifications() {
+    public ArrayList<String> getNotifications() {
         return notifications;
     }
 
     /**
      * @param notification to remove notification
      */
-    public void removeNotification(Notification notification) {
+    public void removeNotification(String notification) {
         this.notifications.remove(notification);
     }
 
@@ -60,7 +60,7 @@ public class Entrant {
      * entrants receiving notifications(invitation)
      * @param notification
      */
-    public void addNotification(Notification notification) {
+    public void addNotification(String notification) {
         this.notifications.add(notification);
     }
 

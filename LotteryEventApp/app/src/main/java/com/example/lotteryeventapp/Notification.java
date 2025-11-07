@@ -7,20 +7,20 @@ package com.example.lotteryeventapp;
  */
 public abstract class Notification {
     private String uid;
-    protected Event event;
-    protected Entrant entrant;
+    protected String event;
+    protected String entrant;
     private String message;
     private boolean sent;
     private boolean read;
 
-    public Notification(String uid, Event event, Entrant entrant, String msg) {
+    public Notification(String uid, String event, String entrant, String msg) {
         this.uid = uid;
         this.event = event;
         this.entrant = entrant;
         this.message = msg;
     }
 
-    public Notification(Event event, Entrant entrant, String msg) {
+    public Notification(String event, String entrant, String msg) {
         this.uid = "";
         this.event = event;
         this.entrant = entrant;
@@ -28,7 +28,7 @@ public abstract class Notification {
     }
 
     @Deprecated
-    public Notification(Event event, Entrant entrant) {
+    public Notification(String event, String entrant) {
         this.uid = "";
         this.event = event;
         this.entrant = entrant;
@@ -44,12 +44,12 @@ public abstract class Notification {
     }
 
     /** Gets the event this notification refers to. */
-    public Event getEvent() {
+    public String getEvent() {
         return event;
     }
 
     /** Gets the entrant who received the notification. */
-    public Entrant getEntrant() {
+    public String getEntrant() {
         return entrant;
     }
 
@@ -79,7 +79,8 @@ public abstract class Notification {
      */
     public void send() {
         if (entrant != null) {
-            entrant.addNotification(this);
+
+            entrant.addNotification(this.uid);
             markAsSent();
         }
     }
