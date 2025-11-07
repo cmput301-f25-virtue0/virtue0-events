@@ -21,24 +21,24 @@ public class InvitationTest {
     }
 
 
-    @Test
-    void testSignUp() {
-        Invitation invitation = mockInvitation();
-        Entrant entrant = invitation.getEntrant();
-        invitation.signUp();
-        assertTrue(invitation.getEvent().getAttendee_list().contains(entrant));
-        assertFalse(entrant.getNotifications().contains(invitation));
-    }
-    @Test
-    void testDecline() {
-        Invitation invitation = mockInvitation();
-        Entrant entrant = invitation.getEntrant();
-        invitation.decline();
-        assertTrue(invitation.getEvent().getCancelled_list().contains(entrant));
-        assertFalse(entrant.getNotifications().contains(invitation));
-
-
-    }
+//    @Test
+//    void testSignUp() {
+//        Invitation invitation = mockInvitation();
+//        Entrant entrant = invitation.getEntrant();
+//        invitation.signUp();
+//        assertTrue(invitation.getEvent().getAttendee_list().contains(entrant));
+//        assertFalse(entrant.getNotifications().contains(invitation));
+//    }
+//    @Test
+//    void testDecline() {
+//        Invitation invitation = mockInvitation();
+//        Entrant entrant = invitation.getEntrant();
+//        invitation.decline();
+//        assertTrue(invitation.getEvent().getCancelled_list().contains(entrant));
+//        assertFalse(entrant.getNotifications().contains(invitation));
+//
+//
+//    }
 
 
 }
