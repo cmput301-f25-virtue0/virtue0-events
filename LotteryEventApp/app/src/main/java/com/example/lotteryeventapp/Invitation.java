@@ -5,8 +5,7 @@ package com.example.lotteryeventapp;
  */
 public class Invitation extends Notification{
     private String uid;
-    private Event event;
-    private Entrant entrant;
+
 
     /**
      * A type of notification sent to an Entrant indicating that they can choose to attend the Event

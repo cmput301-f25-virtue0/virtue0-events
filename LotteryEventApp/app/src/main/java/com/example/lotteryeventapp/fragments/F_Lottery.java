@@ -17,42 +17,47 @@ import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-public class F_AdminProfiles extends Fragment {
-
-    private int role;
+public class F_Lottery extends Fragment {
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
-    //role = 0 for entrant, role = 1 for organizer, role = 2 for admin
-
-    public F_AdminProfiles(int myRole) {
-        this.role = myRole;
-    }
-
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-        // Inflate the layout for this fragment & get the count text view
-        return inflater.inflate(R.layout.admin_profile_list, container, false);
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.lottery, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView rv = view.findViewById(R.id.rvProfiles);
-        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        // Toolbar setup
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            // Go back to the Applicants screen
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
+        });
+
+        // --- Set up RecyclerView ---
+        RecyclerView rv = view.findViewById(R.id.rvEntrants);
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Create Dummy Data
         List<Entrant> data = Arrays.asList(
-                new Entrant("device1", new Entrant.Profile("Daniel", "dk8@ualberta.ca", "780-123-4567")),
-
-                new Entrant("device2", new Entrant.Profile("Alice", "a@b.com", "555-1234")),
-
-                new Entrant("device3", new Entrant.Profile("Bob", "b@c.com", "555-5678"))
+                new Entrant("device4",  new Entrant.Profile("Charlie", "charlie@example.com", "780-555-0101")),
+                new Entrant("device5",  new Entrant.Profile("Eva",     "eva@example.org",     "780-555-0102")),
+                new Entrant("device6",  new Entrant.Profile("Frank",   "frank@example.net",    "780-555-0103")),
+                new Entrant("device7",  new Entrant.Profile("Grace",   "grace@ualberta.ca",    "780-555-0104")),
+                new Entrant("device8",  new Entrant.Profile("Henry",   "henry@example.com",    "780-555-0105"))
         );
 
+        // Set adapter
         this.profileListener = new ProfileListAdapter.OnProfileClickListener() {
             @Override
             public void onProfileClick(Entrant entrant, int position) {
@@ -64,16 +69,10 @@ public class F_AdminProfiles extends Fragment {
                 Toast.makeText(requireContext(), "Delete clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
                 // TODO: Handle delete
             }
+
         };
 
         rv.setAdapter(new ProfileListAdapter(data, profileListener));
-
-
-        // Detect button presses
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmProfile);
-        toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
-        });
     }
 
 }

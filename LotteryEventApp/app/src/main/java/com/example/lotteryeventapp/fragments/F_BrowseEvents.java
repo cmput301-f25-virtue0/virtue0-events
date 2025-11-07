@@ -41,17 +41,14 @@ public class F_BrowseEvents extends Fragment {
 
         }
 
-        MaterialToolbar toolbar = v.findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(role));
-            }
-        });
 
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        MaterialToolbar toolbar = v.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v1 -> {
+            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+        });
 
 
         // Demo "global" events

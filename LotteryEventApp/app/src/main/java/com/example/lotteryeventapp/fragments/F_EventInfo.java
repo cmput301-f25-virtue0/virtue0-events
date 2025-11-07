@@ -86,6 +86,12 @@ public class F_EventInfo extends Fragment {
                 public void onClick(View view) {
                     ((MainActivity) requireActivity()).showFragment(new F_Applicants());
                 }});
+        } else if (role == 2) {
+            view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
+            view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
+
+
+
         }
 
         view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
