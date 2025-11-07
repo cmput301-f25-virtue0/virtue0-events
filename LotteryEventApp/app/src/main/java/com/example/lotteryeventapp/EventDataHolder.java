@@ -17,10 +17,10 @@ public class EventDataHolder {
     private boolean willAutomaticallyRedraw;
     private int waitlistLimit;
     private int attendeeLimit;
-    private ArrayList<String> waitlist;
-    private ArrayList<String> attendeeList;
-    private ArrayList<String> cancelledList;
-    private ArrayList<String> invitedList;
+    private ArrayList<String> waitlist = new ArrayList<String>();
+    private ArrayList<String> attendeeList = new ArrayList<String>();
+    private ArrayList<String> cancelledList = new ArrayList<String>();
+    private ArrayList<String> invitedList = new ArrayList<String>();
     private boolean drawn;
 
     public EventDataHolder(Event event) {

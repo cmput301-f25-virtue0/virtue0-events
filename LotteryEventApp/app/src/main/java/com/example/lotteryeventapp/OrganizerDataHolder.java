@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class OrganizerDataHolder {
     private String uid;
-    private ArrayList<String> events;
+    private ArrayList<String> events = new ArrayList<String>();;
 
     public OrganizerDataHolder(Organizer organizer) {
         this.uid = organizer.getUid();
