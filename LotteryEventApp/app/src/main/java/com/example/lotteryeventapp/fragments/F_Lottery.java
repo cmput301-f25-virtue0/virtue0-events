@@ -1,9 +1,11 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -22,6 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Lottery extends Fragment {
+    private DataModel model;
+    private Event event;
+
+    public F_Lottery(DataModel myModel) {
+        model = myModel;
+        event = model.getCurrentEvent();
+    }
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
@@ -41,7 +52,19 @@ public class F_Lottery extends Fragment {
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
             // Go back to the Applicants screen
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+        });
+
+        //Set up buttons
+        view.findViewById(R.id.btnDraw).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    event.doLottery();
+                } catch(InterruptedException e) {
+                    Log.e("F_Lottery", "doLottery threw error");
+                }
+            }
         });
 
         // --- Set up RecyclerView ---
@@ -49,13 +72,27 @@ public class F_Lottery extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Create Dummy Data
-        List<Entrant> data = Arrays.asList(
+        /*List<Entrant> data = Arrays.asList(
                 new Entrant("device4",  new Entrant.Profile("Charlie", "charlie@example.com", "780-555-0101")),
                 new Entrant("device5",  new Entrant.Profile("Eva",     "eva@example.org",     "780-555-0102")),
                 new Entrant("device6",  new Entrant.Profile("Frank",   "frank@example.net",    "780-555-0103")),
                 new Entrant("device7",  new Entrant.Profile("Grace",   "grace@ualberta.ca",    "780-555-0104")),
                 new Entrant("device8",  new Entrant.Profile("Henry",   "henry@example.com",    "780-555-0105"))
-        );
+        );*/
+        List<Entrant> data;
+        try {
+            data = event.getUsableWaitList();
+        } catch(InterruptedException e) {
+            Log.e("F_Lottery", "getUsableWaitList threw error");
+            data = new ArrayList<>();
+        }
+
+        // Set the text
+        TextView myText = view.findViewById(R.id.tvEventName);
+        myText.setText(event.getTitle());
+        myText = view.findViewById(R.id.tvWaitlistSize);
+        String waitText = data.size() + " " + getString(R.string.in_waitlist);
+        myText.setText(waitText);
 
         // Set adapter
         this.profileListener = new ProfileListAdapter.OnProfileClickListener() {

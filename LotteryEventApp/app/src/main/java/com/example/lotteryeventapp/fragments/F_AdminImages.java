@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.ImageListAdapter;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -21,9 +22,11 @@ import java.util.List;
 
 public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageClickListener {
     private int role;
+    private DataModel model;
 
-    public F_AdminImages(int myRole) {
+    public F_AdminImages(int myRole, DataModel myModel) {
         this.role = myRole;
+        model = myModel;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmImage);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
         });
     }
 

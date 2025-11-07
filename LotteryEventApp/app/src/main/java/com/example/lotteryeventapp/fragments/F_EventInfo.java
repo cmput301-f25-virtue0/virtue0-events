@@ -11,18 +11,24 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.Entrant;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 public class F_EventInfo extends Fragment {
     private int role;
     private Event event;
+    private Entrant entrant;
+    private DataModel model;
 
     //role = 0 for entrant, role = 1 for organizer
-    public F_EventInfo(int myRole, Event myEvent) {
+    public F_EventInfo(int myRole, DataModel myModel) {
         this.role = myRole;
-        event = myEvent;
+        model = myModel;
+        event = model.getCurrentEvent();
+        entrant = model.getCurrentEntrant();
     }
 
     @Override
@@ -70,12 +76,13 @@ public class F_EventInfo extends Fragment {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
+                    //event.waitlistAdd(entrant); todo: convert entrant to correct string format
                 }});
 
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
+                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
                 }});
         }
         else if (role == 1) {
@@ -86,18 +93,18 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(1, event));
+                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(1, model));
                 }});
 
             view.findViewById(R.id.applicantsBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Applicants());
+                    ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
                 }});
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
+                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
                 }});
         } else if (role == 2) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
@@ -107,7 +114,7 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_BrowseEvents(2));
+                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(2, model));
                 }});
 
         }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class EventTest {
     public Event mockEvent(){
-        return new Event("Shopping","6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
+        return new Event("shopping","6:00pm, January 27, 2025", "123","Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
 
     }
 

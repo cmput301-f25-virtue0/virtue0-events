@@ -1,9 +1,11 @@
 package com.example.lotteryeventapp;
 
 import android.provider.Settings;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This class represents the user(entrants) that participate in the events.  Each entrant has
@@ -13,26 +15,26 @@ import java.util.Objects;
 
 public class Entrant {
     private Profile profile;
-    private final String id;
-    private ArrayList<Notification> notifications = new ArrayList<>();
+    private final String uid;
+    private ArrayList<String> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
 
     /**
      * Constructs a new entrant
-     * @param id a unique identifier from their device
+     * @param uid a unique identifier from their device
      * @param profile a profile object containing contact information
      * @throws NullPointerException if id or profile is null
      */
-    public Entrant(String id, Profile profile) {
-        this.id = Objects.requireNonNull(id, "id");
+    public Entrant(String uid, Profile profile) {
+        this.uid = Objects.requireNonNull(uid, "uid");
         this.profile = Objects.requireNonNull(profile, "profile");
     }
 
     /**
      * @return entrant's String type ID
      */
-    public String getId() {
-        return id;
+    public String getUid() {
+        return uid;
     }
 
     /**
@@ -45,14 +47,44 @@ public class Entrant {
     /**
      * @return array of notification objects
      */
-    public ArrayList<Notification> getNotifications() {
+    public ArrayList<String> getNotifications() {
+        return notifications;
+    }
+    public ArrayList<Notification> getUsableNotifications() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Notification> notifications = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getNotifications().size());
+        for (String notification_id: getNotifications()) {
+            model.getNotification(notification_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    Notification notification = (Notification) obj;
+                    notifications.add(notification);
+                    latch.countDown();
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
         return notifications;
     }
 
     /**
      * @param notification to remove notification
      */
-    public void removeNotification(Notification notification) {
+    public void removeNotification(String notification) {
         this.notifications.remove(notification);
     }
 
@@ -60,7 +92,7 @@ public class Entrant {
      * entrants receiving notifications(invitation)
      * @param notification
      */
-    public void addNotification(Notification notification) {
+    public void addNotification(String notification) {
         this.notifications.add(notification);
     }
 
@@ -101,7 +133,6 @@ public class Entrant {
             setEmail(email);
             setPhone(phone);
         }
-
 
         public String getName() {
             return name;
@@ -153,13 +184,35 @@ public class Entrant {
         profile.setName(name);
         profile.setEmail(email);
         profile.setPhone(phone);
+        DataModel model = new DataModel();
+        model.setEntrant(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                Log.d("Firebase", "written");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
     }
 
     /**
      * deletes entrant's profile
      */
     public void deleteProfile() {
-        // TODO: Implement profile deletion once database is setup
+        DataModel model = new DataModel();
+        model.deleteEntrant(this, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
 
 
@@ -172,7 +225,7 @@ public class Entrant {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Entrant)) return false;
-        return id.equals(((Entrant) o).id);
+        return uid.equals(((Entrant) o).uid);
     }
 
     /**
@@ -181,7 +234,7 @@ public class Entrant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(uid);
     }
 
 }

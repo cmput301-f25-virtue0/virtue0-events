@@ -15,16 +15,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Organizer;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class F_MyEvents extends Fragment {
     private int role;
-    public F_MyEvents(int myRole) {
+    private Organizer org;
+    private DataModel model;
+    public F_MyEvents(int myRole, DataModel myModel) {
         this.role = myRole;
+        model = myModel;
+        org = model. getCurrentOrganizer();
     }
 
     @Nullable @Override
@@ -43,15 +50,18 @@ public class F_MyEvents extends Fragment {
 
 
         // Demo "my events" (different set)
-        List<Event> data = Arrays.asList(
+        /*List<Event> data = Arrays.asList(
                 new Event("My Registered: Swim Lessons", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
                         "2024-12-15", "You’re on the waitlist.", false, true, 100, 20),
                 new Event("My Registered: Canoe Safety", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
                         "2024-12-20", "Invitation pending.", false, true, 60, 12)
-        );
+        );*/
+        List<Event> data = new ArrayList<>(); //org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
 
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
-        { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
+        {
+            model.setCurrentEvent(event);
+            ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, model)); }
         );
         rv.setAdapter(adapter);
     }

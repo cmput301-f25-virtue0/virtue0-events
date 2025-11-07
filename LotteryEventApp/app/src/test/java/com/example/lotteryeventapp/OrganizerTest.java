@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 public class OrganizerTest {
     public Event mockEvent(){
-        return new Event("Shopping","6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
+        return new Event("Shopping","123","6:00pm, January 27, 2025", "Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
 
     }
     public Organizer mockOrganizer(){
@@ -19,8 +19,8 @@ public class OrganizerTest {
         Organizer organizer= mockOrganizer();
         Event event = mockEvent();
         assertEquals(0,organizer.getEvents().size());
-        organizer.addEvent(event);
+        organizer.addEvent(event.getUid());
         assertEquals(1,organizer.getEvents().size());
-        assertEquals(event,organizer.getEvents().get(0));
+        assertEquals(event.getUid(),organizer.getEvents().get(0));
     }
 }

@@ -9,10 +9,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class F_Map extends Fragment {
+    private DataModel model;
+    private Event event;
+
+    public F_Map(DataModel myModel) {
+        model = myModel;
+        event = model.getCurrentEvent();
+    }
 
     @Override
     public View onCreateView(
@@ -29,7 +38,7 @@ public class F_Map extends Fragment {
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
         });
 
         // TODO: Add map initialization logic here

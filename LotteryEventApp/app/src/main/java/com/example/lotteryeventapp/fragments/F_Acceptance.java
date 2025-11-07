@@ -1,6 +1,5 @@
 package com.example.lotteryeventapp.fragments;
 
-import android.app.Notification;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Invitation;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 public class F_Acceptance extends Fragment {
-    private Notification notif;
+    private Invitation notif; //Note: 'Notification' here does not seem to be the same as our notification class(?) Conflicting with base Android Class?
+    private DataModel model;
 
-    public F_Acceptance(Notification myNotif) {
+    public F_Acceptance(Invitation myNotif, DataModel myModel) {
         this.notif = myNotif;
+        model = myModel;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class F_Acceptance extends Fragment {
         view.findViewById(R.id.backArrowAccept).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
+                ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
             }
         });
 
@@ -45,7 +48,8 @@ public class F_Acceptance extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), getString(R.string.signed_up), Toast.LENGTH_SHORT).show();
-                ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
+                notif.signUp();
+                ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
             }
         });
 
@@ -53,7 +57,8 @@ public class F_Acceptance extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), getString(R.string.declined), Toast.LENGTH_SHORT).show();
-                ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
+                notif.decline();
+                ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
             }
         });
     }
