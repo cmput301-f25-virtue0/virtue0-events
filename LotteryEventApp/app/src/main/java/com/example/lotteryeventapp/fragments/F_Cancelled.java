@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -22,6 +25,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Cancelled extends Fragment {
+    private DataModel model;
+    private Event event;
+
+    public F_Cancelled(DataModel myModel) {
+        model = myModel;
+        event = model.getCurrentEvent();
+    }
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
@@ -40,13 +50,13 @@ public class F_Cancelled extends Fragment {
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
         });
 
         RecyclerView rv = view.findViewById(R.id.rvCancelled);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        List<Entrant> data = Arrays.asList(
+        /*List<Entrant> data = Arrays.asList(
                 new Entrant("device14", new Entrant.Profile("Noah",    "noah@example.net",     "780-555-0111")),
                 new Entrant("device15", new Entrant.Profile("Olivia",  "olivia@ualberta.ca",   "780-555-0112")),
                 new Entrant("device16", new Entrant.Profile("Parker",  "parker@example.com",   "780-555-0113")),
@@ -55,7 +65,14 @@ public class F_Cancelled extends Fragment {
                 new Entrant("device19", new Entrant.Profile("Sofia",   "sofia@ualberta.ca",    "780-555-0116")),
                 new Entrant("device20", new Entrant.Profile("Tyler",   "tyler@example.com",    "780-555-0117")),
                 new Entrant("device21", new Entrant.Profile("Uma",     "uma@example.org",      "780-555-0118"))
-        );
+        );*/
+        List<Entrant> data;
+        try {
+            data = event.getUsableCancelledList();
+        } catch(InterruptedException e) {
+            Log.e("F_Lottery", "getUsableCancelledList threw error");
+            data = new ArrayList<>();
+        }
 
         // Set adapter
         this.profileListener = new ProfileListAdapter.OnProfileClickListener() {

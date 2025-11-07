@@ -10,16 +10,20 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.example.lotteryeventapp.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class F_HomePage extends Fragment {
     private int role;
+    private DataModel model;
+
 
     //role = 0 for entrant, role = 1 for organizer
-    public F_HomePage(int myRole) {
+    public F_HomePage(int myRole, DataModel myModel) {
         this.role = myRole;
+        model = myModel;
     }
 
     @Override
@@ -35,7 +39,7 @@ public class F_HomePage extends Fragment {
 
         ViewPager2 pager = view.findViewById(R.id.view_pager);
         TabLayout tabs = view.findViewById(R.id.tab_layout);
-        pager.setAdapter(new ViewPagerAdapter(this, role));
+        pager.setAdapter(new ViewPagerAdapter(this, role, model));
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -65,7 +69,7 @@ public class F_HomePage extends Fragment {
         view.findViewById(R.id.backButtonHome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_SelectRole());
+                ((MainActivity) requireActivity()).showFragment(new F_SelectRole(model));
             }
         });
 
@@ -81,13 +85,13 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.Notification).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
+                    ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
                 }
             });
             view.findViewById(R.id.Profile).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Profile());
+                    ((MainActivity) requireActivity()).showFragment(new F_Profile(model));
                 }
             });
             view.findViewById(R.id.filterButton).setOnClickListener(new View.OnClickListener() {
@@ -113,7 +117,7 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.newEventButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(0));
+                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(0, model));
                 }
             });
         }

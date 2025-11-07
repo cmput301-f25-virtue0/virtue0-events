@@ -7,20 +7,49 @@ package com.example.lotteryeventapp;
  */
 public abstract class Notification {
     private String uid;
-    protected Event event;
-    protected Entrant entrant;
+    protected String event;
+    protected String entrant;
+    private String message;
     private boolean sent;
     private boolean read;
 
+    public Notification(String uid, String event, String entrant, String msg) {
+        this.uid = uid;
+        this.event = event;
+        this.entrant = entrant;
+        this.message = msg;
+    }
 
+    public Notification(String event, String entrant, String msg) {
+        this.uid = "";
+        this.event = event;
+        this.entrant = entrant;
+        this.message = msg;
+    }
+
+    @Deprecated
+    public Notification(String event, String entrant) {
+        this.uid = "";
+        this.event = event;
+        this.entrant = entrant;
+        this.message = "";
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
     /** Gets the event this notification refers to. */
-    public Event getEvent() {
+    public String getEvent() {
         return event;
     }
 
     /** Gets the entrant who received the notification. */
-    public Entrant getEntrant() {
+    public String getEntrant() {
         return entrant;
     }
 
@@ -44,20 +73,17 @@ public abstract class Notification {
         this.sent = true;
     }
 
-    /**
-     * Sends the notification to the entrant.
-     * (Assumes Entrant has addNotification(Notification) implemented.)
-     */
-    public void send() {
-        if (entrant != null) {
-            entrant.addNotification(this);
-            markAsSent();
-        }
-    }
+
 
     /**
      * Defines the message content of this notification.
      * Each subclass must override this to provide a message.
      */
-    public abstract String getMessage();
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void setMessage(String msg) {
+        this.message = msg;
+    }
 }

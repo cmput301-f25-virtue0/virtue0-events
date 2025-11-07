@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.ProfileListAdapter;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -24,13 +25,14 @@ import java.util.List;
 public class F_ProfilesList extends Fragment {
 
     private int role;
-
+    private DataModel model;
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
     //role = 0 for entrant, role = 1 for organizer, role = 2 for admin
 
-    public F_ProfilesList(int myRole) {
+    public F_ProfilesList(int myRole, DataModel myModel) {
         this.role = myRole;
+        model = myModel;
     }
 
     public View onCreateView(
@@ -72,7 +74,7 @@ public class F_ProfilesList extends Fragment {
         // Detect button presses
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmProfile);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
         });
     }
 

@@ -1,62 +1,149 @@
 package com.example.lotteryeventapp;
 
+import android.util.Log;
+
 /**
  * This class is a notification that the Entrant has been accepted into the Event
  */
 public class Invitation extends Notification{
-    private String uid;
-
-
     /**
      * A type of notification sent to an Entrant indicating that they can choose to attend the Event
      * @param event the Event the Entrant could sign up for
      * @param entrant the Entrant that could sign up for the Event
      */
-    public Invitation(Event event, Entrant entrant,String uid){
-        this.uid = uid;
-        this.event = event;
-        this.entrant = entrant;
-    }
-    public Invitation(Event event, Entrant entrant){
-        this.event = event;
-        this.entrant = entrant;
+    public Invitation(String uid, String event, String entrant, String msg){
+        super(uid, event, entrant, msg);
     }
 
-    /**
-     * gets the Event this Invitation is about
-     * @return the Event the Invitation is about
-     */
-    public Event getEvent() {
-        return event;
-    }
-
-    /**
-     * gets the Entrant receiving the Invitation
-     * @return the Entrant receiving the Invitation
-     */
-    public Entrant getEntrant() {
-        return entrant;
-    }
-
-    @Override
-    public String getMessage() {
-        return "";
+    public Invitation(String event, String entrant, String msg){
+        super(event, entrant, msg);
     }
 
     /**
      * Entrant chooses to join the attending list
      */
     public void signUp(){
-        this.event.attendeeListAdd(this.entrant);
-        this.entrant.removeNotification(this);
+        String event = this.event;
+        DataModel model = new DataModel();
+        String entrant = this.entrant;
+        Invitation invitation = this;
+        model.getEvent(event, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+
+                Event event = (Event) obj;
+                event.invitedListRemove(entrant);
+                event.attendeeListAdd(entrant);
+                model.setEvent(event, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        Log.d("Firebase", "written");
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("Firebase", "fail");
+                    }
+                });
+
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
+        model.getEntrant(entrant, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                Entrant entrant = (Entrant) obj;
+                entrant.removeNotification(invitation.getUid());
+                model.setEntrant(entrant, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        Log.d("Firebase", "written");
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("Firebase", "fail");
+                    }
+                });
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
     }
 
     /**
      * Entrant chooses to not attend the Event
      */
     public void decline(){
-        this.event.cancelledListAdd(this.entrant);
-        this.event.handleInvitationCancelled(this.entrant);
-        this.entrant.removeNotification(this);
+        String event = this.event;
+        DataModel model = new DataModel();
+        String entrant = this.entrant;
+        Invitation invitation = this;
+        model.getEvent(event, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+
+                Event event = (Event) obj;
+                event.invitedListRemove(entrant);
+                event.cancelledListAdd(entrant);
+                model.setEvent(event, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        Log.d("Firebase", "written");
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("Firebase", "fail");
+                    }
+                });
+
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
+        model.getEntrant(entrant, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                Entrant entrant = (Entrant) obj;
+                entrant.removeNotification(invitation.getUid());
+                model.setEntrant(entrant, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        Log.d("Firebase", "written");
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("Firebase", "fail");
+                    }
+                });
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
     }
 }

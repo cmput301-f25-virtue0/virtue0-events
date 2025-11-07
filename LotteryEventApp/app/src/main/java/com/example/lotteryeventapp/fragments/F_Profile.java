@@ -17,9 +17,16 @@ import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 public class F_Profile extends Fragment {
+    private DataModel model;
+
+    //role = 0 for entrant, role = 1 for organizer
+    public F_Profile(DataModel myModel) {
+        model = myModel;
+    }
 
     private ImageButton btnEditName, btnEditEmail, btnEditPhone;
     private TextView tvName, tvEmail, tvPhone;
@@ -41,7 +48,7 @@ public class F_Profile extends Fragment {
         view.findViewById(R.id.backArrowProfile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
+                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
             }});
 
         Entrant.Profile p = new Entrant.Profile("John", "John@gmail.com", "780-123-4567");

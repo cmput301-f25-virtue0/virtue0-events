@@ -16,14 +16,18 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        //Send user to choose role page if not previous state is detected
-        if (savedInstanceState == null) {
-            showFragment(new F_SelectRole());
-        }
-
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Entrant.Profile profile = new Entrant.Profile("Daniel", "dk8@ualberta.ca", "123-456-7890");
         Entrant entrant = new Entrant(deviceID, profile);
+        DataModel model = new DataModel();
+        model.setCurrentEntrant(entrant);
+
+        //todo: set current organizer to model using model.setCurrentOrganizer(organizer);
+
+        //Send user to choose role page if not previous state is detected
+        if (savedInstanceState == null) {
+            showFragment(new F_SelectRole(model));
+        }
     }
 
     public void showFragment(Fragment newFragment) {

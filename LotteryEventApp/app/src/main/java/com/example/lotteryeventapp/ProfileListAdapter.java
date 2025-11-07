@@ -59,11 +59,11 @@ public class ProfileListAdapter extends RecyclerView.Adapter<ProfileListAdapter.
 
         if (profile != null) {
             // Set the entrant's name (and ID for debugging)
-            String displayText = profile.getName() + " (ID: " + entrant.getId().substring(0, 6) + "...)";
+            String displayText = profile.getName() + " (ID: " + entrant.getUid().substring(0, 6) + "...)";
             h.tvName.setText(displayText);
         } else {
             // Fallback text if the profile is somehow null
-            h.tvName.setText("Invalid Profile (ID: " + entrant.getId().substring(0, 6) + "...)");
+            h.tvName.setText("Invalid Profile (ID: " + entrant.getUid().substring(0, 6) + "...)");
         }
 
         // Set click listeners
