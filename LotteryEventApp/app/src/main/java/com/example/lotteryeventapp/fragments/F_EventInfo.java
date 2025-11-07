@@ -71,6 +71,12 @@ public class F_EventInfo extends Fragment {
                 public void onClick(View view) {
                     Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
                 }});
+
+            view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
+                }});
         }
         else if (role == 1) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
@@ -88,17 +94,25 @@ public class F_EventInfo extends Fragment {
                 public void onClick(View view) {
                     ((MainActivity) requireActivity()).showFragment(new F_Applicants());
                 }});
+            view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
+                }});
         } else if (role == 2) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
             view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
 
+            view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+                }});
+
         }
 
-        view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
-            }});
+
+
     }
 }
