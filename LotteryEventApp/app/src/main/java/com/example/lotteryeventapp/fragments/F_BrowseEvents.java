@@ -16,6 +16,7 @@ import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ public class F_BrowseEvents extends Fragment {
         this.role = myRole;
     }
 
+
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
         return i.inflate(R.layout.fragment_events_list, c, false);
@@ -33,8 +35,21 @@ public class F_BrowseEvents extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
+
+        if (role != 2) {
+            v.findViewById(R.id.toolbar).setVisibility(View.GONE);
+
+        }
+
+
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        MaterialToolbar toolbar = v.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v1 -> {
+            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+        });
+
 
         // Demo "global" events
         List<Event> data = Arrays.asList(
@@ -46,10 +61,7 @@ public class F_BrowseEvents extends Fragment {
                         "2024-12-20", "Paddling & safety essentials.", false, true, 60, 12)
         );
 
-        EventAdapter adapter = new EventAdapter(data, (event, pos) ->
-                /*Toast.makeText(requireContext(),
-                        "Browse tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()*/
+        EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
         { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);

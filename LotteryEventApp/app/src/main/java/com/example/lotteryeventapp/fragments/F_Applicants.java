@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 
 public class F_Applicants extends Fragment {
     @Override
@@ -21,35 +23,41 @@ public class F_Applicants extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
+            });
+
         // Detect button presses
         view.findViewById(R.id.btnDoLottery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //((MainActivity) requireActivity()).showFragment(new F_Lottery());
+                ((MainActivity) requireActivity()).showFragment(new F_Lottery());
             }});
 
         view.findViewById(R.id.btnChosen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //((MainActivity) requireActivity()).showFragment(new F_Chosen());
+                ((MainActivity) requireActivity()).showFragment(new F_Chosen());
             }});
 
         view.findViewById(R.id.btnEnrolled).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //((MainActivity) requireActivity()).showFragment(new F_Enrolled());
+                ((MainActivity) requireActivity()).showFragment(new F_Enrolled());
             }});
 
         view.findViewById(R.id.btnCancelled).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //((MainActivity) requireActivity()).showFragment(new F_Cancelled());
+                ((MainActivity) requireActivity()).showFragment(new F_Cancelled());
             }});
 
         view.findViewById(R.id.btnMap).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //((MainActivity) requireActivity()).showFragment(new F_Map());
+                ((MainActivity) requireActivity()).showFragment(new F_Map());
             }});
     }
 }

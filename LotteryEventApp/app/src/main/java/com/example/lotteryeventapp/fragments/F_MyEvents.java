@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
+import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +37,11 @@ public class F_MyEvents extends Fragment {
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        if (role != 2) {
+            v.findViewById(R.id.toolbar).setVisibility(View.GONE);
+        }
+
+
         // Demo "my events" (different set)
         List<Event> data = Arrays.asList(
                 new Event("My Registered: Swim Lessons", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
@@ -43,10 +50,7 @@ public class F_MyEvents extends Fragment {
                         "2024-12-20", "Invitation pending.", false, true, 60, 12)
         );
 
-        EventAdapter adapter = new EventAdapter(data, (event, pos) ->
-                /*Toast.makeText(requireContext(),
-                        "My Events tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()*/
+        EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
         { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);
