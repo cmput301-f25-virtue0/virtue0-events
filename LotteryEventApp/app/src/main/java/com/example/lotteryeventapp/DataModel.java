@@ -20,6 +20,9 @@ public class DataModel extends TModel<TView>{
     private final CollectionReference admins;
     private final CollectionReference events;
     private final CollectionReference notifications;
+    private Entrant currentEntrant;
+    private Organizer currentOrg;
+    private Event currentEvent;
 
     private ArrayList<View> views = new ArrayList<View>();
 
@@ -91,6 +94,25 @@ public class DataModel extends TModel<TView>{
          * @param e exception thrown
          */
         void onError(Exception e);
+    }
+
+    public Entrant getCurrentEntrant() {
+        return currentEntrant;
+    }
+    public void setCurrentEntrant(Entrant thisEntrant) {
+        currentEntrant = thisEntrant;
+    }
+    public Organizer getCurrentOrganizer() {
+        return currentOrg;
+    }
+    public void setCurrentOrganizer(Organizer thisOrg) {
+        currentOrg = thisOrg;
+    }
+    public Event getCurrentEvent() {
+        return currentEvent;
+    }
+    public void setCurrentEvent(Event thisEvent) {
+        currentEvent = thisEvent;
     }
 
     public void setEntrant(Entrant entrant, SetCallback cb) {
@@ -208,7 +230,7 @@ public class DataModel extends TModel<TView>{
     public void setEvent(Event event, SetCallback cb) {
         EventDataHolder data = new EventDataHolder(event);
 
-        if (!event.getUid().isEmpty()) {
+        if (event.getUid().isEmpty()) {
             // Update existing event
             DocumentReference eventRef = this.events.document(event.getUid());
             eventRef.set(data)

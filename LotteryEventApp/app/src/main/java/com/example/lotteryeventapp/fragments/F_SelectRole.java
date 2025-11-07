@@ -9,9 +9,16 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 public class F_SelectRole extends Fragment {
+    private DataModel model;
+
+    public F_SelectRole(DataModel myModel) {
+        model = myModel;
+    }
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -26,21 +33,21 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnEntrant).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0));
+                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
             }
         });
 
         view.findViewById(R.id.btnOrganizer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
+                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
             }
         });
 
         view.findViewById(R.id.btnAdmin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
             }
         });
     }

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 public class F_CreateEditEvent extends Fragment {
     private int type;
+    private DataModel model;
     private Event event;
 
     //type = 0 for create, type = 1 for edit
@@ -30,9 +32,10 @@ public class F_CreateEditEvent extends Fragment {
 
 
     // This constructor is used for "edit"
-    public F_CreateEditEvent(int myType, Event myEvent) {
+    public F_CreateEditEvent(int myType, DataModel myModel) {
         this.type = myType;
-        this.event = myEvent;
+        model = myModel;
+        event = model.getCurrentEvent();
     }
 
     @Override
@@ -82,7 +85,12 @@ public class F_CreateEditEvent extends Fragment {
         }
 
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
+            if (type == 1) {
+                ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+            }
+            else {
+                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+            }
         });
 
         view.findViewById(R.id.btnPublish).setOnClickListener(new View.OnClickListener() {
@@ -119,11 +127,14 @@ public class F_CreateEditEvent extends Fragment {
 
                     // Differentiate between Create and Edit
                     if (type == 0) {
-                        // create new event
+                        // create new event (will be automatically added to the database)
                         Event makeEvent = new Event(title, dateTime, location, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit);
-                        // TODO: Add 'makeEvent' to the database
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
+                        model.setCurrentEvent(makeEvent);
+                        //View newly created event
+                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+
                     } else {
                         // update existing event
                         event.setTitle(title);
@@ -135,11 +146,18 @@ public class F_CreateEditEvent extends Fragment {
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
 
-                        // TODO: Update 'event' in the database
+                        //Update the existing event
+                        event.editEvent(dateTime, location, regDeadline,
+                                details, track_geo, true, waitlist_limit, attendee_limit);
                         Toast.makeText(getContext(), "Event Updated", Toast.LENGTH_SHORT).show();
                     }
 
-                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
+                    if (type == 1) {
+                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                    }
+                    else {
+                        ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                    }
 
                 } catch(Exception e) {
                     Toast.makeText(getContext(), "Please fill all missing fields!", Toast.LENGTH_SHORT).show();

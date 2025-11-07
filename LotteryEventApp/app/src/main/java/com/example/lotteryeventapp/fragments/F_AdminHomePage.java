@@ -8,15 +8,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class F_AdminHomePage extends Fragment {
 
     private int role;
+    private DataModel model;
 
-    public F_AdminHomePage(int myRole) {
+    public F_AdminHomePage(int myRole, DataModel myModel) {
+
         this.role = myRole;
+        model = myModel;
     }
 
     @Override
@@ -33,21 +37,21 @@ public class F_AdminHomePage extends Fragment {
         view.findViewById(R.id.btnProfiles).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_ProfilesList(2));
+                ((MainActivity) requireActivity()).showFragment(new F_ProfilesList(2, model));
             }
         });
 
         view.findViewById(R.id.btnImages).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminImages(2));
+                ((MainActivity) requireActivity()).showFragment(new F_AdminImages(2, model));
             }
         });
 
         view.findViewById(R.id.btnEvents).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_BrowseEvents(2));
+                ((MainActivity) requireActivity()).showFragment(new F_BrowseEvents(2, model));
             }
         });
 
@@ -60,7 +64,7 @@ public class F_AdminHomePage extends Fragment {
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmin);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_SelectRole());
+            ((MainActivity) requireActivity()).showFragment(new F_SelectRole(model));
         });
     }
 }

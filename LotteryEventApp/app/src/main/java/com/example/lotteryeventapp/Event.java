@@ -74,7 +74,8 @@ public class Event {
         this.invited_list = new ArrayList<>();
         this.drawn = false;
         DataModel model = new DataModel();
-        model.setEvent(this, new DataModel.SetCallback() {
+        // todo: get event to add to firebase properly
+        /*model.setEvent(this, new DataModel.SetCallback() {
             @Override
             public void onSuccess(String msg) {
                 Log.d("Firebase", "written");
@@ -83,7 +84,7 @@ public class Event {
             public void onError(Exception e) {
                 Log.e("Firebase", "fail");
             }
-        });
+        });*/
     }
 
     public String getUid() {
@@ -233,9 +234,7 @@ public class Event {
      * gets the waitlist for the Event
      * @return waitlist for the Event
      */
-    public ArrayList<String> getWaitlist() {
-        return waitlist;
-    }
+    public ArrayList<String> getWaitlist() { return waitlist; }
 
     public ArrayList<Entrant> getUsableWaitList() throws InterruptedException {
         DataModel model = new DataModel();
