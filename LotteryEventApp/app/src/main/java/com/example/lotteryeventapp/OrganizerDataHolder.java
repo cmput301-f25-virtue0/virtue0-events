@@ -11,9 +11,9 @@ public class OrganizerDataHolder {
     public OrganizerDataHolder(Organizer organizer) {
         this.uid = organizer.getUid();
 
-        ArrayList<Event> events = organizer.getEvents();
-        for (Event event: events) {
-            if (!event.getUid().isEmpty()) {
+        ArrayList<String> events = organizer.getEvents();
+        for (String event: events) {
+            if (!event.getUid().isEmpty()) {//unsure how to fix this
                 this.events.add(event.getUid());
             }else {
                 throw new RuntimeException("Organizer contains event that has no uid");

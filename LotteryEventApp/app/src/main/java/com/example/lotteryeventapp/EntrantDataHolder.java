@@ -18,9 +18,9 @@ public class EntrantDataHolder {
         this.phone = entrant.getProfile().getPhone();
         this.deviceId = entrant.getUid();
 
-        ArrayList<Notification> notifications = entrant.getNotifications();
-        for (Notification notification: notifications) {
-            this.notifications.add(notification.getUid());
+        ArrayList<String> notifications = entrant.getNotifications();
+        for (String notification: notifications) {
+            this.notifications.add(notification);
         }
 
         this.notificationOptOut = entrant.isNotificationOptOut();

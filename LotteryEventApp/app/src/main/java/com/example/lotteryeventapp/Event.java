@@ -17,10 +17,10 @@ public class Event {
     private boolean will_automatically_redraw;
     private int waitlist_limit;
     private int attendee_limit;
-    private ArrayList<Entrant> waitlist;
-    private ArrayList<Entrant> attendee_list;
-    private ArrayList<Entrant> cancelled_list;
-    private ArrayList<Entrant> invited_list;
+    private ArrayList<String> waitlist;
+    private ArrayList<String> attendee_list;
+    private ArrayList<String> cancelled_list;
+    private ArrayList<String> invited_list;
     private boolean drawn;
 
     /**
@@ -219,7 +219,7 @@ public class Event {
      * gets the waitlist for the Event
      * @return waitlist for the Event
      */
-    public ArrayList<Entrant> getWaitlist() {
+    public ArrayList<String> getWaitlist() {
         return waitlist;
     }
 
@@ -227,7 +227,7 @@ public class Event {
      * gets the list of Entrants attending the Event
      * @return a list of Entrants attending the Event
      */
-    public ArrayList<Entrant> getAttendee_list() {
+    public ArrayList<String> getAttendee_list() {
         return attendee_list;
     }
 
@@ -235,7 +235,7 @@ public class Event {
      * gets the list of Entrants who cancelled
      * @return list of Entrants who cancelled
      */
-    public ArrayList<Entrant> getCancelled_list() {
+    public ArrayList<String> getCancelled_list() {
         return cancelled_list;
     }
     /**
@@ -243,13 +243,13 @@ public class Event {
      * but haven't confirmed attendance and invites are pending
      * @return list of invited Entrants invited to the Event
      */
-    public ArrayList<Entrant> getInvited_list() { return invited_list; }
+    public ArrayList<String> getInvited_list() { return invited_list; }
 
     /**
      * add an Entrant to the waitlist of the Event
      * @param entrant entrant to be added to the waitlist
      */
-    public void waitlistAdd(Entrant entrant){
+    public void waitlistAdd(String entrant){
         waitlist.add(entrant);
     }
 
@@ -257,7 +257,7 @@ public class Event {
      * adds an Entrant to the attendee list
      * @param entrant Entrant to be added to the attendee_list
      */
-    public void attendeeListAdd(Entrant entrant){
+    public void attendeeListAdd(String entrant){
         attendee_list.add(entrant);
     }
 
@@ -265,7 +265,7 @@ public class Event {
      * add an Entrant to the cancelled_list and redraws automaticallu after selected Entrant cancels
      * @param entrant Entrant to be added to the cancelled_list
      */
-    public void cancelledListAdd(Entrant entrant) {
+    public void cancelledListAdd(String entrant) {
         cancelled_list.add(entrant);
         attendee_list.remove(entrant);
     }
@@ -274,12 +274,12 @@ public class Event {
      * adds an Entrant to the invited list
      * @param cancelledEntrant Entrant to be added to the invited list
      */
-    public void handleInvitationCancelled(Entrant cancelledEntrant) {
+    public void handleInvitationCancelled(String cancelledEntrant) {
         invited_list.remove(cancelledEntrant);
         cancelledListAdd(cancelledEntrant);
 
         if (will_automatically_redraw && !waitlist.isEmpty()) {
-            Entrant replacement = waitlist.remove(0);
+            String replacement = waitlist.remove(0);
             invited_list.add(replacement);
         }
     }
@@ -299,7 +299,7 @@ public class Event {
 
         for (int i = 0; i < numToDraw; i++) {
             int randomIndex = rand.nextInt(waitlist.size());
-            Entrant drawnEntrant = waitlist.remove(randomIndex);
+            String drawnEntrant = waitlist.remove(randomIndex);
             invited_list.add(drawnEntrant);
         }
 

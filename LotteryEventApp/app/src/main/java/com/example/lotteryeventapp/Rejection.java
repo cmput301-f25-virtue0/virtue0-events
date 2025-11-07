@@ -9,11 +9,11 @@ public class Rejection extends Notification{
      * @param event the Event the Entrant was rejected from
      * @param entrant the Entrant the Event rejected
      */
-    public Rejection(String uid, Event event, Entrant entrant, String msg){
+    public Rejection(String uid, String event, String entrant, String msg){
         super(uid, event, entrant, msg);
     }
 
-    public Rejection(Event event, Entrant entrant, String msg){
+    public Rejection(String event, String entrant, String msg){
         super(event, entrant, msg);
     }
 }

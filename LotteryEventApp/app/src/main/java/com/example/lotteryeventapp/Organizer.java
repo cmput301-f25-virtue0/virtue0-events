@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class Organizer {
     private String uid;
-    private ArrayList<Event> events;
+    private ArrayList<String> events;
 
     /**
      * An Organizer is created with no Events
@@ -28,7 +28,7 @@ public class Organizer {
      * add an Event to the Organizer
      * @param event the Event to be added to the Organizer
      */
-    public void addEvent(Event event){
+    public void addEvent(String event){
         this.events.add(event);
     }
 
@@ -36,7 +36,7 @@ public class Organizer {
      * get the Organizers Events
      * @return the Organizers Events
      */
-    public ArrayList<Event> getEvents() {
+    public ArrayList<String> getEvents() {
         return events;
     }
 }

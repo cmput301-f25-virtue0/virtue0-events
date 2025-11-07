@@ -21,16 +21,16 @@ public class Invitation extends Notification{
      * Entrant chooses to join the attending list
      */
     public void signUp(){
-        this.event.attendeeListAdd(this.entrant);
-        this.entrant.removeNotification(this);
+        this.event.attendeeListAdd(this.entrant.getUid());
+        this.entrant.removeNotification(this.getUid());
     }
 
     /**
      * Entrant chooses to not attend the Event
      */
     public void decline(){
-        this.event.cancelledListAdd(this.entrant);
-        this.event.handleInvitationCancelled(this.entrant);
-        this.entrant.removeNotification(this);
+        this.event.cancelledListAdd(this.entrant.getUid());
+        this.event.handleInvitationCancelled(this.entrant.getUid());
+        this.entrant.removeNotification(this.getUid());
     }
 }

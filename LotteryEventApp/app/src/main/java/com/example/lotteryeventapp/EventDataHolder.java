@@ -34,24 +34,24 @@ public class EventDataHolder {
         this.waitlistLimit = event.getWaitlist_limit();
         this.attendeeLimit = event.getAttendee_limit();
 
-        ArrayList<Entrant> waitList = event.getWaitlist();
-        for (Entrant entrant : waitList) {
-            this.waitlist.add(entrant.getUid());
+        ArrayList<String> waitList = event.getWaitlist();
+        for (String entrant : waitList) {
+            this.waitlist.add(entrant);
         }
 
-        ArrayList<Entrant> attendeeList = event.getAttendee_list();
-        for (Entrant entrant : attendeeList) {
-            this.attendeeList.add(entrant.getUid());
+        ArrayList<String> attendeeList = event.getAttendee_list();
+        for (String entrant : attendeeList) {
+            this.attendeeList.add(entrant);
         }
 
-        ArrayList<Entrant> cancelledList = event.getCancelled_list();
-        for (Entrant entrant : cancelledList) {
-            this.cancelledList.add(entrant.getUid());
+        ArrayList<String> cancelledList = event.getCancelled_list();
+        for (String entrant : cancelledList) {
+            this.cancelledList.add(entrant);
         }
 
-        ArrayList<Entrant> invitedList = event.getInvited_list();
-        for (Entrant entrant : invitedList) {
-            this.invitedList.add(entrant.getUid());
+        ArrayList<String> invitedList = event.getInvited_list();
+        for (String entrant : invitedList) {
+            this.invitedList.add(entrant);
         }
 
         this.drawn = event.isDrawn();

@@ -21,8 +21,8 @@ public abstract class NotificationDataHolder {
 
     public NotificationDataHolder(Notification notif, NotificationType notifType) {
         this.uid = notif.getUid();
-        this.event = notif.getEvent().getUid();
-        this.entrant = notif.getEntrant().getUid();
+        this.event = notif.getEvent();
+        this.entrant = notif.getEntrant();
         this.message = notif.getMessage();
         this.sent = notif.isSent();
         this.read = notif.isRead();
