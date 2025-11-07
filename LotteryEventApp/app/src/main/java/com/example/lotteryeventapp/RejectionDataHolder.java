@@ -12,6 +12,15 @@ public class RejectionDataHolder extends NotificationDataHolder {
     }
 
     public Rejection createRejectionInstance() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Rejection rej = new Rejection(this.uid, this.event, this.entrant, this.message);
+
+        if (this.sent) {
+            rej.markAsSent();
+        }
+        if (this.read) {
+            rej.markAsRead();
+        }
+
+        return rej;
     }
 }

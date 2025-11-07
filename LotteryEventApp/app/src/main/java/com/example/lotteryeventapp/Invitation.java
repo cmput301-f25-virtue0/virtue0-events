@@ -9,11 +9,11 @@ public class Invitation extends Notification{
      * @param event the Event the Entrant could sign up for
      * @param entrant the Entrant that could sign up for the Event
      */
-    public Invitation(String uid, Event event, Entrant entrant, String msg){
+    public Invitation(String uid, String event, String entrant, String msg){
         super(uid, event, entrant, msg);
     }
 
-    public Invitation(Event event, Entrant entrant, String msg){
+    public Invitation(String event, String entrant, String msg){
         super(event, entrant, msg);
     }
 

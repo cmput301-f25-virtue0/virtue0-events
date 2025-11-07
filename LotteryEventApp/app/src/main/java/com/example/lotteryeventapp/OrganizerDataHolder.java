@@ -10,15 +10,7 @@ public class OrganizerDataHolder {
 
     public OrganizerDataHolder(Organizer organizer) {
         this.uid = organizer.getUid();
-
-        ArrayList<String> events = organizer.getEvents();
-        for (String event: events) {
-            if (!event.getUid().isEmpty()) {//unsure how to fix this
-                this.events.add(event.getUid());
-            }else {
-                throw new RuntimeException("Organizer contains event that has no uid");
-            }
-        }
+        this.events.addAll(organizer.getEvents());
     }
 
     public OrganizerDataHolder(Map<String, Object> data, String deviceId) {
@@ -32,12 +24,7 @@ public class OrganizerDataHolder {
 
     public Organizer createOrganizerInstance() {
         Organizer organizer = new Organizer(this.uid);
-
-        for (String eventId: this.events) {
-            // TODO: Create event firestore methods
-
-            //organizer.addEvent();
-        }
+        organizer.getEvents().addAll(this.events);
 
         return organizer;
     }

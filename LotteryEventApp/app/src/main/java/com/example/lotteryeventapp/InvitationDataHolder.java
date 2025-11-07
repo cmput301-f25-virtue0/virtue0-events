@@ -12,6 +12,15 @@ public class InvitationDataHolder extends NotificationDataHolder{
     }
 
     public Invitation createInvitationInstance() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Invitation inv = new Invitation(this.uid, this.event, this.entrant, this.message);
+
+        if (this.sent) {
+            inv.markAsSent();
+        }
+        if (this.read) {
+            inv.markAsRead();
+        }
+
+        return inv;
     }
 }

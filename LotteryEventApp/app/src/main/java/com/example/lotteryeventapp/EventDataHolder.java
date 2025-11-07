@@ -33,27 +33,10 @@ public class EventDataHolder {
         this.willAutomaticallyRedraw = event.willAutomaticallyRedraw();
         this.waitlistLimit = event.getWaitlist_limit();
         this.attendeeLimit = event.getAttendee_limit();
-
-        ArrayList<String> waitList = event.getWaitlist();
-        for (String entrant : waitList) {
-            this.waitlist.add(entrant);
-        }
-
-        ArrayList<String> attendeeList = event.getAttendee_list();
-        for (String entrant : attendeeList) {
-            this.attendeeList.add(entrant);
-        }
-
-        ArrayList<String> cancelledList = event.getCancelled_list();
-        for (String entrant : cancelledList) {
-            this.cancelledList.add(entrant);
-        }
-
-        ArrayList<String> invitedList = event.getInvited_list();
-        for (String entrant : invitedList) {
-            this.invitedList.add(entrant);
-        }
-
+        this.waitlist.addAll(event.getWaitlist());
+        this.attendeeList.addAll(event.getAttendee_list());
+        this.cancelledList.addAll(event.getCancelled_list());
+        this.invitedList.addAll(event.getInvited_list());
         this.drawn = event.isDrawn();
     }
 
@@ -95,29 +78,10 @@ public class EventDataHolder {
         Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationDeadline, this.details,
                 this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit);
 
-        for (String entrantId: this.waitlist) {
-            // TODO: Implement
-
-            //event.addWaitlist();
-        }
-
-        for (String entrantId: this.attendeeList) {
-            // TODO: Implement
-
-            //event.addAttendeeList();
-        }
-
-        for (String entrantId: this.cancelledList) {
-            // TODO: Implement
-
-            //event.addCancelledList();
-        }
-
-        for (String entrantId: this.invitedList) {
-            // TODO: Implement
-
-            //event.addInvitedList();
-        }
+        event.getWaitlist().addAll(this.waitlist);
+        event.getAttendee_list().addAll(this.attendeeList);
+        event.getCancelled_list().addAll(this.cancelledList);
+        event.getInvited_list().addAll(this.invitedList);
 
         event.setDrawn(this.drawn);
 

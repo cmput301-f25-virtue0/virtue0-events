@@ -17,12 +17,7 @@ public class EntrantDataHolder {
         this.email = entrant.getProfile().getEmail();
         this.phone = entrant.getProfile().getPhone();
         this.deviceId = entrant.getUid();
-
-        ArrayList<String> notifications = entrant.getNotifications();
-        for (String notification: notifications) {
-            this.notifications.add(notification);
-        }
-
+        this.notifications.addAll(entrant.getNotifications());
         this.notificationOptOut = entrant.isNotificationOptOut();
     }
 
@@ -43,15 +38,7 @@ public class EntrantDataHolder {
     public Entrant createEntrantInstance() {
         Entrant.Profile profile = new Entrant.Profile(this.name, this.email, this.phone);
         Entrant entrant = new Entrant(this.deviceId, profile);
-
-        for (String notifId: this.notifications) {
-            // TODO: Create notification firestore methods
-
-            //entrant.addNotification();
-
-            // Throw exceptions
-        }
-
+        entrant.getNotifications().addAll(this.notifications);
         entrant.setNotificationOptOut(this.notificationOptOut);
 
         return entrant;
