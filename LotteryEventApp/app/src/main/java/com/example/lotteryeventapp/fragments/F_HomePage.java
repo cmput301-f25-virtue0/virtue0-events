@@ -1,4 +1,4 @@
-package com.example.lotteryeventapp;
+package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.R;
+import com.example.lotteryeventapp.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class F_HomePage extends Fragment {
@@ -32,7 +35,7 @@ public class F_HomePage extends Fragment {
 
         ViewPager2 pager = view.findViewById(R.id.view_pager);
         TabLayout tabs = view.findViewById(R.id.tab_layout);
-        pager.setAdapter(new ViewPagerAdapter(this));
+        pager.setAdapter(new ViewPagerAdapter(this, role));
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -58,6 +61,13 @@ public class F_HomePage extends Fragment {
             }
         });
 
+        //Back button
+        view.findViewById(R.id.backButtonHome).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) requireActivity()).showFragment(new F_SelectRole());
+            }
+        });
 
         // Set up page based on role
         if (role == 0) {

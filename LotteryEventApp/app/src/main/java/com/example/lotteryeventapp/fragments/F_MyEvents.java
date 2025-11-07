@@ -1,5 +1,5 @@
 // F_MyEvents.java
-package com.example.lotteryeventapp;
+package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,11 +11,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.EventAdapter;
+import com.example.lotteryeventapp.R;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class F_MyEvents extends Fragment {
-    public F_MyEvents() {}
+    private int role;
+    public F_MyEvents(int myRole) {
+        this.role = myRole;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
@@ -36,9 +44,10 @@ public class F_MyEvents extends Fragment {
         );
 
         EventAdapter adapter = new EventAdapter(data, (event, pos) ->
-                Toast.makeText(requireContext(),
+                /*Toast.makeText(requireContext(),
                         "My Events tapped: " + event.getTitle(),
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_SHORT).show()*/
+        { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
         );
         rv.setAdapter(adapter);
     }
