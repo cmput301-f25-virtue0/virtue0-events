@@ -63,6 +63,7 @@ public class F_EventInfo extends Fragment {
         if (role == 0) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.VISIBLE);
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
+            view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
 
             // Detect button presses
             view.findViewById(R.id.joinButton).setOnClickListener(new View.OnClickListener() {
@@ -74,6 +75,7 @@ public class F_EventInfo extends Fragment {
         else if (role == 1) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
 
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,9 +90,8 @@ public class F_EventInfo extends Fragment {
                 }});
         } else if (role == 2) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
-            view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
-
-
+            view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
+            view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
 
         }
 

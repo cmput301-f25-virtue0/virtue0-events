@@ -200,6 +200,22 @@
                     app:cornerRadius="8dp" />
             </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/layoutAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnDeleteEvent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delete Event" />
+        </LinearLayout>
+
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

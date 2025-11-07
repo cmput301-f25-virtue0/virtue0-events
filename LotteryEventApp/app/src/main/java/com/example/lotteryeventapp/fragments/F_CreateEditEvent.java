@@ -25,12 +25,14 @@ public class F_CreateEditEvent extends Fragment {
     //type = 0 for create, type = 1 for edit
     public F_CreateEditEvent(int myType) {
         this.type = myType;
-        event = null;
+        this.event = null;
     }
 
+
+    // This constructor is used for "edit"
     public F_CreateEditEvent(int myType, Event myEvent) {
         this.type = myType;
-        event = myEvent;
+        this.event = myEvent;
     }
 
     @Override
@@ -43,76 +45,99 @@ public class F_CreateEditEvent extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbarCreateEvent);
+
         //If editing, fill out information with existing event info
-        if ((this.type == 1) && (event != null)){
-            //Title
-            TextInputEditText myText = view.findViewById(R.id.etName);
-            myText.setText(event.getTitle());
-            //Description
+        if (this.type == 1 && this.event != null) {
+            toolbar.setTitle("Edit Event"); // Update toolbar title
+
+            TextInputEditText myText;
+
+            myText = view.findViewById(R.id.etName);
+            myText.setText(Objects.requireNonNullElse(event.getTitle(), ""));
+
             myText = view.findViewById(R.id.etDesc);
-            myText.setText(event.getDetails());
-            //Location
+            myText.setText(Objects.requireNonNullElse(event.getDetails(), ""));
+
             myText = view.findViewById(R.id.etLocation);
-            myText.setText(event.getLocation());
-            //DateTime
+            myText.setText(Objects.requireNonNullElse(event.getLocation(), ""));
+
             myText = view.findViewById(R.id.etWhen);
-            myText.setText(event.getDate_time());
-            //Registration Start
-            //myText = view.findViewById(R.id.etRegOpens);
-            //myText.setText(event.getRegistration_start());
-            //Registration End
+            myText.setText(Objects.requireNonNullElse(event.getDate_time(), ""));
+
             myText = view.findViewById(R.id.etRegCloses);
-            myText.setText(event.getRegistration_deadline());
-            //Capacity
+            myText.setText(Objects.requireNonNullElse(event.getRegistration_deadline(), ""));
+
             myText = view.findViewById(R.id.etCapacity);
-            myText.setText(event.getAttendee_limit());
-            //Sample Size
-            //myText = view.findViewById(R.id.etSample);
-            //myText.setText(event.getSample_size());
-            //Waitlist Limit
+            myText.setText(String.valueOf(event.getAttendee_limit()));
+
             myText = view.findViewById(R.id.etWaitlistLimit);
-            myText.setText(event.getWaitlist_limit());
-            //Geolocation
+            myText.setText(String.valueOf(event.getWaitlist_limit()));
+
             MaterialSwitch mySwitch = view.findViewById(R.id.switchGeo);
-            if (event.willTrack_geolocation()) { mySwitch.setChecked(true); }
-            else { mySwitch.setChecked(false); }
+            mySwitch.setChecked(event.willTrack_geolocation()); // Use getter
+        } else {
+            // This is "create" mode
+            toolbar.setTitle("Create Event");
         }
 
-        // Detect button presses
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbarCreateEvent);
         toolbar.setNavigationOnClickListener(v -> {
             ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
         });
 
         view.findViewById(R.id.btnPublish).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View button) {
-                //Make the new event
-                //Get the values from fields
+            public void onClick(View v) {
                 try {
-                    TextInputEditText myText = view.findViewById(R.id.etName);
-                    String title = myText.getText().toString();
-                    myText = view.findViewById(R.id.etDesc);
-                    String details = myText.getText().toString();
-                    myText = view.findViewById(R.id.etLocation);
-                    String location = myText.getText().toString();
-                    myText = view.findViewById(R.id.etWhen);
-                    String date_time = myText.getText().toString();
-                    myText = view.findViewById(R.id.etRegCloses);
-                    String registration_deadline = myText.getText().toString();
-                    myText = view.findViewById(R.id.etCapacity);
-                    int attendee_limit = Integer.parseInt(myText.getText().toString());
-                    myText = view.findViewById(R.id.etWaitlistLimit);
-                    int waitlist_limit = Integer.parseInt(myText.getText().toString());
-                    MaterialSwitch mySwitch = view.findViewById(R.id.switchGeo);
+                    //Get info from fields
+                    TextInputEditText etTitle = view.findViewById(R.id.etName);
+                    TextInputEditText etDetails = view.findViewById(R.id.etDesc);
+                    TextInputEditText etLocation = view.findViewById(R.id.etLocation);
+                    TextInputEditText etWhen = view.findViewById(R.id.etWhen);
+                    TextInputEditText etRegCloses = view.findViewById(R.id.etRegCloses);
+                    TextInputEditText etCapacity = view.findViewById(R.id.etCapacity);
+                    TextInputEditText etWaitlist = view.findViewById(R.id.etWaitlistLimit);
+                    MaterialSwitch swGeo = view.findViewById(R.id.switchGeo);
 
-                    //Create the new event object
-                    boolean track_geo = mySwitch.isChecked();
-                    Event makeEvent = new Event(title, date_time, location, registration_deadline,
-                            details, track_geo, true, waitlist_limit, attendee_limit);
-                    Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
-                    //Add it to the database
-                    //todo
+                    // Validate fields before parsing
+                    String title = etTitle.getText().toString();
+                    String details = etDetails.getText().toString();
+                    String location = etLocation.getText().toString();
+                    String dateTime = etWhen.getText().toString();
+                    String regDeadline = etRegCloses.getText().toString();
+                    String capacityStr = etCapacity.getText().toString();
+                    String waitlistStr = etWaitlist.getText().toString();
+
+                    if (title.isEmpty() || details.isEmpty() || location.isEmpty() || dateTime.isEmpty() ||
+                            regDeadline.isEmpty() || capacityStr.isEmpty() || waitlistStr.isEmpty()) {
+                        throw new Exception("Empty fields");
+                    }
+
+                    int attendee_limit = Integer.parseInt(capacityStr);
+                    int waitlist_limit = Integer.parseInt(waitlistStr);
+                    boolean track_geo = swGeo.isChecked();
+
+                    // Differentiate between Create and Edit
+                    if (type == 0) {
+                        // create new event
+                        Event makeEvent = new Event(title, dateTime, location, regDeadline,
+                                details, track_geo, true, waitlist_limit, attendee_limit);
+                        // TODO: Add 'makeEvent' to the database
+                        Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // update existing event
+                        event.setTitle(title);
+                        event.setDetails(details);
+                        event.setLocation(location);
+                        event.setDate_time(dateTime);
+                        event.setRegistration_deadline(regDeadline);
+                        event.setAttendee_limit(attendee_limit);
+                        event.setWaitlist_limit(waitlist_limit);
+                        event.setTrack_geolocation(track_geo); // Use setter
+
+                        // TODO: Update 'event' in the database
+                        Toast.makeText(getContext(), "Event Updated", Toast.LENGTH_SHORT).show();
+                    }
 
                     ((MainActivity) requireActivity()).showFragment(new F_HomePage(1));
 
