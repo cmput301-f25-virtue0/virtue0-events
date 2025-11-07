@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 import androidx.annotation.NonNull;
@@ -12,9 +13,11 @@ import androidx.fragment.app.Fragment;
 
 public class F_ImagesList extends Fragment {
     private int role;
+    private DataModel model;
 
-    public F_ImagesList(int myRole) {
+    public F_ImagesList(int myRole, DataModel myModel) {
         this.role = myRole;
+        model = myModel;
     }
 
     public View onCreateView(
@@ -30,7 +33,7 @@ public class F_ImagesList extends Fragment {
         view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
             }
         });
     }

@@ -73,7 +73,6 @@ public class Event {
         this.cancelled_list = new ArrayList<>();
         this.invited_list = new ArrayList<>();
         this.drawn = false;
-
     }
 
     public String getUid() {
@@ -223,9 +222,7 @@ public class Event {
      * gets the waitlist for the Event
      * @return waitlist for the Event
      */
-    public ArrayList<String> getWaitlist() {
-        return waitlist;
-    }
+    public ArrayList<String> getWaitlist() { return waitlist; }
 
     public ArrayList<Entrant> getUsableWaitList() throws InterruptedException {
         DataModel model = new DataModel();

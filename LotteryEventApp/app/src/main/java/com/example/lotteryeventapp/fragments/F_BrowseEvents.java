@@ -17,6 +17,7 @@ import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Notification;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -27,6 +28,12 @@ import java.util.List;
 
 public class F_BrowseEvents extends Fragment {
     private int role;
+    private DataModel model;
+
+    public F_BrowseEvents(int myRole, DataModel myModel) {
+        this.role = myRole;
+        model = myModel;
+    }
     public F_BrowseEvents(int myRole) {
         this.role = myRole;
     }
@@ -51,7 +58,7 @@ public class F_BrowseEvents extends Fragment {
 
         MaterialToolbar toolbar = v.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v1 -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
         });
 
 
@@ -86,8 +93,12 @@ public class F_BrowseEvents extends Fragment {
         });
 
 
+        //todo: get all events
+
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
-        { ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, event)); }
+        {
+            model.setCurrentEvent(event);
+            ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, model)); }
         );
         rv.setAdapter(adapter);
     }
