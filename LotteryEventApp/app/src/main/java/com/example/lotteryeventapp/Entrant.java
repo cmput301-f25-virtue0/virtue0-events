@@ -102,15 +102,16 @@ public class Entrant {
             setPhone(phone);
         }
 
-        public String name() {
+
+        public String getName() {
             return name;
         }
 
-        public String email() {
+        public String getEmail() {
             return email;
         }
 
-        public String phone() {
+        public String getPhone() {
             return phone;
         }
 

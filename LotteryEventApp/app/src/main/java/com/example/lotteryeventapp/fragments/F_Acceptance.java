@@ -37,7 +37,7 @@ public class F_Acceptance extends Fragment {
         view.findViewById(R.id.backArrowAccept).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Notification());
+                ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
             }
         });
 
@@ -45,7 +45,7 @@ public class F_Acceptance extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), getString(R.string.signed_up), Toast.LENGTH_SHORT).show();
-                ((MainActivity) requireActivity()).showFragment(new F_Notification());
+                ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
             }
         });
 
@@ -53,7 +53,7 @@ public class F_Acceptance extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), getString(R.string.declined), Toast.LENGTH_SHORT).show();
-                ((MainActivity) requireActivity()).showFragment(new F_Notification());
+                ((MainActivity) requireActivity()).showFragment(new F_Notification(0));
             }
         });
     }

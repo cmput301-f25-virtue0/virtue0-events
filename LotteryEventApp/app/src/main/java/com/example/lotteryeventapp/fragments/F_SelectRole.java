@@ -40,7 +40,7 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnAdmin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ;
+                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
             }
         });
     }
