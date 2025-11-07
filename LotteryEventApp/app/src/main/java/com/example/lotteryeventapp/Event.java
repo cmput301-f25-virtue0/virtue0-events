@@ -73,17 +73,7 @@ public class Event {
         this.cancelled_list = new ArrayList<>();
         this.invited_list = new ArrayList<>();
         this.drawn = false;
-        DataModel model = new DataModel();
-        model.setEvent(this, new DataModel.SetCallback() {
-            @Override
-            public void onSuccess(String msg) {
-                Log.d("Firebase", "written");
-            }
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-            }
-        });
+
     }
 
     public String getUid() {

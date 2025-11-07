@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.lotteryeventapp.DataModel;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
@@ -122,7 +124,17 @@ public class F_CreateEditEvent extends Fragment {
                         // create new event
                         Event makeEvent = new Event(title, dateTime, location, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit);
-                        // TODO: Add 'makeEvent' to the database
+                        DataModel model = new DataModel();
+                        model.setEvent(makeEvent, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
                     } else {
                         // update existing event

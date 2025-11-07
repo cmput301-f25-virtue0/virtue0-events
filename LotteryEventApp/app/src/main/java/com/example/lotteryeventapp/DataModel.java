@@ -3,10 +3,16 @@ package com.example.lotteryeventapp;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.common.data.DataHolder;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -270,6 +276,26 @@ public class DataModel extends TModel<TView>{
                 .addOnFailureListener(e -> {
                     Log.e("Firestore", "Firestore delete failed: Event " + event.getUid() + "\n" + e.getMessage());
                     cb.onError(e);
+                });
+    }
+    public void getAllEvents(GetCallback cb){
+        ArrayList<Event> events = new ArrayList<Event>();
+        db.collection("cities")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventDataHolder data = new EventDataHolder(document.getData(),document.getId());
+                                events.add(data.createEventInstance());
+                            }
+                            cb.onSuccess(events);
+                        } else {
+                            Log.d("Firestore", "Error getting documents: ", task.getException());
+                            cb.onError(task.getException());
+                        }
+                    }
                 });
     }
 
