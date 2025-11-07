@@ -60,6 +60,7 @@ public class Event {
     public Event(String title, String date_time, String location, String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
         this.title = title;
+        this.uid = "";
         this.date_time = date_time;
         this.location = location;
         this.registration_deadline = registration_deadline;
