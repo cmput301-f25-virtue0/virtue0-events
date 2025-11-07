@@ -1,6 +1,9 @@
 package com.example.lotteryeventapp;
 
+import android.util.Log;
+
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This class contains a collection of events created by an organizer
@@ -39,4 +42,35 @@ public class Organizer {
     public ArrayList<String> getEvents() {
         return events;
     }
+    public ArrayList<Event> getUsableEvents() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Event> events = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getEvents().size());
+        for (String event_id: getEvents()) {
+            model.getEvent(event_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Event event = (Event) obj;
+                    events.add(event);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+            latch.await();
+
+        }
+
+        return events;
+    }
 }
+

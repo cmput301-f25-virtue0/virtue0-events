@@ -1,5 +1,7 @@
 package com.example.lotteryeventapp;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -244,7 +246,12 @@ public class Event {
      * @return list of invited Entrants invited to the Event
      */
     public ArrayList<String> getInvited_list() { return invited_list; }
-
+    public void invitedListAdd(String entrant){
+        invited_list.add(entrant);
+    }
+    public void invitedListRemove(String entrant){
+        invited_list.remove(entrant);
+    }
     /**
      * add an Entrant to the waitlist of the Event
      * @param entrant entrant to be added to the waitlist
@@ -252,7 +259,9 @@ public class Event {
     public void waitlistAdd(String entrant){
         waitlist.add(entrant);
     }
-
+    public void waitlistRemove(String entrant){
+        waitlist.remove(entrant);
+    }
     /**
      * adds an Entrant to the attendee list
      * @param entrant Entrant to be added to the attendee_list
@@ -260,14 +269,18 @@ public class Event {
     public void attendeeListAdd(String entrant){
         attendee_list.add(entrant);
     }
-
+    public void attendeeListRemove(String entrant){
+        attendee_list.remove(entrant);
+    }
     /**
      * add an Entrant to the cancelled_list and redraws automaticallu after selected Entrant cancels
      * @param entrant Entrant to be added to the cancelled_list
      */
     public void cancelledListAdd(String entrant) {
         cancelled_list.add(entrant);
-        attendee_list.remove(entrant);
+    }
+    public void cancelledListRemove(String entrant){
+        cancelled_list.remove(entrant);
     }
 
     /**
@@ -282,6 +295,11 @@ public class Event {
             String replacement = waitlist.remove(0);
             invited_list.add(replacement);
         }
+    }
+    public void handleInvitationAccepted(String acceptedEntrant) {
+        invited_list.remove(acceptedEntrant);
+        attendeeListAdd(acceptedEntrant);
+
     }
     /**
      * Conducts a lottery draw: randomly selects a number of entrants from
@@ -301,6 +319,50 @@ public class Event {
             int randomIndex = rand.nextInt(waitlist.size());
             String drawnEntrant = waitlist.remove(randomIndex);
             invited_list.add(drawnEntrant);
+            DataModel model = new DataModel();
+            Event event = this;
+            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    Entrant entrant = (Entrant) obj;
+                    Invitation invitation = new Invitation(event.uid, entrant.getUid(), "");
+                    model.setNotification(invitation, new DataModel.SetCallback() {
+                        @Override
+                        public void onSuccess(String msg) {
+                            Log.d("Firebase", "written");
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            Log.e("Firebase", "fail");
+                        }
+                    });
+                    if(!invitation.getUid().isEmpty()) {
+                        entrant.addNotification(invitation.getUid());
+                        model.setEntrant(entrant,new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+                    }else{
+                        throw new RuntimeException("Invitation has no UID");
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
         }
 
         drawn = true;
