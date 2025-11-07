@@ -1,9 +1,11 @@
 package com.example.lotteryeventapp;
 
 import android.provider.Settings;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This class represents the user(entrants) that participate in the events.  Each entrant has
@@ -46,6 +48,36 @@ public class Entrant {
      * @return array of notification objects
      */
     public ArrayList<String> getNotifications() {
+        return notifications;
+    }
+    public ArrayList<Notification> getUsableNotifications() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Notification> notifications = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getNotifications().size());
+        for (String notification_id: getNotifications()) {
+            model.getNotification(notification_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    Notification notification = (Notification) obj;
+                    notifications.add(notification);
+                    latch.countDown();
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
         return notifications;
     }
 
@@ -152,13 +184,35 @@ public class Entrant {
         profile.setName(name);
         profile.setEmail(email);
         profile.setPhone(phone);
+        DataModel model = new DataModel();
+        model.setEntrant(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                Log.d("Firebase", "written");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
     }
 
     /**
      * deletes entrant's profile
      */
     public void deleteProfile() {
-        // TODO: Implement profile deletion once database is setup
+        DataModel model = new DataModel();
+        model.deleteEntrant(this, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
 
 

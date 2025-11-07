@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.lotteryeventapp.Event;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;

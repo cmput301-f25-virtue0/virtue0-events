@@ -73,17 +73,7 @@ public abstract class Notification {
         this.sent = true;
     }
 
-    /**
-     * Sends the notification to the entrant.
-     * (Assumes Entrant has addNotification(Notification) implemented.)
-     */
-    public void send() {
-        if (entrant != null) {
 
-            entrant.addNotification(this.uid);
-            markAsSent();
-        }
-    }
 
     /**
      * Defines the message content of this notification.

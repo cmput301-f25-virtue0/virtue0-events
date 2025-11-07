@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
+import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
 
 import java.util.Arrays;

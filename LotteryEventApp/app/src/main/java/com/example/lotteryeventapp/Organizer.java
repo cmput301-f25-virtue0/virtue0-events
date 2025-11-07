@@ -66,10 +66,10 @@ public class Organizer {
                     latch.countDown();
                 }
             });
-            latch.await();
+
 
         }
-
+        latch.await();
         return events;
     }
 }
