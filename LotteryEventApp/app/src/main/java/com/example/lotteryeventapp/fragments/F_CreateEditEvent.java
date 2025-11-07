@@ -132,8 +132,8 @@ public class F_CreateEditEvent extends Fragment {
                         // create new event (will be automatically added to the database)
                         Event makeEvent = new Event(title, dateTime, location, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit);
-                        DataModel newmodel = new DataModel();
-                        newmodel.setEvent(makeEvent, new DataModel.SetCallback() {
+                        DataModel model = new DataModel();
+                        model.setEvent(makeEvent, new DataModel.SetCallback() {
                             @Override
                             public void onSuccess(String msg) {
                                 Log.d("Firebase", "written");
