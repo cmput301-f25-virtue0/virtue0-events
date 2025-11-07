@@ -18,6 +18,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public interface OnEventClickListener {
         void onEventClick(@NonNull Event event, int position);
+        void onDeleteClick(Event delEvent, int delPosition);
     }
 
     private final List<Event> items = new ArrayList<>();
@@ -59,6 +60,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         h.ivPoster.setImageResource(R.drawable.lottery); // placeholder
         if (role == 2) { // 2 = Admin
             h.btnDelete.setVisibility(View.VISIBLE);
+            h.btnDelete.setOnClickListener(v -> {
+                clickListener.onDeleteClick(e, h.getBindingAdapterPosition());
+                DataModel dm = new DataModel();
+                dm.deleteEvent(e);
+
+            });
         } else {
             h.btnDelete.setVisibility(View.INVISIBLE);
         }
