@@ -107,7 +107,7 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2));
+                    ((MainActivity) requireActivity()).showFragment(new F_BrowseEvents(2));
                 }});
 
         }
