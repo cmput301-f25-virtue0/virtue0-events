@@ -28,50 +28,56 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class F_BrowseEvents extends Fragment {
+
     private int role;
     private DataModel model;
-    public F_BrowseEvents() { }
 
 
-    public F_BrowseEvents(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
+    public static F_BrowseEvents newInstance(int myRole) {
+        F_BrowseEvents fragment = new F_BrowseEvents();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
     }
 
-    public F_BrowseEvents(int myRole) {
-        this.role = myRole;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
     }
-
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
         return i.inflate(R.layout.fragment_events_list, c, false);
+
     }
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle b) {
 
+        Log.i("CURRENT ROLE BROWSE", "Current BROWSE user role is: " + role);
+        model = ((MainActivity) requireActivity()).getDataModel();
         if (role != 2) {
             v.findViewById(R.id.toolbar).setVisibility(View.GONE);
-
         }
-
 
         RecyclerView rv = v.findViewById(R.id.rvEvents);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         MaterialToolbar toolbar = v.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v1 -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
+            ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
         });
 
-        DataModel dataModel = new DataModel();
-
-// Start the asynchronous data fetch
-        dataModel.getAllEvents(new DataModel.GetCallback() {
+        // Start the asynchronous data fetch
+        model.getAllEvents(new DataModel.GetCallback() {
             @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) { /* not used here */ }
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {}
 
             @Override
             public void onSuccess(Object obj) {
@@ -80,16 +86,16 @@ public class F_BrowseEvents extends Fragment {
 
                 Log.d("Firebase", "retrieved " + eventData.size() + " events.");
 
-                // 1. Create the adapter with the retrieved data
+                // Create the adapter with the retrieved data
                 EventAdapter adapter = new EventAdapter(eventData, role, (event, pos) ->
                 {
                     // No need for latch anymore,
                     // this adapter and data are only created after fetch.
-                    dataModel.setCurrentEvent(event);
-                    ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, dataModel));
+                    model.setCurrentEvent(event);
+                    ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(role));
                 });
 
-                // 2. Set the adapter to the RecyclerView
+                // Set the adapter to the RecyclerView
                 rv.setAdapter(adapter);
             }
 

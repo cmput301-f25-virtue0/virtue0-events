@@ -1,29 +1,44 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
 import com.example.lotteryeventapp.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class F_HomePage extends Fragment {
+    private static final String ARG_ROLE = "role";
     private int role;
     private DataModel model;
 
+    public static F_HomePage newInstance(int role) {
+        F_HomePage fragment = new F_HomePage();
+        Bundle args = new Bundle();
+        args.putInt(ARG_ROLE, role);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     //role = 0 for entrant, role = 1 for organizer
-    public F_HomePage(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
     }
 
     @Override
@@ -36,9 +51,14 @@ public class F_HomePage extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
+        Log.i("CURRENT ROLE", "Current user role is: " + role);
         ViewPager2 pager = view.findViewById(R.id.view_pager);
         TabLayout tabs = view.findViewById(R.id.tab_layout);
+        if (getArguments() != null) {
+            role = getArguments().getInt(ARG_ROLE);
+        }
+        Log.i("CURRENT ROLE", "Current user role is: " + role);
+        model = ((MainActivity) requireActivity()).getDataModel();
         pager.setAdapter(new ViewPagerAdapter(this, role, model));
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -69,7 +89,7 @@ public class F_HomePage extends Fragment {
         view.findViewById(R.id.backButtonHome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_SelectRole(model));
+                ((MainActivity) requireActivity()).showFragment(new F_SelectRole());
             }
         });
 
@@ -85,7 +105,7 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.Notification).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
+                    ((MainActivity) requireActivity()).showFragment(F_Notification.newInstance(0));
                 }
             });
             view.findViewById(R.id.Profile).setOnClickListener(new View.OnClickListener() {
@@ -120,6 +140,8 @@ public class F_HomePage extends Fragment {
                     ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(0, model));
                 }
             });
+
+            Log.i("CURRENT ROLE", "Current user role is: " + role);
         }
     }
 }

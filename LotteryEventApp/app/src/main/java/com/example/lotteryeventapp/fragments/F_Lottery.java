@@ -26,12 +26,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Lottery extends Fragment {
+    private int role;
     private DataModel model;
     private Event event;
 
-    public F_Lottery(DataModel myModel) {
-        model = myModel;
-        event = model.getCurrentEvent();
+    public static F_Lottery newInstance(int role) {
+        F_Lottery fragment = new F_Lottery();
+        Bundle args = new Bundle();
+        args.putInt("role", role);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
@@ -50,9 +54,11 @@ public class F_Lottery extends Fragment {
 
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
         toolbar.setNavigationOnClickListener(v -> {
             // Go back to the Applicants screen
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
         });
 
         //Set up buttons

@@ -67,7 +67,7 @@ public class F_MyEvents extends Fragment {
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
         {
             model.setCurrentEvent(event);
-            ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, model)); }
+            ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(role)); }
         );
         rv.setAdapter(adapter);
     }

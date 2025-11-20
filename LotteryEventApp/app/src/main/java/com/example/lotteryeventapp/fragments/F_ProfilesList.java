@@ -29,10 +29,12 @@ public class F_ProfilesList extends Fragment {
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
     //role = 0 for entrant, role = 1 for organizer, role = 2 for admin
-
-    public F_ProfilesList(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
+    public static F_ProfilesList newInstance(int myRole) {
+        F_ProfilesList fragment = new F_ProfilesList();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public View onCreateView(
@@ -44,7 +46,7 @@ public class F_ProfilesList extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
+        model = ((MainActivity) requireActivity()).getDataModel();
         RecyclerView rv = view.findViewById(R.id.rvProfiles);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         List<Entrant> data = Arrays.asList(
@@ -74,7 +76,7 @@ public class F_ProfilesList extends Fragment {
         // Detect button presses
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmProfile);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
+            ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
         });
     }
 
