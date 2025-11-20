@@ -22,6 +22,7 @@ public class EventDataHolder {
     private ArrayList<String> cancelledList = new ArrayList<String>();
     private ArrayList<String> invitedList = new ArrayList<String>();
     private boolean drawn;
+//    private boolean redraw;
 
     public EventDataHolder(Event event) {
         this.title = event.getTitle();
@@ -38,6 +39,7 @@ public class EventDataHolder {
         this.cancelledList.addAll(event.getCancelled_list());
         this.invitedList.addAll(event.getInvited_list());
         this.drawn = event.isDrawn();
+//        this.redraw = event.isDrawn();
     }
 
     public String getTitle() {
@@ -162,31 +164,31 @@ public class EventDataHolder {
 
     public EventDataHolder(Map<String, Object> data, String eventId) {
         this.title = (String) data.get("title");
-        this.dateTime = (String) data.get("date_time");
+        this.dateTime = (String) data.get("dateTime");
         this.location = (String) data.get("location");
-        this.registrationDeadline = (String) data.get("registration_deadline");
+        this.registrationDeadline = (String) data.get("registrationDeadline");
         this.details = (String) data.get("details");
-        this.trackGeolocation = (Boolean) data.get("track_geolocation");
-        this.willAutomaticallyRedraw = (Boolean) data.get("redraw");
-        this.waitlistLimit = (int) data.get("waitlist_limit");
-        this.attendeeLimit = (int) data.get("attendee_limit");
+        this.trackGeolocation = (Boolean) data.get("trackGeolocation");
+        this.willAutomaticallyRedraw = (Boolean) data.get("willAutomaticallyRedraw");
+        this.waitlistLimit = ((Long) data.get("waitlistLimit")).intValue();
+        this.attendeeLimit = ((Long) data.get("attendeeLimit")).intValue();
 
         List<Object> waitlist = (List<Object>) data.get("waitlist");
         for (Object o: waitlist) {
             this.waitlist.add((String) o);
         }
 
-        List<Object> attendeeList = (List<Object>) data.get("attendee_list");
+        List<Object> attendeeList = (List<Object>) data.get("attendeeList");
         for (Object o: attendeeList) {
             this.attendeeList.add((String) o);
         }
 
-        List<Object> cancelledList = (List<Object>) data.get("cancelled_list");
+        List<Object> cancelledList = (List<Object>) data.get("cancelledList");
         for (Object o: cancelledList) {
             this.cancelledList.add((String) o);
         }
 
-        List<Object> invitedList = (List<Object>) data.get("invited_list");
+        List<Object> invitedList = (List<Object>) data.get("invitedList");
         for (Object o: invitedList) {
             this.invitedList.add((String) o);
         }
