@@ -34,9 +34,9 @@ public abstract class NotificationDataHolder {
         this.event = (String) data.get("event");
         this.entrant = (String) data.get("entrant");
         this.message = (String) data.get("message");
-        this.sent = (Boolean) data.get("is_sent");
-        this.read = (Boolean) data.get("is_read");
-        this.notificationType = (NotificationType) data.get("notification_type");
+        this.sent = (Boolean) data.get("sent");
+        this.read = (Boolean) data.get("read");
+        this.notificationType = NotificationType.valueOf((String)data.get("notificationType"));
     }
 
     public String getUid() {

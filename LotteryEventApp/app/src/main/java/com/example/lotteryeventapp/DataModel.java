@@ -146,7 +146,7 @@ public class DataModel extends TModel<TView>{
                         cb.onSuccess(entrantData.createEntrantInstance());
                     }else {
                         Log.e("Firestore", "Firestore fetch failed: Entrant " + deviceId + " does not exist");
-                        cb.onError(new RuntimeException("Entrant does not exist"));
+                        cb.onSuccess(null); //This signals no entrant for this device
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -364,7 +364,7 @@ public class DataModel extends TModel<TView>{
         notifRef.get()
                 .addOnSuccessListener(notifSnap -> {
                     if (notifSnap.exists()) {
-                        NotificationDataHolder.NotificationType notifType = NotificationDataHolder.NotificationType.valueOf(notifSnap.getString("notification_type"));
+                        NotificationDataHolder.NotificationType notifType = NotificationDataHolder.NotificationType.valueOf(notifSnap.getString("notificationType"));
                         if (notifType == NotificationDataHolder.NotificationType.INVITATION) {
                             InvitationDataHolder invData = new InvitationDataHolder(notifSnap.getData(), notifId);
 

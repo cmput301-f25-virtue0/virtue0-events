@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.fragments.F_SelectRole;
 import com.example.lotteryeventapp.DataModel;
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.Firebase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,43 +25,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         model = new DataModel();
-        model.setCurrentEntrant(entrant);
-
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        try {
-            model.getEntrant(deviceID, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+        Log.d("DeviceID", "Android ID = " + deviceID);
 
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    entrant = (Entrant) obj;
+        loadEntrant(deviceID);
 
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                }
-            });
-        }catch (Exception RuntimeError){
-            Entrant.Profile profile = new Entrant.Profile();
-
-            this.entrant = new Entrant(deviceID, profile);
-            model.setEntrant(this.entrant, new DataModel.SetCallback() {
-                @Override
-                public void onSuccess(String msg) {
-                    Log.d("Firebase", "written");
-                }
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                }
-            });
-            model.setCurrentEntrant(entrant);
-        }
 //        Entrant.Profile profile = new Entrant.Profile();
 //        this.entrant = new Entrant(deviceID, profile);
 //        model.setEntrant(this.entrant, new DataModel.SetCallback() {
@@ -130,6 +100,55 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             showFragment(new F_SelectRole());
         }
+    }
+
+    private void loadEntrant(String deviceID) {
+        Log.d("EntrantLoad", "Loading entrant for deviceID = " + deviceID);
+
+        model.getEntrant(deviceID, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                if (obj == null) {
+                    Log.d("EntrantLoad", "No entrant found for this device, create new for " + deviceID);
+                    createNewEntrant(deviceID);
+                    return;
+                }
+                Log.d("EntrantLoad", "entrant retrieved");
+                entrant = (Entrant) obj;
+                model.setCurrentEntrant(entrant);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("EntrantLoad", "failed, creating new.", e);
+                createNewEntrant(deviceID);
+            }
+        });
+    }
+    public void createNewEntrant(String deviceID) {
+        Log.d("EntrantLoad", "Creating new entrant for deviceID = " + deviceID);
+
+        Entrant.Profile profile = new Entrant.Profile();
+        entrant = new Entrant(deviceID, profile);
+
+        Log.d("EntrantLoad", "About to call setEntrant for uid = " + entrant.getUid());
+
+        model.setEntrant(entrant, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("EntrantLoad", "setEntrant.onSuccess, New entrant with id: " + id);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d("EntrantLoad", "setEntrant.onError, Failed to write new entrant", e);
+
+            }
+        });
+        model.setCurrentEntrant(entrant);
     }
 
     public void showFragment(Fragment newFragment) {
