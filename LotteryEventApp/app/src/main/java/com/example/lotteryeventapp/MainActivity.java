@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.fragments.F_SelectRole;
 import com.example.lotteryeventapp.DataModel;
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.Firebase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,48 +25,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-
-        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        Entrant.Profile profile = new Entrant.Profile("Daniel", "dk8@ualberta.ca", "123-456-7890");
-        Entrant entrant = new Entrant(deviceID, profile);
         model = new DataModel();
-        model.setCurrentEntrant(entrant);
-
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        try {
-            model.getEntrant(deviceID, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    entrant = (Entrant) obj;
+        loadEntrant(deviceID);
 
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                }
-            });
-        }catch (Exception RuntimeError){
-            Entrant.Profile profile = new Entrant.Profile();
-
-            this.entrant = new Entrant(deviceID, profile);
-            model.setEntrant(this.entrant, new DataModel.SetCallback() {
-                @Override
-                public void onSuccess(String msg) {
-                    Log.d("Firebase", "written");
-                }
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                }
-            });
-            model.setCurrentEntrant(entrant);
-        }
 //        Entrant.Profile profile = new Entrant.Profile();
 //        this.entrant = new Entrant(deviceID, profile);
 //        model.setEntrant(this.entrant, new DataModel.SetCallback() {
@@ -135,6 +100,43 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             showFragment(new F_SelectRole());
         }
+    }
+
+    private void loadEntrant(String deviceID) {
+        model.getEntrant(deviceID, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+                entrant = (Entrant) obj;
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "failed");
+                createNewEntrant(deviceID);
+            }
+        });
+    }
+    public void createNewEntrant(String deviceID) {
+        Entrant.Profile profile = new Entrant.Profile();
+        entrant = new Entrant(deviceID, profile);
+
+        model.setEntrant(entrant, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("Firebase", "Written");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d("Firebase", "Failed");
+
+            }
+        });
+        model.setCurrentEntrant(entrant);
     }
 
     public void showFragment(Fragment newFragment) {
