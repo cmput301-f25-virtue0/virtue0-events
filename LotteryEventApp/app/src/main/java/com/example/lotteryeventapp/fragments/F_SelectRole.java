@@ -15,10 +15,6 @@ import com.example.lotteryeventapp.R;
 public class F_SelectRole extends Fragment {
     private DataModel model;
 
-    public F_SelectRole(DataModel myModel) {
-        model = myModel;
-    }
-
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -29,25 +25,26 @@ public class F_SelectRole extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        model = ((MainActivity) requireActivity()).getDataModel();
         // Detect button presses
         view.findViewById(R.id.btnEntrant).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
             }
         });
 
         view.findViewById(R.id.btnOrganizer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             }
         });
 
         view.findViewById(R.id.btnAdmin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
+                ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
             }
         });
     }

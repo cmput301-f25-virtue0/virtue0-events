@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
@@ -88,10 +89,10 @@ public class F_CreateEditEvent extends Fragment {
 
         toolbar.setNavigationOnClickListener(v -> {
             if (type == 1) {
-                ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
             }
             else {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             }
         });
 
@@ -137,6 +138,20 @@ public class F_CreateEditEvent extends Fragment {
                             @Override
                             public void onSuccess(String msg) {
                                 Log.d("Firebase", "written");
+                                Organizer organizer = MainActivity.organizer;
+                                organizer.addEvent(makeEvent.getUid());
+                                newmodel.setOrganizer(organizer, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+
+                                    }
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+
                             }
                             @Override
                             public void onError(Exception e) {
@@ -146,7 +161,7 @@ public class F_CreateEditEvent extends Fragment {
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
                         model.setCurrentEvent(makeEvent);
                         //View newly created event
-                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
 
                     } else {
                         // update existing event
@@ -166,10 +181,10 @@ public class F_CreateEditEvent extends Fragment {
                     }
 
                     if (type == 1) {
-                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
                     }
                     else {
-                        ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
                     }
 
                 } catch(Exception e) {

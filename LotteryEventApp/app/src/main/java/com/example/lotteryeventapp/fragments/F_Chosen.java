@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,12 +26,26 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Chosen extends Fragment {
+
+    private int role;
     private DataModel model;
     private Event event;
 
-    public F_Chosen(DataModel myModel) {
-        model = myModel;
-        event = model.getCurrentEvent();
+    public static F_Chosen newInstance(int role) {
+        F_Chosen fragment = new F_Chosen();
+        Bundle args = new Bundle();
+        args.putInt("role", role);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
     }
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
@@ -46,10 +61,13 @@ public class F_Chosen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
+
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
         });
 
         // Set up RecyclerView

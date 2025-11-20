@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,15 +26,28 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Cancelled extends Fragment {
+
+    private int role;
     private DataModel model;
     private Event event;
+    private ProfileListAdapter.OnProfileClickListener profileListener;
 
-    public F_Cancelled(DataModel myModel) {
-        model = myModel;
-        event = model.getCurrentEvent();
+    public static F_Cancelled newInstance(int myRole) {
+        F_Cancelled fragment = new F_Cancelled();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
     }
 
-    private ProfileListAdapter.OnProfileClickListener profileListener;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
+    }
 
     @Override
     public View onCreateView(
@@ -47,10 +61,13 @@ public class F_Cancelled extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
+
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+            ((MainActivity) requireActivity()).showFragment(F_Applicants.newInstance(2));
         });
 
         RecyclerView rv = view.findViewById(R.id.rvCancelled);

@@ -133,6 +133,11 @@ public class Entrant {
             setEmail(email);
             setPhone(phone);
         }
+        public Profile() {
+            setName("");
+            setEmail("default@email");
+            setPhone("");
+        }
 
         public String getName() {
             return name;

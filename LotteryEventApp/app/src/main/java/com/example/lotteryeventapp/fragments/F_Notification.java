@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,11 +28,22 @@ public class F_Notification extends Fragment {
     private int role;
     private DataModel model;
 
+    public static F_Notification newInstance(int myRole){
+        F_Notification fragment = new F_Notification();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     //role = 0 for entrant, role = 1 for organizer
-    public F_Notification(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
     }
 
     @Override
@@ -45,14 +57,15 @@ public class F_Notification extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
+        model = ((MainActivity) requireActivity()).getDataModel();
         // 2. Set up the Toolbar
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
             if (role == 0) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
             }
             else {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
             }
         });
 

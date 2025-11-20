@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,10 +25,23 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
     private int role;
     private DataModel model;
 
-    public F_AdminImages(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
+    public static F_AdminImages newInstance(int myRole){
+        F_AdminImages fragment = new F_AdminImages();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
+    }
+
 
     @Override
     public View onCreateView(
@@ -39,6 +53,7 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
+        model= ((MainActivity) requireActivity()).getDataModel();
         RecyclerView rv = view.findViewById(R.id.rvImages);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -55,7 +70,7 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmImage);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
+            ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
         });
     }
 
