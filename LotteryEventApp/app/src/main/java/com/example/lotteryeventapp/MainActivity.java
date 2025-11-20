@@ -22,11 +22,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
-
-        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        Entrant.Profile profile = new Entrant.Profile("Daniel", "dk8@ualberta.ca", "123-456-7890");
-        Entrant entrant = new Entrant(deviceID, profile);
         model = new DataModel();
         model.setCurrentEntrant(entrant);
 
