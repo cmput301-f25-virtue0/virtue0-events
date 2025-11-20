@@ -364,7 +364,7 @@ public class DataModel extends TModel<TView>{
         notifRef.get()
                 .addOnSuccessListener(notifSnap -> {
                     if (notifSnap.exists()) {
-                        NotificationDataHolder.NotificationType notifType = NotificationDataHolder.NotificationType.valueOf(notifSnap.getString("notification_type"));
+                        NotificationDataHolder.NotificationType notifType = NotificationDataHolder.NotificationType.valueOf(notifSnap.getString("notificationType"));
                         if (notifType == NotificationDataHolder.NotificationType.INVITATION) {
                             InvitationDataHolder invData = new InvitationDataHolder(notifSnap.getData(), notifId);
 

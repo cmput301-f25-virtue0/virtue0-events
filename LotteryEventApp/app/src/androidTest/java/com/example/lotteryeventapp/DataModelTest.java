@@ -17,6 +17,248 @@ public class DataModelTest {
     final String permanentTestInvitation = "TEST_INVITATION_DO_NOT_REMOVE";
     final String permanentTestRejection = "TEST_REJECTION_DO_NOT_REMOVE";
 
+    public Rejection mockRejection(){
+        return new Rejection(permanentMockEvent().getUid(), permanentMockEntrant().getUid(), "Mock rejection");
+    }
+
+    public Rejection permanentMockRejection(){
+        return new Rejection(this.permanentTestRejection, permanentMockEvent().getUid(), permanentMockEntrant().getUid(), "Permanent mock rejection");
+    }
+
+    @Test
+    public void getNonexistentRejectionTest() throws InterruptedException {
+        DataModel model = new DataModel();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        model.getNotification("rejection", new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (e.getMessage().equals("Notification does not exist")) {
+                    assertEquals(true, true);
+                }else {
+                    assertEquals(false, true);
+                }
+
+                latch.countDown();
+            }
+        });
+
+        latch.await();
+    }
+
+    @Test
+    public void newRejectionAndDeleteRejectionTest() throws InterruptedException {
+        String rejId = setRejectionTest();
+        deleteRejectionTest(rejId);
+    }
+
+    public void deleteRejectionTest(String invId) throws InterruptedException {
+        DataModel model = new DataModel();
+        Rejection rej = mockRejection();
+        rej.setUid(invId);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        model.deleteNotification(rej, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                assertEquals(true, true);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                assertEquals(false, true);
+                latch.countDown();
+            }
+        });
+        latch.await();
+    }
+
+    public String setRejectionTest() throws InterruptedException {
+        DataModel model = new DataModel();
+        Rejection rej = mockRejection();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        model.setNotification(rej, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                assertEquals(true, true);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                assertEquals(false, true);
+                latch.countDown();
+            }
+        });
+        latch.await();
+
+        assertNotNull(rej.getUid());
+        assertNotEquals("", rej.getUid());
+        return rej.getUid();
+    }
+
+    @Test
+    public void getRejectionTest() throws InterruptedException {
+        DataModel model = new DataModel();
+        CountDownLatch latch = new CountDownLatch(1);
+        model.getNotification(this.permanentTestRejection, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                if (type == NotificationDataHolder.NotificationType.REJECTION) {
+                    assertEquals(true, true);
+                }else {
+                    assertEquals(false, true);
+                }
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                assertEquals(false, true);
+                latch.countDown();
+            }
+        });
+        latch.await();
+    }
+
+    public Invitation mockInvitation(){
+        return new Invitation(permanentMockEvent().getUid(), permanentMockEntrant().getUid(), "Mock invitation");
+    }
+
+    public Invitation permanentMockInvitation(){
+        return new Invitation(this.permanentTestInvitation, permanentMockEvent().getUid(), permanentMockEntrant().getUid(), "Permanent mock invitation");
+    }
+
+    @Test
+    public void getNonexistentInvitationTest() throws InterruptedException {
+        DataModel model = new DataModel();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        model.getNotification("invitation", new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (e.getMessage().equals("Notification does not exist")) {
+                    assertEquals(true, true);
+                }else {
+                    assertEquals(false, true);
+                }
+
+                latch.countDown();
+            }
+        });
+
+        latch.await();
+    }
+
+    @Test
+    public void newInvitationAndDeleteInvitationTest() throws InterruptedException {
+        String invId = setInvitationTest();
+        deleteInvitationTest(invId);
+    }
+
+    public void deleteInvitationTest(String invId) throws InterruptedException {
+        DataModel model = new DataModel();
+        Invitation inv = mockInvitation();
+        inv.setUid(invId);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        model.deleteNotification(inv, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                assertEquals(true, true);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                assertEquals(false, true);
+                latch.countDown();
+            }
+        });
+        latch.await();
+    }
+
+    public String setInvitationTest() throws InterruptedException {
+        DataModel model = new DataModel();
+        Invitation inv = mockInvitation();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        model.setNotification(inv, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                assertEquals(true, true);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                assertEquals(false, true);
+                latch.countDown();
+            }
+        });
+        latch.await();
+
+        assertNotNull(inv.getUid());
+        assertNotEquals("", inv.getUid());
+        return inv.getUid();
+    }
+
+    @Test
+    public void getInvitationTest() throws InterruptedException {
+        DataModel model = new DataModel();
+        CountDownLatch latch = new CountDownLatch(1);
+        model.getNotification(this.permanentTestInvitation, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                if (type == NotificationDataHolder.NotificationType.INVITATION) {
+                    assertEquals(true, true);
+                }else {
+                    assertEquals(false, true);
+                }
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                assertEquals(false, true);
+                latch.countDown();
+            }
+        });
+        latch.await();
+    }
+
 
 
     public Organizer permanentMockOrganizer(){
@@ -65,7 +307,7 @@ public class DataModelTest {
         deleteEntrantTest();
     }
 
-    public void deleteOrganizerTest () throws InterruptedException {
+    public void deleteOrganizerTest() throws InterruptedException {
         DataModel model = new DataModel();
         Organizer organizer = mockOrganizer();
         CountDownLatch latch = new CountDownLatch(1);
@@ -186,7 +428,7 @@ public class DataModelTest {
         deleteEntrantTest();
     }
 
-    public void deleteEntrantTest () throws InterruptedException {
+    public void deleteEntrantTest() throws InterruptedException {
         DataModel model = new DataModel();
         Entrant entrant = mockEntrant();
         CountDownLatch latch = new CountDownLatch(1);
@@ -259,7 +501,7 @@ public class DataModelTest {
     }
 
     public Event permanentMockEvent() {
-        return new Event("Testing", "12:00pm, January 01, 2000","Outpost 19","11:59pm, December 1,2024","Testing event object, DO NOT REMOVE",false,false,20,20);
+        return new Event("Testing", this.permanentTestEvent, "12:00pm, January 01, 2000","Outpost 19","11:59pm, December 1,2024","Testing event object, DO NOT REMOVE",false,false,20,20);
     }
 
     public Event mockEvent() {
@@ -305,7 +547,7 @@ public class DataModelTest {
         deleteEventTest(newEventId);
     }
 
-    public void deleteEventTest (String eventId) throws InterruptedException {
+    public void deleteEventTest(String eventId) throws InterruptedException {
         DataModel model = new DataModel();
         Event event = mockEvent();
         event.setUid(eventId);
