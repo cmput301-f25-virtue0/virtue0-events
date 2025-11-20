@@ -30,17 +30,21 @@ import java.util.concurrent.CountDownLatch;
 public class F_BrowseEvents extends Fragment {
     private int role;
     private DataModel model;
+    public F_BrowseEvents() { }
+
 
     public F_BrowseEvents(int myRole, DataModel myModel) {
         this.role = myRole;
         model = myModel;
     }
+
     public F_BrowseEvents(int myRole) {
         this.role = myRole;
     }
 
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater i, @Nullable ViewGroup c, @Nullable Bundle b) {
         return i.inflate(R.layout.fragment_events_list, c, false);
     }
@@ -62,57 +66,41 @@ public class F_BrowseEvents extends Fragment {
             ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
         });
 
+        DataModel dataModel = new DataModel();
 
-        // Demo "global" events
-//        List<Event> data = Arrays.asList(
-//                new Event("Swim Lessons (Beginners)", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
-//                        "2024-12-15", "Learn to swim safely.", false, true, 100, 20),
-//                new Event("Intro to Piano", "Wed Jan 8 · 5:30–6:30 PM", "Music Room B",
-//                        "2024-12-15", "Basics of piano playing.", false, false, 100, 25),
-//                new Event("Canoe Safety Workshop", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
-//                        "2024-12-20", "Paddling & safety essentials.", false, true, 60, 12)
-//        );
-        ArrayList<Event> data = new ArrayList<>();
-        DataModel model = new DataModel();
-        CountDownLatch latch = new CountDownLatch(1);
-        model.getAllEvents(new DataModel.GetCallback() {
+// Start the asynchronous data fetch
+        dataModel.getAllEvents(new DataModel.GetCallback() {
             @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) { /* not used here */ }
 
-            }
             @Override
             public void onSuccess(Object obj) {
-                data.addAll((ArrayList<Event>) obj);
-                Log.d("Firebase", "retrieved");
-                latch.countDown();
+                // this code runs only after data has been retrieved
+                ArrayList<Event> eventData = (ArrayList<Event>) obj;
 
+                Log.d("Firebase", "retrieved " + eventData.size() + " events.");
 
+                // 1. Create the adapter with the retrieved data
+                EventAdapter adapter = new EventAdapter(eventData, role, (event, pos) ->
+                {
+                    // No need for latch anymore,
+                    // this adapter and data are only created after fetch.
+                    dataModel.setCurrentEvent(event);
+                    ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, dataModel));
+                });
+
+                // 2. Set the adapter to the RecyclerView
+                rv.setAdapter(adapter);
             }
 
             @Override
             public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-
+                Log.e("Firebase", "fail to retrieve events: " + e.getMessage());
+                Toast.makeText(requireContext(), "Error loading events", Toast.LENGTH_SHORT).show();
             }
         });
 
 
-
-        //todo: get all events
-
-        EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
-        {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            Event event1 = new Event("shopping","6:00pm, January 27, 2025", "123","Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
-            model.setCurrentEvent(event1);
-            ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, model)); }
-        );
-        rv.setAdapter(adapter);
     }
 }
-
 
