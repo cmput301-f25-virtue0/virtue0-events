@@ -34,7 +34,7 @@ public class F_Profile extends Fragment {
         view.findViewById(R.id.backArrowProfile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
             }});
     }
 }

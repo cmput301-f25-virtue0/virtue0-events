@@ -28,11 +28,6 @@ public class F_Chosen extends Fragment {
     private DataModel model;
     private Event event;
 
-    public F_Chosen(DataModel myModel) {
-        model = myModel;
-        event = model.getCurrentEvent();
-    }
-
     private ProfileListAdapter.OnProfileClickListener profileListener;
     @Override
     public View onCreateView(
@@ -46,10 +41,13 @@ public class F_Chosen extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
+
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
         });
 
         // Set up RecyclerView

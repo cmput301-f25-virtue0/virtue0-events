@@ -29,11 +29,6 @@ public class F_Lottery extends Fragment {
     private DataModel model;
     private Event event;
 
-    public F_Lottery(DataModel myModel) {
-        model = myModel;
-        event = model.getCurrentEvent();
-    }
-
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
     @Override
@@ -50,9 +45,11 @@ public class F_Lottery extends Fragment {
 
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
         toolbar.setNavigationOnClickListener(v -> {
             // Go back to the Applicants screen
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
         });
 
         //Set up buttons

@@ -28,10 +28,6 @@ public class F_Enrolled extends Fragment {
     private DataModel model;
     private Event event;
 
-    public F_Enrolled(DataModel myModel) {
-        model = myModel;
-        event = model.getCurrentEvent();
-    }
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
@@ -47,10 +43,13 @@ public class F_Enrolled extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
+
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
         });
 
         RecyclerView rv = view.findViewById(R.id.rvEnrolled);

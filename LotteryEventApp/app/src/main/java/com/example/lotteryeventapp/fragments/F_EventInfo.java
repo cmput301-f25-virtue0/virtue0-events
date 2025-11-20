@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.Event;
@@ -24,11 +26,22 @@ public class F_EventInfo extends Fragment {
     private DataModel model;
 
     //role = 0 for entrant, role = 1 for organizer
-    public F_EventInfo(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
-        event = model.getCurrentEvent();
-        entrant = model.getCurrentEntrant();
+
+    public static F_EventInfo newInstance(int myRole){
+        F_EventInfo fragment = new F_EventInfo();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
     }
 
     @Override
@@ -41,6 +54,11 @@ public class F_EventInfo extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
+        Log.i("CURRENT EVENT INFO ROLE", "Current EVENT INFO user role is: " + role);
+
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
         // Set up info based on event
         if (event != null) {
             //Title
@@ -82,7 +100,7 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(0, model));
+                    ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
                 }});
         }
         else if (role == 1) {
@@ -99,12 +117,12 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.applicantsBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Applicants(model));
+                    ((MainActivity) requireActivity()).showFragment(new F_Applicants());
                 }});
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                    ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
                 }});
         } else if (role == 2) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
@@ -114,7 +132,7 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_HomePage(2, model));
+                    ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(2));
                 }});
 
         }

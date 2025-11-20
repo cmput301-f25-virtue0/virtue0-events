@@ -88,10 +88,10 @@ public class F_CreateEditEvent extends Fragment {
 
         toolbar.setNavigationOnClickListener(v -> {
             if (type == 1) {
-                ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
             }
             else {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             }
         });
 
@@ -146,7 +146,7 @@ public class F_CreateEditEvent extends Fragment {
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
                         model.setCurrentEvent(makeEvent);
                         //View newly created event
-                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
 
                     } else {
                         // update existing event
@@ -166,10 +166,10 @@ public class F_CreateEditEvent extends Fragment {
                     }
 
                     if (type == 1) {
-                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
                     }
                     else {
-                        ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
                     }
 
                 } catch(Exception e) {
