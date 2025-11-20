@@ -56,7 +56,7 @@ public class EntrantDataHolder {
             this.notifications.add((String) o);
         }
 
-        this.notificationOptOut = (Boolean) data.get("notification_opt_out");
+        this.notificationOptOut = (Boolean) data.get("notificationOptOut");
     }
 
     public Entrant createEntrantInstance() {

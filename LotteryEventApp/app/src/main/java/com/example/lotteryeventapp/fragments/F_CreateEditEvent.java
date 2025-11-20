@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
@@ -137,6 +138,20 @@ public class F_CreateEditEvent extends Fragment {
                             @Override
                             public void onSuccess(String msg) {
                                 Log.d("Firebase", "written");
+                                Organizer organizer = MainActivity.organizer;
+                                organizer.addEvent(makeEvent.getUid());
+                                newmodel.setOrganizer(organizer, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+
+                                    }
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+
                             }
                             @Override
                             public void onError(Exception e) {
