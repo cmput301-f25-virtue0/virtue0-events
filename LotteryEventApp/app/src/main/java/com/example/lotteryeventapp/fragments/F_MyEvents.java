@@ -50,13 +50,19 @@ public class F_MyEvents extends Fragment {
 
 
         // Demo "my events" (different set)
-        /*List<Event> data = Arrays.asList(
-                new Event("My Registered: Swim Lessons", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
-                        "2024-12-15", "You’re on the waitlist.", false, true, 100, 20),
-                new Event("My Registered: Canoe Safety", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
-                        "2024-12-20", "Invitation pending.", false, true, 60, 12)
-        );*/
+//        List<Event> data = Arrays.asList(
+//                new Event("My Registered: Swim Lessons", "Mon Jan 6 · 6:00–7:30 PM", "Downtown Rec Centre",
+//                        "2024-12-15", "You’re on the waitlist.", false, true, 100, 20),
+//                new Event("My Registered: Canoe Safety", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
+//                        "2024-12-20", "Invitation pending.", false, true, 60, 12)
+//        );
         List<Event> data = new ArrayList<>(); //org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
+//        List<Event> data; //org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
+//        try {
+//            data = MainActivity.organizer.getUsableEvents();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
 
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
         {
