@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.MainActivity;
@@ -30,6 +31,15 @@ public class F_Applicants extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
+    }
+
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
@@ -46,36 +56,36 @@ public class F_Applicants extends Fragment {
         if (event == null) {
             Toast.makeText(requireContext(), "Error: No event selected to run the lottery.", Toast.LENGTH_LONG).show();
             // Go back to the organizer's home page (role 1)
-            ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(2));
+            ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             return; // Stop execution of onViewCreated
         }
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(2));
+            ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             });
 
         // Detect button presses
         view.findViewById(R.id.btnDoLottery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Lottery());
+                ((MainActivity) requireActivity()).showFragment(F_Lottery.newInstance(1));
             }});
 
         view.findViewById(R.id.btnChosen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Chosen());
+                ((MainActivity) requireActivity()).showFragment(F_Chosen.newInstance(1));
             }});
 
         view.findViewById(R.id.btnEnrolled).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Enrolled());
+                ((MainActivity) requireActivity()).showFragment(F_Enrolled.newInstance(1));
             }});
 
         view.findViewById(R.id.btnCancelled).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Cancelled());
+                ((MainActivity) requireActivity()).showFragment(F_Cancelled.newInstance(1));
             }});
 
         view.findViewById(R.id.btnMap).setOnClickListener(new View.OnClickListener() {

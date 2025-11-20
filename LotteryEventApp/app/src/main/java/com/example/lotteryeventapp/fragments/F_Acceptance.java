@@ -15,12 +15,17 @@ import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 public class F_Acceptance extends Fragment {
+
+    private int role;
     private Invitation notif; //Note: 'Notification' here does not seem to be the same as our notification class(?) Conflicting with base Android Class?
     private DataModel model;
 
-    public F_Acceptance(Invitation myNotif, DataModel myModel) {
-        this.notif = myNotif;
-        model = myModel;
+    public static F_Acceptance newInstance(int myRole){
+        F_Acceptance fragment = new F_Acceptance();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override

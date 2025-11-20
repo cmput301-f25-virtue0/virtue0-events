@@ -26,8 +26,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Lottery extends Fragment {
+    private int role;
     private DataModel model;
     private Event event;
+
+    public static F_Lottery newInstance(int role) {
+        F_Lottery fragment = new F_Lottery();
+        Bundle args = new Bundle();
+        args.putInt("role", role);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
 

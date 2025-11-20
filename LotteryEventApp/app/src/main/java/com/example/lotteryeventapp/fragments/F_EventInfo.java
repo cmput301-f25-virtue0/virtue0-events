@@ -132,7 +132,7 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(2));
+                    ((MainActivity) requireActivity()).showFragment(F_BrowseEvents.newInstance(2));
                 }});
 
         }

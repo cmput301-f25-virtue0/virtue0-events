@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,8 +26,27 @@ import java.util.Arrays;
 import java.util.List;
 
 public class F_Enrolled extends Fragment {
+
+    private int role;
     private DataModel model;
     private Event event;
+
+    public static F_Enrolled newInstance(int myRole) {
+        F_Enrolled fragment = new F_Enrolled();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // CRITICAL: Retrieve the 'role' argument here
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
+    }
 
 
     private ProfileListAdapter.OnProfileClickListener profileListener;
