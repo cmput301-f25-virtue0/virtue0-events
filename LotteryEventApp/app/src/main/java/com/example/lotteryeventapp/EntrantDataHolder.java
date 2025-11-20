@@ -12,6 +12,30 @@ public class EntrantDataHolder {
     private ArrayList<String> notifications = new ArrayList<String>();
     private boolean notificationOptOut;
 
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public ArrayList<String> getNotifications() {
+        return notifications;
+    }
+
+    public boolean isNotificationOptOut() {
+        return notificationOptOut;
+    }
+
     public EntrantDataHolder(Entrant entrant) {
         this.name = entrant.getProfile().getName();
         this.email = entrant.getProfile().getEmail();

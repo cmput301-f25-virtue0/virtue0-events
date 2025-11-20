@@ -25,6 +25,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class F_BrowseEvents extends Fragment {
     private int role;
@@ -73,6 +74,7 @@ public class F_BrowseEvents extends Fragment {
 //        );
         ArrayList<Event> data = new ArrayList<>();
         DataModel model = new DataModel();
+        CountDownLatch latch = new CountDownLatch(1);
         model.getAllEvents(new DataModel.GetCallback() {
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
@@ -82,6 +84,8 @@ public class F_BrowseEvents extends Fragment {
             public void onSuccess(Object obj) {
                 data.addAll((ArrayList<Event>) obj);
                 Log.d("Firebase", "retrieved");
+                latch.countDown();
+
 
             }
 
@@ -91,6 +95,11 @@ public class F_BrowseEvents extends Fragment {
 
             }
         });
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
 
         //todo: get all events

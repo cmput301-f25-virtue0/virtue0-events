@@ -236,7 +236,7 @@ public class DataModel extends TModel<TView>{
     public void setEvent(Event event, SetCallback cb) {
         EventDataHolder data = new EventDataHolder(event);
 
-        if (event.getUid().isEmpty()) {
+        if (!event.getUid().isEmpty()) {
             // Update existing event
             DocumentReference eventRef = this.events.document(event.getUid());
             eventRef.set(data)
@@ -302,7 +302,7 @@ public class DataModel extends TModel<TView>{
     }
     public void getAllEvents(GetCallback cb){
         ArrayList<Event> events = new ArrayList<Event>();
-        db.collection("cities")
+        this.events
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

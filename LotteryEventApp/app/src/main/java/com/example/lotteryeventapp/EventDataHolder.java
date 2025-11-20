@@ -40,6 +40,126 @@ public class EventDataHolder {
         this.drawn = event.isDrawn();
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getRegistrationDeadline() {
+        return registrationDeadline;
+    }
+
+    public void setRegistrationDeadline(String registrationDeadline) {
+        this.registrationDeadline = registrationDeadline;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public boolean isTrackGeolocation() {
+        return trackGeolocation;
+    }
+
+    public void setTrackGeolocation(boolean trackGeolocation) {
+        this.trackGeolocation = trackGeolocation;
+    }
+
+    public boolean isWillAutomaticallyRedraw() {
+        return willAutomaticallyRedraw;
+    }
+
+    public void setWillAutomaticallyRedraw(boolean willAutomaticallyRedraw) {
+        this.willAutomaticallyRedraw = willAutomaticallyRedraw;
+    }
+
+    public int getWaitlistLimit() {
+        return waitlistLimit;
+    }
+
+    public void setWaitlistLimit(int waitlistLimit) {
+        this.waitlistLimit = waitlistLimit;
+    }
+
+    public int getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public void setAttendeeLimit(int attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
+    }
+
+    public ArrayList<String> getWaitlist() {
+        return waitlist;
+    }
+
+    public void setWaitlist(ArrayList<String> waitlist) {
+        this.waitlist = waitlist;
+    }
+
+    public ArrayList<String> getAttendeeList() {
+        return attendeeList;
+    }
+
+    public void setAttendeeList(ArrayList<String> attendeeList) {
+        this.attendeeList = attendeeList;
+    }
+
+    public ArrayList<String> getCancelledList() {
+        return cancelledList;
+    }
+
+    public void setCancelledList(ArrayList<String> cancelledList) {
+        this.cancelledList = cancelledList;
+    }
+
+    public ArrayList<String> getInvitedList() {
+        return invitedList;
+    }
+
+    public void setInvitedList(ArrayList<String> invitedList) {
+        this.invitedList = invitedList;
+    }
+
+    public boolean isDrawn() {
+        return drawn;
+    }
+
+    public void setDrawn(boolean drawn) {
+        this.drawn = drawn;
+    }
+
     public EventDataHolder(Map<String, Object> data, String eventId) {
         this.title = (String) data.get("title");
         this.dateTime = (String) data.get("date_time");

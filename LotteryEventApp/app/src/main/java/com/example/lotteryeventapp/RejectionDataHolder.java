@@ -23,4 +23,5 @@ public class RejectionDataHolder extends NotificationDataHolder {
 
         return rej;
     }
+
 }
