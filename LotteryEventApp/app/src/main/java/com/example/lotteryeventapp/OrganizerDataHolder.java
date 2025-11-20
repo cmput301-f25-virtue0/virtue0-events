@@ -28,4 +28,20 @@ public class OrganizerDataHolder {
 
         return organizer;
     }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public ArrayList<String> getEvents() {
+        return events;
+    }
+
+    public void setEvents(ArrayList<String> events) {
+        this.events = events;
+    }
 }
