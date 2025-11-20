@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         model = new DataModel();
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        Log.d("DeviceID", "Android ID = " + deviceID);
 
         loadEntrant(deviceID);
 
@@ -103,36 +104,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadEntrant(String deviceID) {
+        Log.d("EntrantLoad", "Loading entrant for deviceID = " + deviceID);
+
         model.getEntrant(deviceID, new DataModel.GetCallback() {
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
             }
             @Override
             public void onSuccess(Object obj) {
-                Log.d("Firebase", "retrieved");
+                if (obj == null) {
+                    Log.d("EntrantLoad", "No entrant found for this device, create new for " + deviceID);
+                    createNewEntrant(deviceID);
+                    return;
+                }
+                Log.d("EntrantLoad", "entrant retrieved");
                 entrant = (Entrant) obj;
+                model.setCurrentEntrant(entrant);
             }
 
             @Override
             public void onError(Exception e) {
-                Log.e("Firebase", "failed");
+                Log.e("EntrantLoad", "failed, creating new.", e);
                 createNewEntrant(deviceID);
             }
         });
     }
     public void createNewEntrant(String deviceID) {
+        Log.d("EntrantLoad", "Creating new entrant for deviceID = " + deviceID);
+
         Entrant.Profile profile = new Entrant.Profile();
         entrant = new Entrant(deviceID, profile);
+
+        Log.d("EntrantLoad", "About to call setEntrant for uid = " + entrant.getUid());
 
         model.setEntrant(entrant, new DataModel.SetCallback() {
             @Override
             public void onSuccess(String id) {
-                Log.d("Firebase", "Written");
+                Log.d("EntrantLoad", "setEntrant.onSuccess, New entrant with id: " + id);
             }
 
             @Override
             public void onError(Exception e) {
-                Log.d("Firebase", "Failed");
+                Log.d("EntrantLoad", "setEntrant.onError, Failed to write new entrant", e);
 
             }
         });

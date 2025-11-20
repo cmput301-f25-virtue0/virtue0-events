@@ -44,6 +44,7 @@ public class F_Profile extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         // Detect button presses
         view.findViewById(R.id.backArrowProfile).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,13 +52,24 @@ public class F_Profile extends Fragment {
                 ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
             }});
 
-        Entrant.Profile p = new Entrant.Profile("John", "John@gmail.com", "780-123-4567");
-        entrant = new Entrant("1234", p);
+        MainActivity activity = (MainActivity) requireActivity();
+        model = activity.getDataModel();
+        entrant = activity.getEntrant();
+
+        tvName = view.findViewById(R.id.UserName);
+        tvEmail = view.findViewById(R.id.Email);
+        tvPhone = view.findViewById(R.id.UserPhone);
 
         btnEditName = view.findViewById(R.id.btnEditName);
         btnEditEmail = view.findViewById(R.id.btnEditEmail);
         btnEditPhone = view.findViewById(R.id.btnEditPhone);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
+
+        if (entrant != null) {
+            tvName.setText(entrant.getProfile().getName());
+            tvEmail.setText(entrant.getProfile().getEmail());
+            tvPhone.setText(entrant.getProfile().getPhone());
+        }
 
         btnEditName.setOnClickListener(v -> {
             EditText input = new EditText(requireContext());
@@ -99,7 +111,7 @@ public class F_Profile extends Fragment {
                     .setTitle("Edit Phone Number")
                     .setPositiveButton("Save", (dialog, which) -> {
                         String newPhone = input.getText().toString();
-                        entrant.updateProfile(entrant.getProfile().getName(), newPhone, entrant.getProfile().getPhone());
+                        entrant.updateProfile(entrant.getProfile().getName(), entrant.getProfile().getEmail(), newPhone);
                         tvEmail.setText(newPhone);
                         Toast.makeText(requireContext(), "Phone updated", Toast.LENGTH_SHORT).show();
                     }).setNegativeButton("Cancel", null).show();

@@ -146,7 +146,7 @@ public class DataModel extends TModel<TView>{
                         cb.onSuccess(entrantData.createEntrantInstance());
                     }else {
                         Log.e("Firestore", "Firestore fetch failed: Entrant " + deviceId + " does not exist");
-                        cb.onError(new RuntimeException("Entrant does not exist"));
+                        cb.onSuccess(null); //This signals no entrant for this device
                     }
                 })
                 .addOnFailureListener(e -> {
