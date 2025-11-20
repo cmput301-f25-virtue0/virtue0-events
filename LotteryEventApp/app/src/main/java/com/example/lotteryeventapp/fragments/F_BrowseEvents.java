@@ -95,18 +95,20 @@ public class F_BrowseEvents extends Fragment {
 
             }
         });
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
 
 
         //todo: get all events
 
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
         {
-            model.setCurrentEvent(event);
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Event event1 = new Event("shopping","6:00pm, January 27, 2025", "123","Southgate","11:59pm, December 1,2024","Stuff will happen",false,false,20,20);
+            model.setCurrentEvent(event1);
             ((MainActivity) requireActivity()).showFragment(new F_EventInfo(role, model)); }
         );
         rv.setAdapter(adapter);
