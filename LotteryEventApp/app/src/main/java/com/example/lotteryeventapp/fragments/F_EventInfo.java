@@ -100,13 +100,12 @@ public class F_EventInfo extends Fragment {
                 public void onClick(View view) {
                     joinWaitlist();
                 }});
-            if (currentEntrant.getWaitlistedEvents().contains(event.getUid())) {
+
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
                 }});
-            }
         }
         else if (role == 1) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
