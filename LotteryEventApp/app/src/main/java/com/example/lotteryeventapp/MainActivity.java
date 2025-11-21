@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         model = new DataModel();
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-//        model.setCurrentOrganizer(organizer);
+
         loadEntrant(deviceID);
         loadOrganizer(deviceID);
 
@@ -95,10 +95,6 @@ public class MainActivity extends AppCompatActivity {
 //        model.setCurrentOrganizer(this.organizer);
 
 
-
-
-
-
         //todo: set current organizer to model using model.setCurrentOrganizer(organizer);
 
         //Send user to choose role page if not previous state is detected
@@ -151,28 +147,33 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(Object obj) {
                 Log.d("Firebase", "retrieved");
                 entrant = (Entrant) obj;
+                model.setCurrentEntrant(entrant);
             }
 
             @Override
             public void onError(Exception e) {
-                Log.e("Firebase", "failed");
+                Log.e("EntrantLoad", "failed, creating new.", e);
                 createNewEntrant(deviceID);
             }
         });
     }
     public void createNewEntrant(String deviceID) {
+        Log.d("EntrantLoad", "Creating new entrant for deviceID = " + deviceID);
+
         Entrant.Profile profile = new Entrant.Profile();
         entrant = new Entrant(deviceID, profile);
+
+        Log.d("EntrantLoad", "About to call setEntrant for uid = " + entrant.getUid());
 
         model.setEntrant(entrant, new DataModel.SetCallback() {
             @Override
             public void onSuccess(String id) {
-                Log.d("Firebase", "Written");
+                Log.d("EntrantLoad", "setEntrant.onSuccess, New entrant with id: " + id);
             }
 
             @Override
             public void onError(Exception e) {
-                Log.d("Firebase", "Failed");
+                Log.d("EntrantLoad", "setEntrant.onError, Failed to write new entrant", e);
 
             }
         });
