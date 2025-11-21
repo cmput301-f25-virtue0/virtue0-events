@@ -25,6 +25,7 @@ public class EventDataHolder {
 //    private boolean redraw;
 
     public EventDataHolder(Event event) {
+        this.uid = event.getUid();
         this.title = event.getTitle();
         this.dateTime = event.getDate_time();
         this.location = event.getLocation();

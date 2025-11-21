@@ -19,6 +19,9 @@ public class Entrant {
     private ArrayList<String> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
 
+    private ArrayList<String> waitlistedEvents = new ArrayList<>();
+
+
     /**
      * Constructs a new entrant
      * @param uid a unique identifier from their device
@@ -240,6 +243,20 @@ public class Entrant {
     @Override
     public int hashCode() {
         return Objects.hash(uid);
+    }
+
+    public void addWaitlistedEvent(String eventId) {
+        if (!waitlistedEvents.contains(eventId)) {
+            waitlistedEvents.add(eventId);
+        }
+    }
+
+    public void removeWaitlistedEvent(String eventId) {
+        waitlistedEvents.remove(eventId);
+    }
+
+    public ArrayList<String> getWaitlistedEvents() {
+        return waitlistedEvents;
     }
 
 }

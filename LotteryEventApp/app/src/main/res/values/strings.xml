@@ -36,7 +36,7 @@
     <string name="admin">Administrator</string>
     <string name="choose_a_role_to_continue">Choose a role to continue</string>
     <string name="sign_in_as">Sign in as</string>
-    <string name="browse_events">Browse Events\n</string>
+    <string name="browse_events">Browse Events</string>
     <string name="my_events">My Events</string>
     <string name="add_events">Add events</string>
     <string name="notifications">Notifications</string>
@@ -45,4 +45,10 @@
     <string name="images">Images</string>
     <string name="delete">Delete</string>
     <string name="in_waitlist">in waitlist</string>
+    <string name="contact_info">Contact info</string>
+    <string name="edit_name">edit name</string>
+    <string name="name">Name</string>
+    <string name="phone_number">Phone number</string>
+    <string name="edit_phone_number">edit phone number</string>
+    <string name="email">Email</string>
 </resources>
