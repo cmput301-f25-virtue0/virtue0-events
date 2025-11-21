@@ -85,42 +85,6 @@ public class MainActivity extends AppCompatActivity {
             showFragment(new F_SelectRole());
         }
     }
-    private void loadOrganizer(String deviceID) {
-        model.getOrganizer(deviceID, new DataModel.GetCallback() {
-            @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-            }
-            @Override
-            public void onSuccess(Object obj) {
-                Log.d("Firebase", "retrieved");
-                organizer = (Organizer) obj;
-                model.setCurrentOrganizer(organizer);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "failed");
-                createNewOrganizer(deviceID);
-            }
-        });
-    }
-    public void createNewOrganizer(String deviceID) {
-        organizer = new Organizer(deviceID);
-
-        model.setOrganizer(organizer, new DataModel.SetCallback() {
-            @Override
-            public void onSuccess(String id) {
-                Log.d("Firebase", "Written");
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.d("Firebase", "Failed");
-
-            }
-        });
-        model.setCurrentOrganizer(organizer);
-    }
     private void loadEntrant(String deviceID) {
         model.getEntrant(deviceID, new DataModel.GetCallback() {
             @Override
