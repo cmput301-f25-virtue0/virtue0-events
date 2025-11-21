@@ -27,8 +27,6 @@ public class F_CreateEditEvent extends Fragment {
     private DataModel model;
     private Event event;
 
-
-
     // This constructor is used for "edit"
     public static F_CreateEditEvent newInstance(int myType) {
         F_CreateEditEvent fragment = new F_CreateEditEvent();
@@ -54,6 +52,8 @@ public class F_CreateEditEvent extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarCreateEvent);
         model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
+
 
 
         //If editing, fill out information with existing event info
