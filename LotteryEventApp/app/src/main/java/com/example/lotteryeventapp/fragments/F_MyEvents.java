@@ -31,7 +31,7 @@ public class F_MyEvents extends Fragment {
     public F_MyEvents(int myRole, DataModel myModel) {
         this.role = myRole;
         model = myModel;
-        org = model. getCurrentOrganizer();
+        org = model.getCurrentOrganizer();
     }
 
     @Nullable @Override
@@ -56,13 +56,13 @@ public class F_MyEvents extends Fragment {
 //                new Event("My Registered: Canoe Safety", "Sat Jan 11 · 10:00–12:00 PM", "Lakefront Dock",
 //                        "2024-12-20", "Invitation pending.", false, true, 60, 12)
 //        );
-        List<Event> data = new ArrayList<>(); //org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
-//        List<Event> data; //org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
-//        try {
-//            data = MainActivity.organizer.getUsableEvents();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+//        List<Event> data = new ArrayList<>(); //org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
+        List<Event> data;//org.getUsableEvents(); todo: get organizer and replace 'new' statement with commented statement
+        try {
+            data = org.getUsableEvents();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
         {

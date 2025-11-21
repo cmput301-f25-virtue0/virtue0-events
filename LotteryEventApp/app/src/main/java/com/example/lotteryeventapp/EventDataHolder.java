@@ -163,6 +163,7 @@ public class EventDataHolder {
     }
 
     public EventDataHolder(Map<String, Object> data, String eventId) {
+        this.uid = eventId;
         this.title = (String) data.get("title");
         this.dateTime = (String) data.get("dateTime");
         this.location = (String) data.get("location");

@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DataModel model;
     private Entrant entrant;
-    public static Organizer organizer;
+    private Organizer organizer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +27,9 @@ public class MainActivity extends AppCompatActivity {
 
         model = new DataModel();
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
+//        model.setCurrentOrganizer(organizer);
         loadEntrant(deviceID);
+        loadOrganizer(deviceID);
 
 //        Entrant.Profile profile = new Entrant.Profile();
 //        this.entrant = new Entrant(deviceID, profile);
@@ -44,39 +45,39 @@ public class MainActivity extends AppCompatActivity {
 //        });
 //        model.setCurrentEntrant(entrant);
 
-        try {
-            model.getOrganizer(deviceID, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    organizer = (Organizer) obj;
-
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                }
-            });
-        }catch (Exception RuntimeError){
-
-            this.organizer = new Organizer(deviceID);
-            model.setOrganizer(this.organizer, new DataModel.SetCallback() {
-                @Override
-                public void onSuccess(String msg) {
-                    Log.d("Firebase", "written");
-                }
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                }
-            });
-            model.setCurrentOrganizer(this.organizer);
-        }
+//        try {
+//            model.getOrganizer(deviceID, new DataModel.GetCallback() {
+//                @Override
+//                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+//
+//                }
+//                @Override
+//                public void onSuccess(Object obj) {
+//                    Log.d("Firebase", "retrieved");
+//                    organizer = (Organizer) obj;
+//
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                }
+//            });
+//        }catch (Exception RuntimeError){
+//
+//            this.organizer = new Organizer(deviceID);
+//            model.setOrganizer(this.organizer, new DataModel.SetCallback() {
+//                @Override
+//                public void onSuccess(String msg) {
+//                    Log.d("Firebase", "written");
+//                }
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                }
+//            });
+//            model.setCurrentOrganizer(this.organizer);
+//        }
 
 
 //
@@ -94,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
 //        model.setCurrentOrganizer(this.organizer);
 
 
+
+
+
+
         //todo: set current organizer to model using model.setCurrentOrganizer(organizer);
 
         //Send user to choose role page if not previous state is detected
@@ -101,7 +106,42 @@ public class MainActivity extends AppCompatActivity {
             showFragment(new F_SelectRole());
         }
     }
+    private void loadOrganizer(String deviceID) {
+        model.getOrganizer(deviceID, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+                organizer = (Organizer) obj;
+                model.setCurrentOrganizer(organizer);
+            }
 
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "failed");
+                createNewOrganizer(deviceID);
+            }
+        });
+    }
+    public void createNewOrganizer(String deviceID) {
+        organizer = new Organizer(deviceID);
+
+        model.setOrganizer(organizer, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("Firebase", "Written");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d("Firebase", "Failed");
+
+            }
+        });
+        model.setCurrentOrganizer(organizer);
+    }
     private void loadEntrant(String deviceID) {
         model.getEntrant(deviceID, new DataModel.GetCallback() {
             @Override

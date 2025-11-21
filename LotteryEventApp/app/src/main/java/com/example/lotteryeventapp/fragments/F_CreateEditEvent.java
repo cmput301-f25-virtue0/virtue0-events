@@ -138,7 +138,7 @@ public class F_CreateEditEvent extends Fragment {
                             @Override
                             public void onSuccess(String msg) {
                                 Log.d("Firebase", "written");
-                                Organizer organizer = MainActivity.organizer;
+                                Organizer organizer = newmodel.getCurrentOrganizer();
                                 organizer.addEvent(makeEvent.getUid());
                                 newmodel.setOrganizer(organizer, new DataModel.SetCallback() {
                                     @Override
@@ -175,9 +175,21 @@ public class F_CreateEditEvent extends Fragment {
                         event.setTrack_geolocation(track_geo); // Use setter
 
                         //Update the existing event
-                        event.editEvent(dateTime, location, regDeadline,
-                                details, track_geo, true, waitlist_limit, attendee_limit);
+//                        event.editEvent(dateTime, location, regDeadline,
+//                                details, track_geo, true, waitlist_limit, attendee_limit);
                         Toast.makeText(getContext(), "Event Updated", Toast.LENGTH_SHORT).show();
+                        DataModel model = new DataModel();
+                        model.setEvent(event, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
                     }
 
                     if (type == 1) {
@@ -188,7 +200,8 @@ public class F_CreateEditEvent extends Fragment {
                     }
 
                 } catch(Exception e) {
-                    Toast.makeText(getContext(), "Please fill all missing fields!", Toast.LENGTH_SHORT).show();
+                    throw new RuntimeException(e);
+//                    Toast.makeText(getContext(), "Please fill all missing fields!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
