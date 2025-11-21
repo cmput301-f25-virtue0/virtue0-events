@@ -162,7 +162,6 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
                     model.deleteEvent(delEvent, new DataModel.DeleteCallback() {
                         @Override
                         public void onSuccess() {
-                            // CRITICAL FIX: Check context before showing Toast
                             if (isAdded() && getContext() != null) {
                                 Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
                                 fetchEvents(true);
@@ -172,7 +171,6 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
                         @Override
                         public void onError(Exception e) {
                             Log.e("DeleteEvent", "Error deleting event", e);
-                            // CRITICAL FIX: Check context before showing Toast
                             if (isAdded() && getContext() != null) {
                                 Toast.makeText(getContext(), "Failed to delete event", Toast.LENGTH_SHORT).show();
                                 if (swipeRefreshLayout != null) {
