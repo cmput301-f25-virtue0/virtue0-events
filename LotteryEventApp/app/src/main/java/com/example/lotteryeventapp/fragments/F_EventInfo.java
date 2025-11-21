@@ -115,7 +115,7 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(1, model));
+                    ((MainActivity) requireActivity()).showFragment(F_CreateEditEvent.newInstance(1));
                 }});
 
             view.findViewById(R.id.applicantsBtn).setOnClickListener(new View.OnClickListener() {
