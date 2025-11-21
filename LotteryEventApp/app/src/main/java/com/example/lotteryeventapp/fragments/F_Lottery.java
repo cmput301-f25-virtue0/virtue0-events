@@ -21,6 +21,7 @@ import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,37 +86,63 @@ public class F_Lottery extends Fragment {
                 new Entrant("device7",  new Entrant.Profile("Grace",   "grace@ualberta.ca",    "780-555-0104")),
                 new Entrant("device8",  new Entrant.Profile("Henry",   "henry@example.com",    "780-555-0105"))
         );*/
-        List<Entrant> data;
-        try {
-            data = event.getUsableWaitList();
-        } catch(InterruptedException e) {
-            Log.e("F_Lottery", "getUsableWaitList threw error");
-            data = new ArrayList<>();
-        }
 
+//        List<Entrant> data;
+//        try {
+//            data = event.getUsableWaitList();
+//        } catch(InterruptedException e) {
+//            Log.e("F_Lottery", "getUsableWaitList threw error");
+//            data = new ArrayList<>();
+//        }
+//        ProfileListAdapter.OnProfileClickListener fragment = this.profileListener;
+        model.getUsableEntrants(event,new DataModel.GetCallback() {
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+                ArrayList<Entrant> data = (ArrayList<Entrant>) obj;
+
+
+                TextView myText = view.findViewById(R.id.tvEventName);
+                myText.setText(event.getTitle());
+                myText = view.findViewById(R.id.tvWaitlistSize);
+                String waitText = data.size() + " " + getString(R.string.in_waitlist);
+                myText.setText(waitText);
+
+                // Set adapter
+                profileListener = new ProfileListAdapter.OnProfileClickListener() {
+                    @Override
+                    public void onProfileClick(Entrant entrant, int position) {
+                        Toast.makeText(requireContext(), "Profile clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onDeleteClick(Entrant entrant, int position) {
+                        Toast.makeText(requireContext(), "Delete clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
+                        // TODO: Handle delete
+                    }
+
+                };
+
+                rv.setAdapter(new ProfileListAdapter(data, profileListener));
+
+
+//                entrants.add(entrant);
+//                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+//                latch.countDown();
+            }
+        });
         // Set the text
-        TextView myText = view.findViewById(R.id.tvEventName);
-        myText.setText(event.getTitle());
-        myText = view.findViewById(R.id.tvWaitlistSize);
-        String waitText = data.size() + " " + getString(R.string.in_waitlist);
-        myText.setText(waitText);
 
-        // Set adapter
-        this.profileListener = new ProfileListAdapter.OnProfileClickListener() {
-            @Override
-            public void onProfileClick(Entrant entrant, int position) {
-                Toast.makeText(requireContext(), "Profile clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDeleteClick(Entrant entrant, int position) {
-                Toast.makeText(requireContext(), "Delete clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
-                // TODO: Handle delete
-            }
-
-        };
-
-        rv.setAdapter(new ProfileListAdapter(data, profileListener));
     }
 
 }

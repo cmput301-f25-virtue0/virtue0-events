@@ -10,11 +10,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used for interactions with the database.
@@ -402,4 +405,55 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
+
+    public void getUsableEntrants(Event event, GetCallback cb){
+        List entrantsIds = event.getWaitlist();
+//        ArrayList<> filterObjects = new ArrayList<>;
+        ArrayList<Entrant> entrants = new ArrayList<>();
+
+//        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
+        this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
+                                entrants.add(data.createEntrantInstance());
+                            }
+                            cb.onSuccess(entrants);
+                        } else {
+                            Log.d("Firestore", "Error getting documents: ", task.getException());
+                            cb.onError(task.getException());
+                        }
+                    }
+                });
+    }
+
+    public void getUsableEvents(Organizer organizer, GetCallback cb){
+        List eventsIds = organizer.getEvents();
+//        ArrayList<> filterObjects = new ArrayList<>;
+        ArrayList<Event> events = new ArrayList<>();
+
+//        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
+        this.events.whereIn(FieldPath.documentId(),   eventsIds)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventDataHolder data = new EventDataHolder(document.getData(),document.getId());
+                                events.add(data.createEventInstance());
+                            }
+                            cb.onSuccess(events);
+                        } else {
+                            Log.d("Firestore", "Error getting documents: ", task.getException());
+                            cb.onError(task.getException());
+                        }
+                    }
+                });
+    }
+
 }
