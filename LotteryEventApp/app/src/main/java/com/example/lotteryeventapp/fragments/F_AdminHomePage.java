@@ -30,7 +30,6 @@ public class F_AdminHomePage extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // CRITICAL: Retrieve the 'role' argument here
         if (getArguments() != null) {
             this.role = getArguments().getInt("role");
         }
