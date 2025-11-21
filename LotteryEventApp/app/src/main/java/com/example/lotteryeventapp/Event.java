@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Event {
     private String title;
-    private String uid;
+    private String uid = "";
     private String date_time;
     private String location;
     private String registration_deadline;

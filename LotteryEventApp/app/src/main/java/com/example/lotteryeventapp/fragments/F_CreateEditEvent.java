@@ -27,19 +27,17 @@ public class F_CreateEditEvent extends Fragment {
     private DataModel model;
     private Event event;
 
-    //type = 0 for create, type = 1 for edit
-    public F_CreateEditEvent(int myType) {
-        this.type = myType;
-        this.event = null;
-    }
 
 
     // This constructor is used for "edit"
-    public F_CreateEditEvent(int myType, DataModel myModel) {
-        this.type = myType;
-        model = myModel;
-        event = model.getCurrentEvent();
+    public static F_CreateEditEvent newInstance(int myType) {
+        F_CreateEditEvent fragment = new F_CreateEditEvent();
+        Bundle args = new Bundle();
+        args.putInt("type", myType);
+        fragment.setArguments(args);
+        return fragment;
     }
+
 
     @Override
     public View onCreateView(
@@ -47,11 +45,16 @@ public class F_CreateEditEvent extends Fragment {
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment & get the count text view
+        if (getArguments() != null) {
+            this.type = getArguments().getInt("type");
+        }
         return inflater.inflate(R.layout.edit_and_create_event, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarCreateEvent);
+        model = ((MainActivity) requireActivity()).getDataModel();
+
 
         //If editing, fill out information with existing event info
         if (this.type == 1 && this.event != null) {
@@ -133,14 +136,13 @@ public class F_CreateEditEvent extends Fragment {
                         // create new event (will be automatically added to the database)
                         Event makeEvent = new Event(title, dateTime, location, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit);
-                        DataModel newmodel = new DataModel();
-                        newmodel.setEvent(makeEvent, new DataModel.SetCallback() {
+                        model.setEvent(makeEvent, new DataModel.SetCallback() {
                             @Override
                             public void onSuccess(String msg) {
                                 Log.d("Firebase", "written");
-                                Organizer organizer = newmodel.getCurrentOrganizer();
+                                Organizer organizer = model.getCurrentOrganizer();
                                 organizer.addEvent(makeEvent.getUid());
-                                newmodel.setOrganizer(organizer, new DataModel.SetCallback() {
+                                model.setOrganizer(organizer, new DataModel.SetCallback() {
                                     @Override
                                     public void onSuccess(String msg) {
                                         Log.d("Firebase", "written");
@@ -178,7 +180,6 @@ public class F_CreateEditEvent extends Fragment {
 //                        event.editEvent(dateTime, location, regDeadline,
 //                                details, track_geo, true, waitlist_limit, attendee_limit);
                         Toast.makeText(getContext(), "Event Updated", Toast.LENGTH_SHORT).show();
-                        DataModel model = new DataModel();
                         model.setEvent(event, new DataModel.SetCallback() {
                             @Override
                             public void onSuccess(String msg) {

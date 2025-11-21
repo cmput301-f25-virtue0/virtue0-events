@@ -118,7 +118,7 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.newEventButton).setVisibility(View.VISIBLE);
 
             view.findViewById(R.id.newEventButton).setOnClickListener(v ->
-                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(0, model))
+                    ((MainActivity) requireActivity()).showFragment(F_CreateEditEvent.newInstance(0))
             );
         }
     }
