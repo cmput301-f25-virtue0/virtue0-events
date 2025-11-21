@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,7 @@ import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -32,6 +34,7 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
     private int role;
     private DataModel model;
     private Entrant entrant;
+    private Organizer organizer;
 
     private RecyclerView rv;
     private EventAdapter adapter;
@@ -56,7 +59,6 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflates the layout containing the SwipeRefreshLayout and RecyclerView
         return inflater.inflate(R.layout.fragment_events_list, container, false);
     }
 
@@ -66,7 +68,13 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
 
         Log.i("CURRENT ROLE MY_EVENTS", "Current MY_EVENTS user role is: " + role);
         model = ((MainActivity) requireActivity()).getDataModel();
-        entrant = model.getCurrentEntrant();
+
+        // Initialize user objects based on role
+        if (role == 1) { // Organizer
+            organizer = model.getCurrentOrganizer();
+        } else { // Entrant
+            entrant = model.getCurrentEntrant();
+        }
 
         // Initialize views
         rv = view.findViewById(R.id.rvEvents);
@@ -75,12 +83,10 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
 
         // Setup RecyclerView and Adapter
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        // Initialize adapter with an empty list initially
         adapter = new EventAdapter(new ArrayList<>(), role, this);
         rv.setAdapter(adapter);
 
-        // Configure Toolbar visibility (Hide for Entrants as they likely have a main toolbar)
+        // Configure Toolbar visibility
         if (toolbar != null) {
             toolbar.setVisibility(View.GONE);
         }
@@ -93,13 +99,53 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
         fetchEvents(false);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh data when returning to the fragment
+        fetchEvents(false);
+    }
+
+    private void fetchEvents(boolean forceRefresh) {
+        Log.d("F_MyEvents", "Fetching events for role: " + role);
+
+        if (role == 1) {
+            fetchOrganizerEvents();
+        } else {
+            fetchEntrantEvents();
+        }
+    }
+
+    /**
+     * Fetches events created by the current Organizer.
+     */
+    private void fetchOrganizerEvents() {
+        // Ensure organizer is loaded
+        if (organizer == null) {
+            organizer = model.getCurrentOrganizer();
+            if (organizer == null) {
+                Log.e("F_MyEvents", "Current Organizer is null");
+                swipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+        }
+
+        ArrayList<String> createdEventIds = organizer.getEvents(); // Get list of created event IDs
+
+        // If no created events, clear list and stop refreshing
+        if (createdEventIds == null || createdEventIds.isEmpty()) {
+            adapter.setItems(new ArrayList<>());
+            swipeRefreshLayout.setRefreshing(false);
+            return;
+        }
+
+        fetchEventsFromIds(createdEventIds);
+    }
+
     /**
      * Fetches waitlisted events for the current Entrant.
-     * Uses AtomicInteger to track when all individual event fetches are complete.
      */
-    private void fetchEvents(boolean forceRefresh) {
-        Log.d("F_MyEvents", "Fetching waitlisted events...");
-
+    private void fetchEntrantEvents() {
         // Ensure entrant is loaded
         if (entrant == null) {
             entrant = model.getCurrentEntrant();
@@ -110,7 +156,7 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
             }
         }
 
-        ArrayList<String> waitlistedIds = entrant.getWaitlistedEvents();
+        ArrayList<String> waitlistedIds = entrant.getWaitlistedEvents(); // Get list of waitlisted IDs
 
         // If no waitlisted events, clear list and stop refreshing
         if (waitlistedIds == null || waitlistedIds.isEmpty()) {
@@ -119,16 +165,21 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
             return;
         }
 
-        ArrayList<Event> fetchedEvents = new ArrayList<>();
-        // Counter to track when all async calls are finished
-        AtomicInteger activeFetches = new AtomicInteger(waitlistedIds.size());
+        fetchEventsFromIds(waitlistedIds);
+    }
 
-        for (String eventId : waitlistedIds) {
+    /**
+     * Shared helper method to fetch Event objects from a list of IDs.
+     */
+    private void fetchEventsFromIds(ArrayList<String> eventIds) {
+        ArrayList<Event> fetchedEvents = new ArrayList<>();
+        AtomicInteger activeFetches = new AtomicInteger(eventIds.size());
+
+        for (String eventId : eventIds) {
             model.getEvent(eventId, new DataModel.GetCallback() {
                 @Override
                 public void onSuccess(Object obj) {
                     if (obj instanceof Event) {
-                        // Synchronized block to safely add to list from multiple callbacks
                         synchronized (fetchedEvents) {
                             fetchedEvents.add((Event) obj);
                         }
@@ -137,9 +188,7 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
                 }
 
                 @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-                    // Not used for getEvent
-                }
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) { }
 
                 @Override
                 public void onError(Exception e) {
@@ -147,13 +196,11 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
                     checkCompletion();
                 }
 
-                // Helper to check if this was the last request
                 private void checkCompletion() {
                     if (activeFetches.decrementAndGet() == 0) {
-                        // Run UI updates on main thread
                         if (isAdded() && getActivity() != null) {
                             requireActivity().runOnUiThread(() -> {
-                                Log.d("F_MyEvents", "Retrieved " + fetchedEvents.size() + " waitlisted events.");
+                                Log.d("F_MyEvents", "Retrieved " + fetchedEvents.size() + " events.");
                                 adapter.setItems(fetchedEvents);
                                 swipeRefreshLayout.setRefreshing(false);
                             });
@@ -173,9 +220,39 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
 
     @Override
     public void onDeleteClick(Event delEvent, int delPosition) {
-        // Entrants cannot delete events from the database.
-        // If this was "Leave Waitlist", logic would go here.
-        // For safety, we do nothing or show a message.
-        Toast.makeText(getContext(), "Entrants cannot delete events.", Toast.LENGTH_SHORT).show();
+        if (role == 1) {
+            // Organizer Deletion Logic
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete '" + delEvent.getTitle() + "'?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        swipeRefreshLayout.setRefreshing(true);
+                        model.deleteEvent(delEvent, new DataModel.DeleteCallback() {
+                            @Override
+                            public void onSuccess() {
+                                if (isAdded() && getContext() != null) {
+                                    Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
+
+                                    // Update local organizer list and refresh
+                                    if (organizer != null) {
+                                        fetchEvents(true);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                if (isAdded() && getContext() != null) {
+                                    Toast.makeText(getContext(), "Failed to delete event", Toast.LENGTH_SHORT).show();
+                                    swipeRefreshLayout.setRefreshing(false);
+                                }
+                            }
+                        });
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        } else {
+            Toast.makeText(getContext(), "Entrants cannot delete events.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

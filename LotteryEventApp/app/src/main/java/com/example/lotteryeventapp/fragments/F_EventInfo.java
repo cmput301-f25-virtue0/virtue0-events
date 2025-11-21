@@ -111,7 +111,7 @@ public class F_EventInfo extends Fragment {
         else if (role == 1) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
-            view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
+            view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
 
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override

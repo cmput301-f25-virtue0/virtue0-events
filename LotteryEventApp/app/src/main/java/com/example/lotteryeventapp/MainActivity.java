@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("DeviceID", "Android ID = " + deviceID);
 
         loadEntrant(deviceID);
+        loadOrganizer(deviceID);
 
 //        Entrant.Profile profile = new Entrant.Profile();
 //        this.entrant = new Entrant(deviceID, profile);
@@ -79,22 +80,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-//
-//        this.organizer = new Organizer(deviceID);
-//        model.setOrganizer(this.organizer, new DataModel.SetCallback() {
-//            @Override
-//            public void onSuccess(String msg) {
-//                Log.d("Firebase", "written");
-//            }
-//            @Override
-//            public void onError(Exception e) {
-//                Log.e("Firebase", "fail");
-//            }
-//        });
-//        model.setCurrentOrganizer(this.organizer);
-
-
-        //todo: set current organizer to model using model.setCurrentOrganizer(organizer);
 
         //Send user to choose role page if not previous state is detected
         if (savedInstanceState == null) {
@@ -168,5 +153,53 @@ public class MainActivity extends AppCompatActivity {
 
     public Organizer getOrganizer() {
         return this.organizer;
+    }
+
+    private void loadOrganizer(String deviceId) {
+        Log.d("OrganizerLoad", "Loading organizer for deviceID = " + deviceId);
+
+        model.getOrganizer(deviceId, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+                // FOUND: Organizer exists in database
+                Log.d("OrganizerLoad", "Organizer retrieved");
+                organizer = (Organizer) obj;
+                model.setCurrentOrganizer(organizer);
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                // Not used
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("OrganizerLoad", "Failed to load organizer, creating new one. Error: " + e.getMessage());
+                createNewOrganizer(deviceId);
+            }
+        });
+    }
+
+    private void createNewOrganizer(String deviceId) {
+        Log.d("OrganizerLoad", "Creating new organizer for deviceID = " + deviceId);
+
+        // Create the new object
+        organizer = new Organizer(deviceId);
+
+        // Save it to Firebase
+        model.setOrganizer(organizer, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("OrganizerLoad", "New organizer created and saved.");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("OrganizerLoad", "Failed to save new organizer", e);
+            }
+        });
+
+        // Set it as current in the model
+        model.setCurrentOrganizer(organizer);
     }
 }
