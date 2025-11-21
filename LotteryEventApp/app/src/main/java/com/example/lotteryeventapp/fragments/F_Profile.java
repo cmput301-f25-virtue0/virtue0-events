@@ -112,7 +112,7 @@ public class F_Profile extends Fragment {
                     .setPositiveButton("Save", (dialog, which) -> {
                         String newPhone = input.getText().toString();
                         entrant.updateProfile(entrant.getProfile().getName(), entrant.getProfile().getEmail(), newPhone);
-                        tvEmail.setText(newPhone);
+                        tvPhone.setText(newPhone);
                         Toast.makeText(requireContext(), "Phone updated", Toast.LENGTH_SHORT).show();
                     }).setNegativeButton("Cancel", null).show();
 

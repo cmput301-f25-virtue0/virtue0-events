@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
         model = new DataModel();
         String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -80,63 +79,11 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 
-//
-//        this.organizer = new Organizer(deviceID);
-//        model.setOrganizer(this.organizer, new DataModel.SetCallback() {
-//            @Override
-//            public void onSuccess(String msg) {
-//                Log.d("Firebase", "written");
-//            }
-//            @Override
-//            public void onError(Exception e) {
-//                Log.e("Firebase", "fail");
-//            }
-//        });
-//        model.setCurrentOrganizer(this.organizer);
-
-
-        //todo: set current organizer to model using model.setCurrentOrganizer(organizer);
 
         //Send user to choose role page if not previous state is detected
         if (savedInstanceState == null) {
             showFragment(new F_SelectRole());
         }
-    }
-    private void loadOrganizer(String deviceID) {
-        model.getOrganizer(deviceID, new DataModel.GetCallback() {
-            @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-            }
-            @Override
-            public void onSuccess(Object obj) {
-                Log.d("Firebase", "retrieved");
-                organizer = (Organizer) obj;
-                model.setCurrentOrganizer(organizer);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "failed");
-                createNewOrganizer(deviceID);
-            }
-        });
-    }
-    public void createNewOrganizer(String deviceID) {
-        organizer = new Organizer(deviceID);
-
-        model.setOrganizer(organizer, new DataModel.SetCallback() {
-            @Override
-            public void onSuccess(String id) {
-                Log.d("Firebase", "Written");
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.d("Firebase", "Failed");
-
-            }
-        });
-        model.setCurrentOrganizer(organizer);
     }
     private void loadEntrant(String deviceID) {
         model.getEntrant(deviceID, new DataModel.GetCallback() {
@@ -197,5 +144,53 @@ public class MainActivity extends AppCompatActivity {
 
     public Organizer getOrganizer() {
         return this.organizer;
+    }
+
+    private void loadOrganizer(String deviceId) {
+        Log.d("OrganizerLoad", "Loading organizer for deviceID = " + deviceId);
+
+        model.getOrganizer(deviceId, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+                // FOUND: Organizer exists in database
+                Log.d("OrganizerLoad", "Organizer retrieved");
+                organizer = (Organizer) obj;
+                model.setCurrentOrganizer(organizer);
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                // Not used
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("OrganizerLoad", "Failed to load organizer, creating new one. Error: " + e.getMessage());
+                createNewOrganizer(deviceId);
+            }
+        });
+    }
+
+    private void createNewOrganizer(String deviceId) {
+        Log.d("OrganizerLoad", "Creating new organizer for deviceID = " + deviceId);
+
+        // Create the new object
+        organizer = new Organizer(deviceId);
+
+        // Save it to Firebase
+        model.setOrganizer(organizer, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("OrganizerLoad", "New organizer created and saved.");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("OrganizerLoad", "Failed to save new organizer", e);
+            }
+        });
+
+        // Set it as current in the model
+        model.setCurrentOrganizer(organizer);
     }
 }

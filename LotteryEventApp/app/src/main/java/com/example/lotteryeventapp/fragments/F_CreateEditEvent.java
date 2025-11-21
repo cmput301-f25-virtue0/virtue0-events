@@ -203,6 +203,8 @@ public class F_CreateEditEvent extends Fragment {
                     throw new RuntimeException(e);
 //                    Toast.makeText(getContext(), "Please fill all missing fields!", Toast.LENGTH_SHORT).show();
                 }
+
+
             }
         });
     }

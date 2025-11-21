@@ -33,7 +33,6 @@ public class F_Applicants extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // CRITICAL: Retrieve the 'role' argument here
         if (getArguments() != null) {
             this.role = getArguments().getInt("role");
         }

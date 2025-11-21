@@ -17,7 +17,7 @@ import com.example.lotteryeventapp.R;
 public class F_Acceptance extends Fragment {
 
     private int role;
-    private Invitation notif; //Note: 'Notification' here does not seem to be the same as our notification class(?) Conflicting with base Android Class?
+    private Invitation notif;
     private DataModel model;
 
     public static F_Acceptance newInstance(int myRole){

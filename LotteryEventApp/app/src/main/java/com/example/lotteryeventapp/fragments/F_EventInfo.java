@@ -27,6 +27,7 @@ public class F_EventInfo extends Fragment {
 
     //role = 0 for entrant, role = 1 for organizer
 
+
     public static F_EventInfo newInstance(int myRole){
         F_EventInfo fragment = new F_EventInfo();
         Bundle args = new Bundle();
@@ -88,13 +89,16 @@ public class F_EventInfo extends Fragment {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.VISIBLE);
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
             view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
+            Entrant currentEntrant = model.getCurrentEntrant();
+            if (currentEntrant.getWaitlistedEvents().contains(event.getUid())) {
+                view.findViewById(R.id.joinButton).setVisibility(View.GONE);
+            }
 
             // Detect button presses
             view.findViewById(R.id.joinButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
-                    //event.waitlistAdd(entrant); todo: convert entrant to correct string format
+                    joinWaitlist();
                 }});
 
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
@@ -106,7 +110,7 @@ public class F_EventInfo extends Fragment {
         else if (role == 1) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
-            view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
+            view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
 
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -119,6 +123,7 @@ public class F_EventInfo extends Fragment {
                 public void onClick(View view) {
                     ((MainActivity) requireActivity()).showFragment(new F_Applicants());
                 }});
+
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -136,8 +141,82 @@ public class F_EventInfo extends Fragment {
                 }});
 
         }
+    }
+    /**
+     * Handles the logic for an entrant joining the event's waitlist.
+     */
+    private void joinWaitlist() {
+        if (event == null) {
+            Toast.makeText(getContext(), "Error: Event not found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        Entrant currentEntrant = model.getCurrentEntrant();
+        if (currentEntrant == null) {
+            Toast.makeText(getContext(), "Error: User profile not found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        String entrantId = currentEntrant.getUid();
 
+        // Check if already on the waitlist or enrolled
+        if (event.getWaitlist().contains(entrantId)) {
+            Toast.makeText(getContext(), "You are already on the waitlist.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if waitlist is full (if limit > 0)
+        if (event.getWaitlist_limit() > 0 && event.getWaitlistAmount() >= event.getWaitlist_limit()) {
+            Toast.makeText(getContext(), "Waitlist is full.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //  Update Local Objects
+        event.waitlistAdd(entrantId);
+        currentEntrant.addWaitlistedEvent(event.getUid()); // Add to entrant's list
+
+        //  Update Event in Firestore
+        model.setEvent(event, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                // Event update successful, now update the Entrant
+                model.setEntrant(currentEntrant, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String id) {
+                        // Both updates successful
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Joined waiting list!", Toast.LENGTH_SHORT).show();
+                            // Update the displayed fraction
+                            TextView waitlistText = getView().findViewById(R.id.waitingListSize);
+                            String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
+                            waitlistText.setText(fraction);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Entrant update failed
+                        Log.e("JoinWaitlist", "Failed to update entrant", e);
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Error updating profile. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+                        // Revert local changes for consistency
+                        event.waitlistRemove(entrantId);
+                        currentEntrant.removeWaitlistedEvent(event.getUid());
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Event update failed
+                event.waitlistRemove(entrantId);
+                currentEntrant.removeWaitlistedEvent(event.getUid());
+                Log.e("JoinWaitlist", "Failed to update event", e);
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Failed to join waitlist. Please try again.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
