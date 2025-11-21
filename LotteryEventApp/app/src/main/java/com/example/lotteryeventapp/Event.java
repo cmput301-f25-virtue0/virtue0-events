@@ -429,107 +429,119 @@ public class Event {
 
         Random rand = new Random();
         int numToDraw = Math.min(attendee_limit - invited_list.size(), waitlist.size());
-        CountDownLatch latch = new CountDownLatch(numToDraw);
+//        CountDownLatch latch = new CountDownLatch(numToDraw);
         for (int i = 0; i < numToDraw; i++) {
             int randomIndex = rand.nextInt(waitlist.size());
             String drawnEntrant = waitlist.remove(randomIndex);
             invited_list.add(drawnEntrant);
-            DataModel model = new DataModel();
-            Event event = this;
-            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    Entrant entrant = (Entrant) obj;
-                    Invitation invitation = new Invitation(event.uid, entrant.getUid(), "");
-                    model.setNotification(invitation, new DataModel.SetCallback() {
-                        @Override
-                        public void onSuccess(String msg) {
-                            Log.d("Firebase", "written");
-                        }
-                        @Override
-                        public void onError(Exception e) {
-                            Log.e("Firebase", "fail");
-                        }
-                    });
-                    entrant.addNotification(invitation.getUid());
-                    model.setEntrant(entrant,new DataModel.SetCallback() {
-                        @Override
-                        public void onSuccess(String msg) {
-                            Log.d("Firebase", "written");
-                        }
 
-                        @Override
-                        public void onError(Exception e) {
-                            Log.e("Firebase", "fail");
-                        }
-                    });
-                    latch.countDown();
-                }
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
-
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    latch.countDown();
-                }
-            });
-
+//            Event event = this;
+//            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
+//                @Override
+//                public void onSuccess(Object obj) {
+//                    Log.d("Firebase", "retrieved");
+//                    Entrant entrant = (Entrant) obj;
+//                    Invitation invitation = new Invitation(event.uid, entrant.getUid(), "");
+//                    model.setNotification(invitation, new DataModel.SetCallback() {
+//                        @Override
+//                        public void onSuccess(String msg) {
+//                            Log.d("Firebase", "written");
+//                        }
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.e("Firebase", "fail");
+//                        }
+//                    });
+//                    entrant.addNotification(invitation.getUid());
+//                    model.setEntrant(entrant,new DataModel.SetCallback() {
+//                        @Override
+//                        public void onSuccess(String msg) {
+//                            Log.d("Firebase", "written");
+//                        }
+//
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.e("Firebase", "fail");
+//                        }
+//                    });
+//                    latch.countDown();
+//                }
+//                @Override
+//                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+//
+//
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                    latch.countDown();
+//                }
+//            });
+//
+//        }
+//        latch.await();
+//        CountDownLatch rejection_latch = new CountDownLatch(this.getWaitlistAmount());
+//        for (int i = 0; i < this.getWaitlistAmount(); i++) {
+//
+//            String rejectedEntrant = this.getWaitlist().get(i);
+//
+//            DataModel model = new DataModel();
+//            Event event = this;
+//            model.getEntrant(rejectedEntrant, new DataModel.GetCallback() {
+//                @Override
+//                public void onSuccess(Object obj) {
+//                    Log.d("Firebase", "retrieved");
+//                    Entrant entrant = (Entrant) obj;
+//                    Rejection rejection = new Rejection(event.uid, entrant.getUid(), "");
+//                    model.setNotification(rejection, new DataModel.SetCallback() {
+//                        @Override
+//                        public void onSuccess(String msg) {
+//                            Log.d("Firebase", "written");
+//                        }
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.e("Firebase", "fail");
+//                        }
+//                    });
+//                    entrant.addNotification(rejection.getUid());
+//                    model.setEntrant(entrant,new DataModel.SetCallback() {
+//                        @Override
+//                        public void onSuccess(String msg) {
+//                            Log.d("Firebase", "written");
+//                        }
+//
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.e("Firebase", "fail");
+//                        }
+//                    });
+//                    rejection_latch.countDown();
+//                }
+//                @Override
+//                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+//
+//                }
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                    rejection_latch.countDown();
+//                }
+//            });
         }
-        latch.await();
-        CountDownLatch rejection_latch = new CountDownLatch(this.getWaitlistAmount());
-        for (int i = 0; i < this.getWaitlistAmount(); i++) {
-
-            String rejectedEntrant = this.getWaitlist().get(i);
-
-            DataModel model = new DataModel();
-            Event event = this;
-            model.getEntrant(rejectedEntrant, new DataModel.GetCallback() {
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    Entrant entrant = (Entrant) obj;
-                    Rejection rejection = new Rejection(event.uid, entrant.getUid(), "");
-                    model.setNotification(rejection, new DataModel.SetCallback() {
-                        @Override
-                        public void onSuccess(String msg) {
-                            Log.d("Firebase", "written");
-                        }
-                        @Override
-                        public void onError(Exception e) {
-                            Log.e("Firebase", "fail");
-                        }
-                    });
-                    entrant.addNotification(rejection.getUid());
-                    model.setEntrant(entrant,new DataModel.SetCallback() {
-                        @Override
-                        public void onSuccess(String msg) {
-                            Log.d("Firebase", "written");
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            Log.e("Firebase", "fail");
-                        }
-                    });
-                    rejection_latch.countDown();
-                }
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
-                }
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    rejection_latch.countDown();
-                }
-            });
-        }
-        rejection_latch.await();
+        DataModel model = new DataModel();
+//            Event event = this;
+        model.setEvent(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                Log.d("Firebase", "written");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
+//        rejection_latch.await();
         drawn = true;
     }
     /**
