@@ -30,6 +30,8 @@ public class DataModel extends TModel<TView>{
     private Organizer currentOrg;
     private Event currentEvent;
 
+    private ArrayList<Event> cachedEvents = null;
+
     private ArrayList<View> views = new ArrayList<View>();
 
     public DataModel() {
@@ -289,6 +291,23 @@ public class DataModel extends TModel<TView>{
     }
 
     public void deleteEvent(Event event, DeleteCallback cb) {
+
+        // Check if the event object itself is null
+        if (event == null) {
+            Log.e("Firestore", "Firestore delete failed: The event object provided was null.");
+            cb.onError(new IllegalArgumentException("Event object cannot be null."));
+            return; // Stop execution
+        }
+
+        String eventId = event.getUid();
+
+        // Check if the event's ID is null or empty
+        if (eventId == null || eventId.isEmpty()) {
+            Log.e("Firestore", "Firestore delete failed: The event ID was null or empty.");
+            cb.onError(new IllegalArgumentException("Event ID is invalid and cannot be deleted."));
+            return; // Stop execution
+        }
+
         DocumentReference eventRef = this.events.document(event.getUid());
         eventRef.delete()
                 .addOnSuccessListener(aVoid -> {
@@ -300,18 +319,32 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
-    public void getAllEvents(GetCallback cb){
-        ArrayList<Event> events = new ArrayList<Event>();
+    public void getAllEvents(GetCallback cb, boolean forceRefresh){
+
+        // Check cache first
+        if (!forceRefresh && cachedEvents != null) {
+            Log.d("DataModel", "Returning events from cache. Size: " + cachedEvents.size());
+            cb.onSuccess(cachedEvents);
+            return;
+        }
+
+        Log.d("DataModel", "Events cache is empty or refresh forced. Fetching from Firestore...");
+
+
         this.events
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            ArrayList<Event> events = new ArrayList<Event>();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 EventDataHolder data = new EventDataHolder(document.getData(),document.getId());
                                 events.add(data.createEventInstance());
                             }
+                            //update cache
+                            cachedEvents = events;
+                            Log.d("Firestore", "Successfully fetched and cached " + events.size() + " events.");
                             cb.onSuccess(events);
                         } else {
                             Log.d("Firestore", "Error getting documents: ", task.getException());
@@ -401,5 +434,14 @@ public class DataModel extends TModel<TView>{
                     Log.e("Firestore", "Firestore delete failed: Notification " + notif.getUid() + "\n" + e.getMessage());
                     cb.onError(e);
                 });
+    }
+
+    public void clearEventsCache() {
+        this.cachedEvents = null;
+        Log.d("DataModel", "Events cache cleared.");
+    }
+
+    public void getAllEvents(DataModel.GetCallback cb) {
+        getAllEvents(cb, false);
     }
 }

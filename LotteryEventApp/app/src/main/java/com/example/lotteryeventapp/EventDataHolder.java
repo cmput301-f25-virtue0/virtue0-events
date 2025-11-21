@@ -25,6 +25,7 @@ public class EventDataHolder {
 //    private boolean redraw;
 
     public EventDataHolder(Event event) {
+        this.uid = event.getUid();
         this.title = event.getTitle();
         this.dateTime = event.getDate_time();
         this.location = event.getLocation();
@@ -163,6 +164,7 @@ public class EventDataHolder {
     }
 
     public EventDataHolder(Map<String, Object> data, String eventId) {
+        this.uid = eventId;
         this.title = (String) data.get("title");
         this.dateTime = (String) data.get("dateTime");
         this.location = (String) data.get("location");

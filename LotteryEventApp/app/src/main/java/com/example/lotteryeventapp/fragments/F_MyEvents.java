@@ -63,12 +63,7 @@ public class F_MyEvents extends Fragment {
 //        } catch (InterruptedException e) {
 //            throw new RuntimeException(e);
 //        }
-
-        EventAdapter adapter = new EventAdapter(data, role, (event, pos) ->
-        {
-            model.setCurrentEvent(event);
-            ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(role)); }
-        );
+        EventAdapter adapter = new EventAdapter(data, role);
         rv.setAdapter(adapter);
     }
 }

@@ -94,7 +94,6 @@ public class F_EventInfo extends Fragment {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(getContext(), "Joined waiting list", Toast.LENGTH_SHORT).show();
-                    //event.waitlistAdd(entrant); todo: convert entrant to correct string format
                 }});
 
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
