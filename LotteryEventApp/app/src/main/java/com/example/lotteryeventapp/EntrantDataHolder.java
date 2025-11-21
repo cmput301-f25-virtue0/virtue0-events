@@ -12,6 +12,12 @@ public class EntrantDataHolder {
     private ArrayList<String> notifications = new ArrayList<String>();
     private boolean notificationOptOut;
 
+    private ArrayList<String> waitlistedEvents = new ArrayList<>();
+
+    public ArrayList<String> getWaitlistedEvents() {
+        return waitlistedEvents;
+    }
+
     public String getName() {
         return name;
     }
@@ -43,6 +49,7 @@ public class EntrantDataHolder {
         this.deviceId = entrant.getUid();
         this.notifications.addAll(entrant.getNotifications());
         this.notificationOptOut = entrant.isNotificationOptOut();
+        this.waitlistedEvents.addAll(entrant.getWaitlistedEvents());
     }
 
     public EntrantDataHolder(Map<String, Object> data, String deviceId) {
@@ -50,6 +57,13 @@ public class EntrantDataHolder {
         this.email = (String) data.get("email");
         this.phone = (String) data.get("phone");
         this.deviceId = deviceId;
+
+        List<Object> waitlisted = (List<Object>) data.get("waitlistedEvents");
+        if (waitlisted != null) {
+            for (Object o : waitlisted) {
+                this.waitlistedEvents.add((String) o);
+            }
+        }
 
         List<Object> notifications = (List<Object>) data.get("notifications");
         for (Object o: notifications) {
@@ -64,6 +78,7 @@ public class EntrantDataHolder {
         Entrant entrant = new Entrant(this.deviceId, profile);
         entrant.getNotifications().addAll(this.notifications);
         entrant.setNotificationOptOut(this.notificationOptOut);
+        entrant.getWaitlistedEvents().addAll(this.waitlistedEvents);
 
         return entrant;
     }
