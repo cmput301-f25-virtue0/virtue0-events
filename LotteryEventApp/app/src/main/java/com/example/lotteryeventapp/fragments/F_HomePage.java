@@ -5,17 +5,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.CaptureAct;
 import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
 import com.example.lotteryeventapp.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 public class F_HomePage extends Fragment {
     private static final String ARG_ROLE = "role";
@@ -110,11 +116,17 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.Profile).setOnClickListener(v ->
                     ((MainActivity) requireActivity()).showFragment(new F_Profile(model))
             );
+
+            view.findViewById(R.id.QRCodeButton).setOnClickListener(v->
+            {
+                scanCode();
+            });
+
         } else if (role == 1) {
-            view.findViewById(R.id.Notification).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.Profile).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.filterButton).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.QRCodeButton).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.Notification).setVisibility(View.GONE);
+            view.findViewById(R.id.Profile).setVisibility(View.GONE);
+            view.findViewById(R.id.filterButton).setVisibility(View.GONE);
+            view.findViewById(R.id.QRCodeButton).setVisibility(View.GONE);
             view.findViewById(R.id.newEventButton).setVisibility(View.VISIBLE);
 
             view.findViewById(R.id.newEventButton).setOnClickListener(v ->
@@ -122,4 +134,47 @@ public class F_HomePage extends Fragment {
             );
         }
     }
+
+    private void scanCode() {
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Volume up to flash on");
+        options.setBeepEnabled(false);
+        options.setOrientationLocked(false);
+        options.setCaptureActivity(CaptureAct.class);
+        barcodeLauncher.launch(options);
+    }
+
+    ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
+        if (result.getContents() != null) {
+            String scannedEventId = result.getContents();
+            Log.d("QRScan", "Scanned ID: " + scannedEventId);
+            model = ((MainActivity) requireActivity()).getDataModel();
+            model.getEvent(scannedEventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    // Event found. Cast it and set it as current
+                    Event scannedEvent = (Event) obj;
+                    model.setCurrentEvent(scannedEvent);
+
+                    if (isAdded() && getActivity() != null) {
+                        Toast.makeText(getContext(), "Found Event: " + scannedEvent.getTitle(), Toast.LENGTH_SHORT).show();
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(0));
+                    }
+            }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    // Not used here
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("QRScan", "Event not found", e);
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Error: Event not found. Invalid QR Code.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+    });
+
 }

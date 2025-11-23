@@ -11,12 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.DataModel;
-import com.example.lotteryeventapp.Organizer;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
-import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -27,7 +26,6 @@ public class F_CreateEditEvent extends Fragment {
     private DataModel model;
     private Event event;
 
-    // This constructor is used for "edit"
     public static F_CreateEditEvent newInstance(int myType) {
         F_CreateEditEvent fragment = new F_CreateEditEvent();
         Bundle args = new Bundle();
@@ -209,4 +207,5 @@ public class F_CreateEditEvent extends Fragment {
             }
         });
     }
+
 }

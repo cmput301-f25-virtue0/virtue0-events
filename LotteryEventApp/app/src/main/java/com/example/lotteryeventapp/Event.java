@@ -14,6 +14,7 @@ public class Event {
     private String uid = "";
     private String date_time;
     private String location;
+    private String organizer; //the organizer who created this event
     private String registration_deadline;
     private String details;
     private boolean track_geolocation;
@@ -76,13 +77,14 @@ public class Event {
         this.drawn = false;
     }
 
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
     public String getUid() {
         return uid;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
 
     public String getTitle() {
         return title;
