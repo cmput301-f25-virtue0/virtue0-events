@@ -355,30 +355,13 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="20dp">
 
+
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSaveDraft"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:id="@+id/btnFinalize"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/save_draft"
-                    app:icon="@drawable/add"
-                    app:iconPadding="8dp"
-                    android:visibility="invisible"
-                    android:layout_marginTop="16dp"/>
-
-                <Space
-                    android:layout_width="12dp"
-                    android:layout_height="0dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPublish"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/publish_generate_qr"
-                    app:icon="@drawable/qr_code"
-                    app:iconPadding="8dp" />
+                    android:text="@string/btnFinalize" />
             </LinearLayout>
 
             <!-- spacer -->

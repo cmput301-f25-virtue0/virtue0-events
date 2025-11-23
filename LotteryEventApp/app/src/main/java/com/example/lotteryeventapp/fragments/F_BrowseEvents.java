@@ -33,6 +33,8 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
     private EventAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private String currentOrganizer;
+
     public static F_BrowseEvents newInstance(int role) {
         F_BrowseEvents fragment = new F_BrowseEvents();
         Bundle args = new Bundle();
@@ -47,6 +49,7 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
         if (getArguments() != null) {
             role = getArguments().getInt(ARG_ROLE);
         }
+
     }
 
     @Nullable
@@ -62,6 +65,7 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
 
         Log.i("CURRENT ROLE BROWSE", "Current BROWSE user role is: " + role);
         model = ((MainActivity) requireActivity()).getDataModel();
+        currentOrganizer = model.getCurrentOrganizer().getUid();
 
         // Initialize views
         rv = v.findViewById(R.id.rvEvents);
@@ -72,7 +76,7 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         // Initialize adapter with an empty list initially
-        adapter = new EventAdapter(new ArrayList<>(), role, this);
+        adapter = new EventAdapter(new ArrayList<>(), role,this, currentOrganizer);
         rv.setAdapter(adapter);
 
         // Configure Toolbar visibility and navigation

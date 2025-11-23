@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private DataModel model;
     private Entrant entrant;
     private Organizer organizer;
+    private int activeHomePageTab = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,12 +87,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void loadEntrant(String deviceID) {
+
         model.getEntrant(deviceID, new DataModel.GetCallback() {
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
             }
             @Override
             public void onSuccess(Object obj) {
+                //if entrant does not exists (null), create new entrant
+                if (obj == null) {
+                    Log.d("EntrantLoad", "Entrant not found (obj is null), creating new.");
+                    createNewEntrant(deviceID);
+                    return;
+                }
+
                 Log.d("Firebase", "retrieved");
                 entrant = (Entrant) obj;
                 model.setCurrentEntrant(entrant);
@@ -192,5 +201,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Set it as current in the model
         model.setCurrentOrganizer(organizer);
+    }
+
+    public int getActiveHomePageTab() {
+        return activeHomePageTab;
+    }
+
+    public void setActiveHomePageTab(int tabIndex) {
+        this.activeHomePageTab = tabIndex;
     }
 }

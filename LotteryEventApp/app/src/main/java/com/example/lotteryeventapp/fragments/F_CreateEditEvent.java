@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -53,7 +54,6 @@ public class F_CreateEditEvent extends Fragment {
         event = model.getCurrentEvent();
 
 
-
         //If editing, fill out information with existing event info
         if (this.type == 1 && this.event != null) {
             toolbar.setTitle("Edit Event"); // Update toolbar title
@@ -83,6 +83,8 @@ public class F_CreateEditEvent extends Fragment {
 
             MaterialSwitch mySwitch = view.findViewById(R.id.switchGeo);
             mySwitch.setChecked(event.willTrack_geolocation()); // Use getter
+            Button finalize = view.findViewById(R.id.btnFinalize);
+            finalize.setText("Update Event");
         } else {
             // This is "create" mode
             toolbar.setTitle("Create Event");
@@ -97,7 +99,7 @@ public class F_CreateEditEvent extends Fragment {
             }
         });
 
-        view.findViewById(R.id.btnPublish).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.btnFinalize).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -128,12 +130,13 @@ public class F_CreateEditEvent extends Fragment {
                     int attendee_limit = Integer.parseInt(capacityStr);
                     int waitlist_limit = Integer.parseInt(waitlistStr);
                     boolean track_geo = swGeo.isChecked();
+                    String organizer = model.getCurrentOrganizer().getUid();
 
                     // Differentiate between Create and Edit
                     if (type == 0) {
                         // create new event (will be automatically added to the database)
                         Event makeEvent = new Event(title, dateTime, location, regDeadline,
-                                details, track_geo, true, waitlist_limit, attendee_limit);
+                                details, track_geo, true, waitlist_limit, attendee_limit, organizer);
                         model.setEvent(makeEvent, new DataModel.SetCallback() {
                             @Override
                             public void onSuccess(String msg) {
@@ -173,6 +176,26 @@ public class F_CreateEditEvent extends Fragment {
                         event.setAttendee_limit(attendee_limit);
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
+                        event.setOrganizer(organizer);
+
+                        Organizer currentOrganizer = model.getCurrentOrganizer();
+                        if (!currentOrganizer.getEvents().contains(event.getUid())) {
+
+                            // Add it locally
+                            currentOrganizer.addEvent(event.getUid());
+
+                            // Save the updated organizer to Firebase
+                            model.setOrganizer(currentOrganizer, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "Linked missing event to Organizer");
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "Failed to update Organizer link");
+                                }
+                            });
+                        }
 
                         //Update the existing event
 //                        event.editEvent(dateTime, location, regDeadline,

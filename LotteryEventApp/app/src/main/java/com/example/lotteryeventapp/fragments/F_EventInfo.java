@@ -85,12 +85,13 @@ public class F_EventInfo extends Fragment {
             //Description
             myText = view.findViewById(R.id.eventDescription);
             myText.setText(event.getDetails());
+
             //Wait list size
-            if (role == 0) {
-                myText = view.findViewById(R.id.waitingListSize);
-                String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
-                myText.setText(fraction);
-            }
+
+            myText = view.findViewById(R.id.waitingListSize);
+            String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
+            myText.setText(fraction);
+
         }
 
         // Set up page based on role
@@ -118,10 +119,16 @@ public class F_EventInfo extends Fragment {
             });
         }
         else if (role == 1) {
-            view.findViewById(R.id.joinButton).setVisibility(View.GONE);
-            view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
-            view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
+            String currentOrgID = model.getCurrentOrganizer().getUid();
+            String eventOrgID = event.getOrganizer();
 
+            Log.d("DEBUG_CHECK", "My Org ID: " + currentOrgID);
+            Log.d("DEBUG_CHECK", "Event Org ID: " + eventOrgID);
+            view.findViewById(R.id.joinButton).setVisibility(View.GONE);
+            if (model.getCurrentOrganizer().getUid().equals(event.getOrganizer())) {
+                view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
+            }
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -140,8 +147,7 @@ public class F_EventInfo extends Fragment {
                     ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
                 }});
         } else if (role == 2) {
-            view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
-            view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
+            view.findViewById(R.id.joinButton).setVisibility(View.GONE);
             view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
 
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
@@ -241,15 +247,14 @@ public class F_EventInfo extends Fragment {
     private void showDialogWithQR(Bitmap qrBitmap) {
         if (getContext() == null || qrBitmap == null) return;
 
-        // 1. Create an ImageView programmatically to hold the QR code
+        // Create an ImageView to display the QR code
         ImageView imageView = new ImageView(getContext());
         imageView.setImageBitmap(qrBitmap);
         imageView.setAdjustViewBounds(true);
 
-        // Optional: Add some padding so the QR code isn't touching the edges
         imageView.setPadding(50, 50, 50, 50);
 
-        // 2. Create the Dialog
+        // Create the Dialog
         new MaterialAlertDialogBuilder(getContext())
                 .setTitle("Event QR Code")
                 .setMessage("Here is the QR Code for the event.")
