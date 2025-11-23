@@ -29,7 +29,7 @@ public class F_Profile extends Fragment {
     }
 
     private ImageButton btnEditName, btnEditEmail, btnEditPhone;
-    private TextView tvName, tvEmail, tvPhone;
+    private TextView tvName, tvEmail, tvPhone, tvUID;
     private Switch notificationSwitch;
 
     private Entrant entrant; //temporary entrant for now
@@ -59,6 +59,7 @@ public class F_Profile extends Fragment {
         tvName = view.findViewById(R.id.UserName);
         tvEmail = view.findViewById(R.id.Email);
         tvPhone = view.findViewById(R.id.UserPhone);
+        tvUID = view.findViewById(R.id.userID);
 
         btnEditName = view.findViewById(R.id.btnEditName);
         btnEditEmail = view.findViewById(R.id.btnEditEmail);
@@ -69,6 +70,7 @@ public class F_Profile extends Fragment {
             tvName.setText(entrant.getProfile().getName());
             tvEmail.setText(entrant.getProfile().getEmail());
             tvPhone.setText(entrant.getProfile().getPhone());
+            tvUID.setText(entrant.getUid());
         }
 
         btnEditName.setOnClickListener(v -> {

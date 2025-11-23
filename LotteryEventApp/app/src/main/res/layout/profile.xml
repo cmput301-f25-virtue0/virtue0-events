@@ -176,13 +176,13 @@
                 android:paddingVertical="6dp">
 
                 <TextView
-                    android:id="@+id/userContact"
+                    android:id="@+id/userID"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:hint="@string/contact_info"
+                    android:hint="@string/user_id"
                     android:textAppearance="?attr/textAppearanceBody1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/btnEditContact"

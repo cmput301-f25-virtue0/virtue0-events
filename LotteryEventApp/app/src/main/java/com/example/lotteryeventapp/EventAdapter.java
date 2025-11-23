@@ -15,6 +15,10 @@ import java.util.List;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private int role;
+    private String currentOrganizerId;
+
+    private String currentEntrantId;
+
 
     public interface OnEventClickListener {
         void onEventClick(@NonNull Event event, int position);
@@ -26,16 +30,30 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public EventAdapter() { this.clickListener = null; }
 
-    public EventAdapter(@NonNull List<Event> initial, int myRole) {
+
+    public EventAdapter(@NonNull List<Event> initial, int myRole, String myId) {
         items.addAll(initial);
         this.clickListener = null;
         this.role = myRole;
+
+        if (role == 1) {
+            this.currentOrganizerId = myId;
+        } else if (role == 0) {
+            this.currentEntrantId = myId;
+        }
     }
 
-    public EventAdapter(@NonNull List<Event> initial, int role, @NonNull OnEventClickListener listener) {
+
+    public EventAdapter(@NonNull List<Event> initial, int role, @NonNull OnEventClickListener listener, String myId) {
         items.addAll(initial);
         this.clickListener = listener;
         this.role = role;
+
+        if (role == 1) {
+            this.currentOrganizerId = myId;
+        } else if (role == 0) {
+            this.currentEntrantId = myId;
+        }
     }
 
     public void setItems(@NonNull List<Event> newItems) {
@@ -58,6 +76,27 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         h.tvLocation.setText(n(e.getLocation()).toUpperCase());
         h.tvDate.setText(n(e.getDate_time()));
         h.ivPoster.setImageResource(R.drawable.lottery); // placeholder
+        h.tvOwnerTag.setVisibility(View.GONE);
+        h.tvJoinedTag.setVisibility(View.GONE);
+
+
+        if (role == 1 && currentOrganizerId != null && e.getOrganizer() != null && currentOrganizerId.equals(e.getOrganizer())) {
+            h.tvOwnerTag.setVisibility(View.VISIBLE);
+        }
+
+        if (role == 0 && currentEntrantId != null) {
+            boolean isWaitlisted = e.getWaitlist() != null && e.getWaitlist().contains(currentEntrantId);
+            // TODO check rest of entrant status:
+            // boolean isEnrolled = e.getAttendee_list() != null && e.getAttendee_list().contains(currentEntrantId);
+
+            if (isWaitlisted) {
+                h.tvJoinedTag.setVisibility(View.VISIBLE);
+                h.tvJoinedTag.setText("WAITLISTED"); // Change text dynamically
+            } else {
+                h.tvJoinedTag.setVisibility(View.GONE);
+            }
+        }
+
         if (role == 2) { // 2 = Admin
             h.btnDelete.setVisibility(View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
@@ -80,6 +119,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         TextView tvTitle, tvLocation, tvDate;
         Button btnDelete;
 
+        TextView tvOwnerTag;
+
+        TextView tvJoinedTag;
+
+
         EventViewHolder(@NonNull View itemView,
                         @NonNull OnEventClickListener listener,
                         @NonNull List<Event> dataRef) {
@@ -89,6 +133,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             tvLocation = itemView.findViewById(R.id.tvLocation);
             tvDate   = itemView.findViewById(R.id.tvDate);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+            tvOwnerTag = itemView.findViewById(R.id.tvOwnerTag);
+            tvJoinedTag = itemView.findViewById(R.id.tvJoinedTag);
 
 
 

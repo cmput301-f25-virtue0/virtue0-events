@@ -16,7 +16,7 @@
     <string name="require_geolocation">Require geolocation</string>
     <string name="geo_help">Geolocation help</string>
     <string name="save_draft">Save draft</string>
-    <string name="publish_generate_qr">Publish and generate QR code</string>
+    <string name="btnFinalize">Publish event</string>
     <string name="edit_event">Edit event</string>
     <string name="download_qr_code">Download QR code</string>
     <string name="save_changes">Save changes</string>
@@ -45,10 +45,11 @@
     <string name="images">Images</string>
     <string name="delete">Delete</string>
     <string name="in_waitlist">in waitlist</string>
-    <string name="contact_info">Contact info</string>
+    <string name="user_id">Your user ID</string>
     <string name="edit_name">edit name</string>
     <string name="name">Name</string>
     <string name="phone_number">Phone number</string>
     <string name="edit_phone_number">edit phone number</string>
     <string name="email">Email</string>
+    <string name="show_qr_code">Show QR Code</string>
 </resources>

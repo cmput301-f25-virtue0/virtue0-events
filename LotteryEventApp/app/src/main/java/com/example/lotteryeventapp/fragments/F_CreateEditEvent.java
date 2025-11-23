@@ -5,18 +5,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.DataModel;
-import com.example.lotteryeventapp.Organizer;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
-import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -27,9 +27,6 @@ public class F_CreateEditEvent extends Fragment {
     private DataModel model;
     private Event event;
 
-
-
-    // This constructor is used for "edit"
     public static F_CreateEditEvent newInstance(int myType) {
         F_CreateEditEvent fragment = new F_CreateEditEvent();
         Bundle args = new Bundle();
@@ -54,6 +51,7 @@ public class F_CreateEditEvent extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarCreateEvent);
         model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
 
 
         //If editing, fill out information with existing event info
@@ -85,6 +83,8 @@ public class F_CreateEditEvent extends Fragment {
 
             MaterialSwitch mySwitch = view.findViewById(R.id.switchGeo);
             mySwitch.setChecked(event.willTrack_geolocation()); // Use getter
+            Button finalize = view.findViewById(R.id.btnFinalize);
+            finalize.setText("Update Event");
         } else {
             // This is "create" mode
             toolbar.setTitle("Create Event");
@@ -99,7 +99,7 @@ public class F_CreateEditEvent extends Fragment {
             }
         });
 
-        view.findViewById(R.id.btnPublish).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.btnFinalize).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -130,12 +130,13 @@ public class F_CreateEditEvent extends Fragment {
                     int attendee_limit = Integer.parseInt(capacityStr);
                     int waitlist_limit = Integer.parseInt(waitlistStr);
                     boolean track_geo = swGeo.isChecked();
+                    String organizer = model.getCurrentOrganizer().getUid();
 
                     // Differentiate between Create and Edit
                     if (type == 0) {
                         // create new event (will be automatically added to the database)
                         Event makeEvent = new Event(title, dateTime, location, regDeadline,
-                                details, track_geo, true, waitlist_limit, attendee_limit);
+                                details, track_geo, true, waitlist_limit, attendee_limit, organizer);
                         model.setEvent(makeEvent, new DataModel.SetCallback() {
                             @Override
                             public void onSuccess(String msg) {
@@ -175,6 +176,26 @@ public class F_CreateEditEvent extends Fragment {
                         event.setAttendee_limit(attendee_limit);
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
+                        event.setOrganizer(organizer);
+
+                        Organizer currentOrganizer = model.getCurrentOrganizer();
+                        if (!currentOrganizer.getEvents().contains(event.getUid())) {
+
+                            // Add it locally
+                            currentOrganizer.addEvent(event.getUid());
+
+                            // Save the updated organizer to Firebase
+                            model.setOrganizer(currentOrganizer, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "Linked missing event to Organizer");
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "Failed to update Organizer link");
+                                }
+                            });
+                        }
 
                         //Update the existing event
 //                        event.editEvent(dateTime, location, regDeadline,
@@ -209,4 +230,5 @@ public class F_CreateEditEvent extends Fragment {
             }
         });
     }
+
 }

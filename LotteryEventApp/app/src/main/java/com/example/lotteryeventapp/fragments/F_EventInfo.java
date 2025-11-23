@@ -1,5 +1,6 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,15 @@ import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 public class F_EventInfo extends Fragment {
     private int role;
     private Event event;
@@ -26,7 +36,6 @@ public class F_EventInfo extends Fragment {
     private DataModel model;
 
     //role = 0 for entrant, role = 1 for organizer
-
 
     public static F_EventInfo newInstance(int myRole){
         F_EventInfo fragment = new F_EventInfo();
@@ -76,12 +85,13 @@ public class F_EventInfo extends Fragment {
             //Description
             myText = view.findViewById(R.id.eventDescription);
             myText.setText(event.getDetails());
+
             //Wait list size
-            if (role == 0) {
-                myText = view.findViewById(R.id.waitingListSize);
-                String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
-                myText.setText(fraction);
-            }
+
+            myText = view.findViewById(R.id.waitingListSize);
+            String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
+            myText.setText(fraction);
+
         }
 
         // Set up page based on role
@@ -93,25 +103,32 @@ public class F_EventInfo extends Fragment {
             if (currentEntrant.getWaitlistedEvents().contains(event.getUid())) {
                 view.findViewById(R.id.joinButton).setVisibility(View.GONE);
             }
-
             // Detect button presses
             view.findViewById(R.id.joinButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     joinWaitlist();
-                }});
+                }
+            });
 
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
-                }});
+                }
+            });
         }
         else if (role == 1) {
-            view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
-            view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
-            view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
+            String currentOrgID = model.getCurrentOrganizer().getUid();
+            String eventOrgID = event.getOrganizer();
 
+            Log.d("DEBUG_CHECK", "My Org ID: " + currentOrgID);
+            Log.d("DEBUG_CHECK", "Event Org ID: " + eventOrgID);
+            view.findViewById(R.id.joinButton).setVisibility(View.GONE);
+            if (model.getCurrentOrganizer().getUid().equals(event.getOrganizer())) {
+                view.findViewById(R.id.layoutOrganizer).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
+            }
             view.findViewById(R.id.editEventBtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -130,8 +147,7 @@ public class F_EventInfo extends Fragment {
                     ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
                 }});
         } else if (role == 2) {
-            view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
-            view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
+            view.findViewById(R.id.joinButton).setVisibility(View.GONE);
             view.findViewById(R.id.layoutAdmin).setVisibility(View.VISIBLE);
 
             view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
@@ -141,6 +157,14 @@ public class F_EventInfo extends Fragment {
                 }});
 
         }
+        view.findViewById(R.id.showQRCodeBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = event.getUid();
+                Bitmap qrBitmap = generateQRCodeBitmap(content);
+                showDialogWithQR(qrBitmap);
+            }
+        });
     }
     /**
      * Handles the logic for an entrant joining the event's waitlist.
@@ -218,5 +242,47 @@ public class F_EventInfo extends Fragment {
                 }
             }
         });
+    }
+
+    private void showDialogWithQR(Bitmap qrBitmap) {
+        if (getContext() == null || qrBitmap == null) return;
+
+        // Create an ImageView to display the QR code
+        ImageView imageView = new ImageView(getContext());
+        imageView.setImageBitmap(qrBitmap);
+        imageView.setAdjustViewBounds(true);
+
+        imageView.setPadding(50, 50, 50, 50);
+
+        // Create the Dialog
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Event QR Code")
+                .setMessage("Here is the QR Code for the event.")
+                .setView(imageView)
+                .setPositiveButton("Close", (dialog, which) -> {
+                    dialog.dismiss();
+                    ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(role));
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private Bitmap generateQRCodeBitmap(String content) {
+        QRCodeWriter writer = new QRCodeWriter();
+        try {
+            BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? android.graphics.Color.BLACK : android.graphics.Color.WHITE);
+                }
+            }
+            return bmp;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

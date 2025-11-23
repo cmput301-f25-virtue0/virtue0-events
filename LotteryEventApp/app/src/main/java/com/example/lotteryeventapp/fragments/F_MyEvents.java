@@ -69,12 +69,6 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
         Log.i("CURRENT ROLE MY_EVENTS", "Current MY_EVENTS user role is: " + role);
         model = ((MainActivity) requireActivity()).getDataModel();
 
-        // Initialize user objects based on role
-        if (role == 1) { // Organizer
-            organizer = model.getCurrentOrganizer();
-        } else { // Entrant
-            entrant = model.getCurrentEntrant();
-        }
 
         // Initialize views
         rv = view.findViewById(R.id.rvEvents);
@@ -83,7 +77,13 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
 
         // Setup RecyclerView and Adapter
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new EventAdapter(new ArrayList<>(), role, this);
+
+        // Set adapter based on role
+        if (role == 1) {
+            adapter = new EventAdapter(new ArrayList<>(), role, this, model.getCurrentOrganizer().getUid());
+        } else{
+            adapter = new EventAdapter(new ArrayList<>(), role, this, model.getCurrentEntrant().getUid());
+        }
         rv.setAdapter(adapter);
 
         // Configure Toolbar visibility

@@ -14,6 +14,7 @@ public class Event {
     private String uid = "";
     private String date_time;
     private String location;
+    private String organizer; //the organizer who created this event
     private String registration_deadline;
     private String details;
     private boolean track_geolocation;
@@ -38,7 +39,7 @@ public class Event {
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
     public Event(String title, String uid, String date_time, String location, String registration_deadline, String details,
-                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
         this.title = title;
         this.uid = uid;
         this.date_time = date_time;
@@ -54,11 +55,12 @@ public class Event {
         this.cancelled_list = new ArrayList<>();
         this.invited_list = new ArrayList<>();
         this.drawn = false;
+        this.organizer = organizer;
 
     }
 
     public Event(String title, String date_time, String location, String registration_deadline, String details,
-                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
         this.title = title;
         this.uid = "";
         this.date_time = date_time;
@@ -74,15 +76,28 @@ public class Event {
         this.cancelled_list = new ArrayList<>();
         this.invited_list = new ArrayList<>();
         this.drawn = false;
+        this.organizer = organizer;
+    }
+
+
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
+    }
+
+
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getUid() {
         return uid;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
 
     public String getTitle() {
         return title;

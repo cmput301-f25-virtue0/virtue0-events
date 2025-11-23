@@ -22,6 +22,8 @@ public class EventDataHolder {
     private ArrayList<String> cancelledList = new ArrayList<String>();
     private ArrayList<String> invitedList = new ArrayList<String>();
     private boolean drawn;
+
+    private String organizer;
 //    private boolean redraw;
 
     public EventDataHolder(Event event) {
@@ -40,6 +42,7 @@ public class EventDataHolder {
         this.cancelledList.addAll(event.getCancelled_list());
         this.invitedList.addAll(event.getInvited_list());
         this.drawn = event.isDrawn();
+        this.organizer = event.getOrganizer();
 //        this.redraw = event.isDrawn();
     }
 
@@ -163,6 +166,14 @@ public class EventDataHolder {
         this.drawn = drawn;
     }
 
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
+    }
+
     public EventDataHolder(Map<String, Object> data, String eventId) {
         this.uid = eventId;
         this.title = (String) data.get("title");
@@ -174,6 +185,7 @@ public class EventDataHolder {
         this.willAutomaticallyRedraw = (Boolean) data.get("willAutomaticallyRedraw");
         this.waitlistLimit = ((Long) data.get("waitlistLimit")).intValue();
         this.attendeeLimit = ((Long) data.get("attendeeLimit")).intValue();
+        this.organizer = (String) data.get("organizer");
 
         List<Object> waitlist = (List<Object>) data.get("waitlist");
         for (Object o: waitlist) {
@@ -200,12 +212,13 @@ public class EventDataHolder {
 
     public Event createEventInstance() {
         Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationDeadline, this.details,
-                this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit);
+                this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit, this.organizer);
 
         event.getWaitlist().addAll(this.waitlist);
         event.getAttendee_list().addAll(this.attendeeList);
         event.getCancelled_list().addAll(this.cancelledList);
         event.getInvited_list().addAll(this.invitedList);
+        event.setOrganizer(organizer);
 
         event.setDrawn(this.drawn);
 

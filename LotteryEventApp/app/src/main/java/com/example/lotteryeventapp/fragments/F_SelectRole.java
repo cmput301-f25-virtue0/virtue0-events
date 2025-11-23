@@ -30,6 +30,7 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnEntrant).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ((MainActivity) requireActivity()).setActiveHomePageTab(0);
                 ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
             }
         });
@@ -37,6 +38,7 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnOrganizer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ((MainActivity) requireActivity()).setActiveHomePageTab(0);
                 ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             }
         });
