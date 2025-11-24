@@ -449,7 +449,6 @@ public class Event {
             int randomIndex = rand.nextInt(waitlist.size());
             String drawnEntrant = waitlist.remove(randomIndex);
             invited_list.add(drawnEntrant);
-
 //            Event event = this;
 //            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
 //                @Override
@@ -545,6 +544,161 @@ public class Event {
 //            });
         }
         DataModel model = new DataModel();
+        Event event = this;
+        if(!this.waitlist.isEmpty()) {
+            model.getUsableWaitlistEntrants(this, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ArrayList<Entrant> waitlist = (ArrayList<Entrant>) obj;
+                    for (int i = 0; i < waitlist.size(); i++) {
+                        Entrant rejected_entrant = waitlist.get(i);
+                        Rejection rejection = new Rejection(event.uid, rejected_entrant.getUid(), "Sorry, you were not selected to attend this event");
+                        model.setNotification(rejection, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+                                rejected_entrant.addNotification(rejection.getUid());
+                                model.setEntrant(rejected_entrant, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }
+
+        if(!this.invited_list.isEmpty()) {
+            model.getUsableInvitedListEntrants(this, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ArrayList<Entrant> invitedList = (ArrayList<Entrant>) obj;
+                    for (int i = 0; i < invitedList.size(); i++) {
+                        Entrant invited_entrant = invitedList.get(i);
+                        Invitation invitation = new Invitation(event.uid, invited_entrant.getUid(), "Congratulations, you are welcome to sign up for this event");
+                        model.setNotification(invitation, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+                                invited_entrant.addNotification(invitation.getUid());
+                                model.setEntrant(invited_entrant, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }
+
+
+//
+//        ArrayList<Entrant> usableInvitedList = model.getUsableInvitedListEntrants();
+//        for (int i = 0; i < usableWaitlist.size(); i++) {
+//            Entrant rejected_entrant = usableWaitlist.get(i);
+//            Rejection rejection = new Rejection(this.uid, rejected_entrant.getUid(),"Sorry, you were not selected to attend this event");
+//            model.setNotification(rejection, new DataModel.SetCallback() {
+//                @Override
+//                public void onSuccess(String msg) {
+//                    Log.d("Firebase", "written");
+//                    rejected_entrant.addNotification(rejection.getUid());
+//                    model.setEntrant(rejected_entrant, new DataModel.SetCallback() {
+//                        @Override
+//                        public void onSuccess(String msg) {
+//                            Log.d("Firebase", "written");
+//                        }
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.e("Firebase", "fail");
+//                        }
+//                    });
+//                }
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                }
+//            });
+//
+//        }
+//
+//        for (int i = 0; i < usableInvitedList.size(); i++) {
+//            Entrant invited_entrant = usableInvitedList.get(i);
+//            Invitation invitation = new Invitation(this.uid, invited_entrant.getUid(),"Congratulations, you are welcome to sign up for this event");
+//            model.setNotification(invitation, new DataModel.SetCallback() {
+//                @Override
+//                public void onSuccess(String msg) {
+//                    Log.d("Firebase", "written");
+//                    invited_entrant.addNotification(invitation.getUid());
+//                    model.setEntrant(invited_entrant, new DataModel.SetCallback() {
+//                        @Override
+//                        public void onSuccess(String msg) {
+//                            Log.d("Firebase", "written");
+//                        }
+//                        @Override
+//                        public void onError(Exception e) {
+//                            Log.e("Firebase", "fail");
+//                        }
+//                    });
+//                }
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                }
+//            });
+//
+//        }
+
+
 //            Event event = this;
         model.setEvent(this, new DataModel.SetCallback() {
             @Override

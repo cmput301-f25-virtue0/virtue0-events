@@ -95,7 +95,7 @@ public class F_Lottery extends Fragment {
 //            data = new ArrayList<>();
 //        }
 //        ProfileListAdapter.OnProfileClickListener fragment = this.profileListener;
-        model.getUsableEntrants(event,new DataModel.GetCallback() {
+        model.getUsableWaitlistEntrants(event,new DataModel.GetCallback() {
 
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
