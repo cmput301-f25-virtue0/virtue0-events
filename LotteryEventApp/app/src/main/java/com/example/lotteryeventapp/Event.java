@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
+import com.example.lotteryeventapp.DataModel;
+
 /**
  * This class contains all of the information and functionality of an Event
  */
@@ -15,6 +17,8 @@ public class Event {
     private String date_time;
     private String location;
     private String organizer; //the organizer who created this event
+
+    private String registration_start;
     private String registration_deadline;
     private String details;
     private boolean track_geolocation;
@@ -38,12 +42,13 @@ public class Event {
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public Event(String title, String uid, String date_time, String location, String registration_deadline, String details,
+    public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
                   boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
         this.title = title;
         this.uid = uid;
         this.date_time = date_time;
         this.location = location;
+        this.registration_start = registration_start;
         this.registration_deadline = registration_deadline;
         this.details = details;
         this.track_geolocation = track_geolocation;
@@ -59,12 +64,13 @@ public class Event {
 
     }
 
-    public Event(String title, String date_time, String location, String registration_deadline, String details,
+    public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
         this.title = title;
         this.uid = "";
         this.date_time = date_time;
         this.location = location;
+        this.registration_start = registration_start;
         this.registration_deadline = registration_deadline;
         this.details = details;
         this.track_geolocation = track_geolocation;
@@ -77,6 +83,14 @@ public class Event {
         this.invited_list = new ArrayList<>();
         this.drawn = false;
         this.organizer = organizer;
+    }
+
+    public String getRegistration_start() {
+        return registration_start;
+    }
+
+    public void setRegistration_start(String registration_start) {
+        this.registration_start = registration_start;
     }
 
 
@@ -442,13 +456,60 @@ public class Event {
             return;
         }
 
+        DataModel model = new DataModel();
+
         Random rand = new Random();
         int numToDraw = Math.min(attendee_limit - invited_list.size(), waitlist.size());
-//        CountDownLatch latch = new CountDownLatch(numToDraw);
+        CountDownLatch latch = new CountDownLatch(numToDraw);
+
         for (int i = 0; i < numToDraw; i++) {
             int randomIndex = rand.nextInt(waitlist.size());
             String drawnEntrant = waitlist.remove(randomIndex);
             invited_list.add(drawnEntrant);
+
+            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
+                        @Override
+                        public void onSuccess(Object obj) {
+                            Entrant entrant = (Entrant) obj;
+
+                            if (entrant != null) {
+                                // remove the event from the entrant's personal list
+                                entrant.removeWaitlistedEvent(uid);
+
+                                // Save the updated Entrant back to DB
+                                model.setEntrant(entrant, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Lottery", "Removed event from entrant " + entrant.getUid());
+                                        latch.countDown(); // Done with this entrant
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Lottery", "Failed to update entrant " + entrant.getUid());
+                                        latch.countDown(); // Countdown even on error to prevent hanging
+                                    }
+                                });
+                            } else {
+                                latch.countDown(); // Entrant not found
+                            }
+                        }
+
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    // Not used
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Lottery", "Failed to retrieve entrant " + drawnEntrant);
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
 
 //            Event event = this;
 //            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
@@ -543,9 +604,7 @@ public class Event {
 //                    rejection_latch.countDown();
 //                }
 //            });
-        }
-        DataModel model = new DataModel();
-//            Event event = this;
+//
         model.setEvent(this, new DataModel.SetCallback() {
             @Override
             public void onSuccess(String msg) {
@@ -586,10 +645,11 @@ public class Event {
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public void editEvent(String date_time, String location, String registration_deadline, String details,
+    public void editEvent(String date_time, String location, String registration_start, String registration_deadline, String details,
                           boolean track_geolocation, boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
         setDate_time(date_time);
         setLocation(location);
+        setRegistration_start(registration_start);
         setRegistration_deadline(registration_deadline);
         setDetails(details);
         setTrack_geolocation(track_geolocation);

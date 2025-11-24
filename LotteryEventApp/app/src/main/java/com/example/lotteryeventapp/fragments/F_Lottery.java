@@ -78,23 +78,6 @@ public class F_Lottery extends Fragment {
         RecyclerView rv = view.findViewById(R.id.rvEntrants);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Create Dummy Data
-        /*List<Entrant> data = Arrays.asList(
-                new Entrant("device4",  new Entrant.Profile("Charlie", "charlie@example.com", "780-555-0101")),
-                new Entrant("device5",  new Entrant.Profile("Eva",     "eva@example.org",     "780-555-0102")),
-                new Entrant("device6",  new Entrant.Profile("Frank",   "frank@example.net",    "780-555-0103")),
-                new Entrant("device7",  new Entrant.Profile("Grace",   "grace@ualberta.ca",    "780-555-0104")),
-                new Entrant("device8",  new Entrant.Profile("Henry",   "henry@example.com",    "780-555-0105"))
-        );*/
-
-//        List<Entrant> data;
-//        try {
-//            data = event.getUsableWaitList();
-//        } catch(InterruptedException e) {
-//            Log.e("F_Lottery", "getUsableWaitList threw error");
-//            data = new ArrayList<>();
-//        }
-//        ProfileListAdapter.OnProfileClickListener fragment = this.profileListener;
         model.getUsableEntrants(event,new DataModel.GetCallback() {
 
             @Override

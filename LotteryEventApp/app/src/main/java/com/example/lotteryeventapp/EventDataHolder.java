@@ -11,6 +11,8 @@ public class EventDataHolder {
     private String uid;
     private String dateTime;
     private String location;
+
+    private String registrationStart;
     private String registrationDeadline;
     private String details;
     private boolean trackGeolocation;
@@ -31,6 +33,7 @@ public class EventDataHolder {
         this.title = event.getTitle();
         this.dateTime = event.getDate_time();
         this.location = event.getLocation();
+        this.registrationStart = event.getRegistration_start();
         this.registrationDeadline = event.getRegistration_deadline();
         this.details = event.getDetails();
         this.trackGeolocation = event.willTrack_geolocation();
@@ -44,6 +47,14 @@ public class EventDataHolder {
         this.drawn = event.isDrawn();
         this.organizer = event.getOrganizer();
 //        this.redraw = event.isDrawn();
+    }
+
+    public String getRegistrationStart() {
+        return registrationStart;
+    }
+
+    public void setRegistrationStart(String registrationStart) {
+        this.registrationStart = registrationStart;
     }
 
     public String getTitle() {
@@ -179,6 +190,7 @@ public class EventDataHolder {
         this.title = (String) data.get("title");
         this.dateTime = (String) data.get("dateTime");
         this.location = (String) data.get("location");
+        this.registrationStart = (String) data.get("registrationStart");
         this.registrationDeadline = (String) data.get("registrationDeadline");
         this.details = (String) data.get("details");
         this.trackGeolocation = (Boolean) data.get("trackGeolocation");
@@ -211,7 +223,7 @@ public class EventDataHolder {
     }
 
     public Event createEventInstance() {
-        Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationDeadline, this.details,
+        Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationStart, this.registrationDeadline, this.details,
                 this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit, this.organizer);
 
         event.getWaitlist().addAll(this.waitlist);

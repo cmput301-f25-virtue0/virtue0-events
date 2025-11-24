@@ -52,4 +52,6 @@
     <string name="edit_phone_number">edit phone number</string>
     <string name="email">Email</string>
     <string name="show_qr_code">Show QR Code</string>
-</resources>
+    <string name="lottery_explanation_title">How the Lottery Works</string>
+    <string name="lottery_explanation_body">To sign up for an event, you join a waiting list during the open registration window rather than securing a spot immediately. Since the selection process is random, joining the list early does not increase your chances of being chosen.\n\nOnce the registration period closes, the system performs a lottery draw and notifies the selected entrants. If you receive an invitation, you must formally accept it to confirm your attendance; if you decline, the system automatically draws a new applicant from the waiting list to fill the vacancy.</string>
+    <string name="close">Close</string></resources>
