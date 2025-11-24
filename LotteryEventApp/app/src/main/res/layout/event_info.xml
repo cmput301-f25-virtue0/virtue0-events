@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar2"
         android:layout_width="0dp"
@@ -16,7 +15,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Back button -->
     <ImageButton
         android:id="@+id/backButton"
         android:layout_width="40dp"
@@ -33,9 +31,6 @@
         app:layout_constraintTop_toTopOf="@id/toolbar2"
         app:layout_constraintBottom_toBottomOf="@id/toolbar2"/>
 
-
-
-    <!-- Centered title -->
     <TextView
         android:id="@+id/titleEvent"
         android:layout_width="wrap_content"
@@ -49,7 +44,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Scrollable content -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="0dp"
@@ -67,19 +61,15 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:paddingTop="24dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="100dp"> <ImageView
+            android:id="@+id/eventPoster"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="centerCrop"
+            android:contentDescription="event_poster"
+            tools:srcCompat="@tools:sample/avatars" />
 
-            <!-- Poster -->
-            <ImageView
-                android:id="@+id/eventPoster"
-                android:layout_width="180dp"
-                android:layout_height="180dp"
-                android:layout_gravity="center_horizontal"
-                android:scaleType="centerCrop"
-                android:contentDescription="event_poster"
-                tools:srcCompat="@tools:sample/avatars" />
-
-            <!-- Name -->
             <TextView
                 android:id="@+id/eventName"
                 android:layout_width="match_parent"
@@ -89,7 +79,6 @@
                 android:textStyle="bold"
                 tools:text="Community Swim Lessons" />
 
-            <!-- Date & time -->
             <TextView
                 android:id="@+id/eventDateTime"
                 android:layout_width="match_parent"
@@ -98,7 +87,6 @@
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="Sat, Nov 9 • 10:00 AM – 11:30 AM" />
 
-            <!-- Location -->
             <TextView
                 android:id="@+id/eventLocation"
                 android:layout_width="match_parent"
@@ -107,7 +95,6 @@
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="City Sports Centre, 123 Main St" />
 
-            <!-- Tags placeholder -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/tagGroup"
                 android:layout_width="match_parent"
@@ -132,7 +119,6 @@
                     tools:text="Accessible" />
             </com.google.android.material.chip.ChipGroup>
 
-            <!-- Description -->
             <TextView
                 android:id="@+id/eventDescription"
                 android:layout_width="match_parent"
@@ -141,14 +127,12 @@
                 android:textAppearance="?attr/textAppearanceBody1"
                 tools:text="A weekly swim session focusing on water confidence and basic techniques. All ages welcome." />
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="16dp"
                 android:background="#1F000000" />
 
-            <!-- Capacity / Join row -->
             <LinearLayout
                 android:id="@+id/layoutEntrant"
                 android:layout_width="match_parent"
@@ -174,15 +158,50 @@
 
             </LinearLayout>
 
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/showQRCodeBtn"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/show_qr_code"
                 app:cornerRadius="24dp" />
 
+            <LinearLayout
+                android:id="@+id/layoutInvited"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:visibility="gone">
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/acceptInvitationBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Accept Invitation"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:cornerRadius="24dp" />
+
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="0dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rejectInvitationBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reject Invitation"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:cornerRadius="24dp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutOrganizer"
@@ -193,41 +212,43 @@
                 android:orientation="horizontal"
                 android:visibility="gone">
 
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editEventBtn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Edit Event"
                     app:cornerRadius="8dp" />
 
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="0dp" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/applicantsBtn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
                     android:layout_weight="1"
                     android:text="Applicants"
                     app:cornerRadius="8dp" />
             </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layoutAdmin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/btnDeleteEvent"
+            <LinearLayout
+                android:id="@+id/layoutAdmin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Delete Event" />
-        </LinearLayout>
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-
+                <Button
+                    android:id="@+id/btnDeleteEvent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delete Event" />
+            </LinearLayout>
 
         </LinearLayout>
 

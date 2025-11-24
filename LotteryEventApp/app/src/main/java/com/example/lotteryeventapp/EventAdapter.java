@@ -1,6 +1,7 @@
 // EventAdapter.java
 package com.example.lotteryeventapp;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,28 +77,40 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         h.tvLocation.setText(n(e.getLocation()).toUpperCase());
         h.tvDate.setText(n(e.getDate_time()));
         h.ivPoster.setImageResource(R.drawable.lottery); // placeholder
+
+        // Reset Visibility
         h.tvOwnerTag.setVisibility(View.GONE);
         h.tvJoinedTag.setVisibility(View.GONE);
-
 
         if (role == 1 && currentOrganizerId != null && e.getOrganizer() != null && currentOrganizerId.equals(e.getOrganizer())) {
             h.tvOwnerTag.setVisibility(View.VISIBLE);
         }
 
+        //entrant lane
         if (role == 0 && currentEntrantId != null) {
             boolean isWaitlisted = e.getWaitlist() != null && e.getWaitlist().contains(currentEntrantId);
-            // TODO check rest of entrant status:
-            // boolean isEnrolled = e.getAttendee_list() != null && e.getAttendee_list().contains(currentEntrantId);
+            boolean isAttending = e.getAttendee_list() != null && e.getAttendee_list().contains(currentEntrantId);
+            boolean isInvited = e.getInvited_list() != null && e.getInvited_list().contains(currentEntrantId);
 
-            if (isWaitlisted) {
+            if (isAttending) {
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
-                h.tvJoinedTag.setText("WAITLISTED"); // Change text dynamically
-            } else {
-                h.tvJoinedTag.setVisibility(View.GONE);
+                h.tvJoinedTag.setText("ATTENDING");
+                h.tvJoinedTag.setBackgroundColor(Color.parseColor("#4CAF50")); // Green
+            }
+            else if (isInvited) {
+                h.tvJoinedTag.setVisibility(View.VISIBLE);
+                h.tvJoinedTag.setText("INVITED");
+                h.tvJoinedTag.setBackgroundColor(Color.parseColor("#FF9800")); // Orange
+            }
+            else if (isWaitlisted) {
+                h.tvJoinedTag.setVisibility(View.VISIBLE);
+                h.tvJoinedTag.setText("WAITLISTED");
+                h.tvJoinedTag.setBackgroundColor(Color.GRAY); // Default Gray
             }
         }
 
-        if (role == 2) { // 2 = Admin
+        //admin lane
+        if (role == 2) {
             h.btnDelete.setVisibility(View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
                 if (clickListener != null) {

@@ -452,171 +452,64 @@ public class Event {
      */
     public void doLottery() throws InterruptedException {
         if (waitlist.isEmpty()) {
-            System.out.println("No entrants on the waitlist to draw from.");
+            Log.d("Lottery", "No entrants to draw.");
+            return;
+        }
+
+        int spotsAvailable = attendee_limit - (invited_list.size() + attendee_list.size());
+        int numToDraw = Math.min(spotsAvailable, waitlist.size());
+
+        if (numToDraw <= 0) {
+            Log.d("Lottery", "No spots available to draw.");
             return;
         }
 
         DataModel model = new DataModel();
-
         Random rand = new Random();
-        int numToDraw = Math.min(attendee_limit - invited_list.size(), waitlist.size());
-        CountDownLatch latch = new CountDownLatch(numToDraw);
 
+        // Temporary list to handle the loop
+        ArrayList<String> drawnIds = new ArrayList<>();
+
+        // update event local lists
         for (int i = 0; i < numToDraw; i++) {
             int randomIndex = rand.nextInt(waitlist.size());
-            String drawnEntrant = waitlist.remove(randomIndex);
-            invited_list.add(drawnEntrant);
+            String drawnId = waitlist.remove(randomIndex);
+            invited_list.add(drawnId);
+            drawnIds.add(drawnId);
+        }
 
-            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
-                        @Override
-                        public void onSuccess(Object obj) {
-                            Entrant entrant = (Entrant) obj;
-
-                            if (entrant != null) {
-                                // remove the event from the entrant's personal list
-                                entrant.removeWaitlistedEvent(uid);
-
-                                // Save the updated Entrant back to DB
-                                model.setEntrant(entrant, new DataModel.SetCallback() {
-                                    @Override
-                                    public void onSuccess(String msg) {
-                                        Log.d("Lottery", "Removed event from entrant " + entrant.getUid());
-                                        latch.countDown(); // Done with this entrant
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        Log.e("Lottery", "Failed to update entrant " + entrant.getUid());
-                                        latch.countDown(); // Countdown even on error to prevent hanging
-                                    }
-                                });
-                            } else {
-                                latch.countDown(); // Entrant not found
-                            }
-                        }
-
+        // Update entrants in Firebase
+        for (String entrantId : drawnIds) {
+            model.getEntrant(entrantId, new DataModel.GetCallback() {
                 @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-                    // Not used
-                }
+                public void onSuccess(Object obj) {
+                    Entrant entrant = (Entrant) obj;
+                    if (entrant != null) {
 
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Lottery", "Failed to retrieve entrant " + drawnEntrant);
-                    latch.countDown();
+                        entrant.removeWaitlistedEvent(uid); // Remove from Waiting
+                        entrant.addInvitedEvent(uid);        // Add to Chosen
+
+
+                        // TODO: entrant.getNotifications().add("You are chosen for " + title);
+
+                        // save updated entrant
+                        model.setEntrant(entrant, new DataModel.SetCallback() {
+                            @Override public void onSuccess(String msg) { Log.d("Lottery", "Updated entrant " + entrantId); }
+                            @Override public void onError(Exception e) {}
+                        });
+                    }
                 }
+                @Override public <T extends Enum<T>> void onSuccess(Object obj, T type) {}
+                @Override public void onError(Exception e) { Log.e("Lottery", "Failed to fetch entrant " + entrantId); }
             });
         }
 
-        latch.await();
-
-
-//            Event event = this;
-//            model.getEntrant(drawnEntrant, new DataModel.GetCallback() {
-//                @Override
-//                public void onSuccess(Object obj) {
-//                    Log.d("Firebase", "retrieved");
-//                    Entrant entrant = (Entrant) obj;
-//                    Invitation invitation = new Invitation(event.uid, entrant.getUid(), "");
-//                    model.setNotification(invitation, new DataModel.SetCallback() {
-//                        @Override
-//                        public void onSuccess(String msg) {
-//                            Log.d("Firebase", "written");
-//                        }
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Log.e("Firebase", "fail");
-//                        }
-//                    });
-//                    entrant.addNotification(invitation.getUid());
-//                    model.setEntrant(entrant,new DataModel.SetCallback() {
-//                        @Override
-//                        public void onSuccess(String msg) {
-//                            Log.d("Firebase", "written");
-//                        }
-//
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Log.e("Firebase", "fail");
-//                        }
-//                    });
-//                    latch.countDown();
-//                }
-//                @Override
-//                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-//
-//
-//                }
-//
-//                @Override
-//                public void onError(Exception e) {
-//                    Log.e("Firebase", "fail");
-//                    latch.countDown();
-//                }
-//            });
-//
-//        }
-//        latch.await();
-//        CountDownLatch rejection_latch = new CountDownLatch(this.getWaitlistAmount());
-//        for (int i = 0; i < this.getWaitlistAmount(); i++) {
-//
-//            String rejectedEntrant = this.getWaitlist().get(i);
-//
-//            DataModel model = new DataModel();
-//            Event event = this;
-//            model.getEntrant(rejectedEntrant, new DataModel.GetCallback() {
-//                @Override
-//                public void onSuccess(Object obj) {
-//                    Log.d("Firebase", "retrieved");
-//                    Entrant entrant = (Entrant) obj;
-//                    Rejection rejection = new Rejection(event.uid, entrant.getUid(), "");
-//                    model.setNotification(rejection, new DataModel.SetCallback() {
-//                        @Override
-//                        public void onSuccess(String msg) {
-//                            Log.d("Firebase", "written");
-//                        }
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Log.e("Firebase", "fail");
-//                        }
-//                    });
-//                    entrant.addNotification(rejection.getUid());
-//                    model.setEntrant(entrant,new DataModel.SetCallback() {
-//                        @Override
-//                        public void onSuccess(String msg) {
-//                            Log.d("Firebase", "written");
-//                        }
-//
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Log.e("Firebase", "fail");
-//                        }
-//                    });
-//                    rejection_latch.countDown();
-//                }
-//                @Override
-//                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-//
-//                }
-//                @Override
-//                public void onError(Exception e) {
-//                    Log.e("Firebase", "fail");
-//                    rejection_latch.countDown();
-//                }
-//            });
-//
+        // update event in firebase
+        this.drawn = true;
         model.setEvent(this, new DataModel.SetCallback() {
-            @Override
-            public void onSuccess(String msg) {
-                Log.d("Firebase", "written");
-            }
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-            }
+            @Override public void onSuccess(String msg) { Log.d("Lottery", "Event lottery saved."); }
+            @Override public void onError(Exception e) {}
         });
-//        rejection_latch.await();
-        drawn = true;
     }
     /**
      * tells whether the Event has already drawn names yet

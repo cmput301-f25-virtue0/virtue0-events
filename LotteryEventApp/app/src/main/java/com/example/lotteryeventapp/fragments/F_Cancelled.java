@@ -66,7 +66,7 @@ public class F_Cancelled extends Fragment {
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(F_Applicants.newInstance(2));
+            ((MainActivity) requireActivity()).showFragment(F_Applicants.newInstance(1));
         });
 
         RecyclerView rv = view.findViewById(R.id.rvCancelled);

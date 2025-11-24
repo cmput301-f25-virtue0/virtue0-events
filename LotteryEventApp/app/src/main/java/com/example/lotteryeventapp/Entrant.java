@@ -21,6 +21,10 @@ public class Entrant {
 
     private ArrayList<String> waitlistedEvents = new ArrayList<>();
 
+    private ArrayList<String> invitedEvents = new ArrayList<>();
+
+    private ArrayList<String> attendedEvents = new ArrayList<>();
+
 
     /**
      * Constructs a new entrant
@@ -31,6 +35,22 @@ public class Entrant {
     public Entrant(String uid, Profile profile) {
         this.uid = Objects.requireNonNull(uid, "uid");
         this.profile = Objects.requireNonNull(profile, "profile");
+    }
+
+    public ArrayList<String> getAttendedEvents() {
+        return attendedEvents;
+    }
+
+    public void setAttendedEvents(ArrayList<String> attendedEvents) {
+        this.attendedEvents = attendedEvents;
+    }
+
+    public ArrayList<String> getInvitedEvents() {
+        return invitedEvents;
+    }
+
+    public void setInvitedEvents(ArrayList<String> invitedEvents) {
+        this.invitedEvents = invitedEvents;
     }
 
     /**
@@ -138,7 +158,7 @@ public class Entrant {
         }
         public Profile() {
             setName("");
-            setEmail("default@email");
+            setEmail("default@example.com");
             setPhone("");
         }
 
@@ -257,6 +277,26 @@ public class Entrant {
 
     public ArrayList<String> getWaitlistedEvents() {
         return waitlistedEvents;
+    }
+
+    public void addInvitedEvent(String eventId) {
+        if (!invitedEvents.contains(eventId)) {
+            invitedEvents.add(eventId);
+        }
+    }
+
+    public void removeInvitedEvent(String eventId) {
+        invitedEvents.remove(eventId);
+    }
+
+    public void addAttendedEvent(String eventId) {
+        if (!attendedEvents.contains(eventId)) {
+            attendedEvents.add(eventId);
+        }
+    }
+
+    public void removeAttendedEvent(String eventId) {
+        attendedEvents.remove(eventId);
     }
 
 }

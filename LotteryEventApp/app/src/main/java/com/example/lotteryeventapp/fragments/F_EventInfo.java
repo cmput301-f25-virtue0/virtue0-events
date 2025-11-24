@@ -96,12 +96,24 @@ public class F_EventInfo extends Fragment {
 
         // Set up page based on role
         if (role == 0) {
+            Entrant currentEntrant = model.getCurrentEntrant();
+            boolean isWaitlisted = event.getWaitlist() != null && event.getWaitlist().contains(currentEntrant.getUid());
+            boolean isAttending = event.getAttendee_list() != null && event.getAttendee_list().contains(currentEntrant.getUid());
+            boolean isInvited = event.getInvited_list() != null && event.getInvited_list().contains(currentEntrant.getUid());
+
+            if (!isAttending || !isInvited) {
             view.findViewById(R.id.layoutEntrant).setVisibility(View.VISIBLE);
+            }
             view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
             view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
-            Entrant currentEntrant = model.getCurrentEntrant();
-            if (currentEntrant.getWaitlistedEvents().contains(event.getUid())) {
+
+            if (isWaitlisted || isAttending || isInvited) {
                 view.findViewById(R.id.joinButton).setVisibility(View.GONE);
+            }
+
+            if (isInvited) {
+                view.findViewById(R.id.layoutInvited).setVisibility(View.VISIBLE);
+
             }
             // Detect button presses
             view.findViewById(R.id.joinButton).setOnClickListener(new View.OnClickListener() {

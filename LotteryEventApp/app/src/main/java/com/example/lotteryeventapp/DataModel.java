@@ -18,6 +18,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Used for interactions with the database.
@@ -449,8 +450,15 @@ public class DataModel extends TModel<TView>{
     }
 
     public void getUsableEntrants(Event event, GetCallback cb){
+
         List entrantsIds = event.getWaitlist();
-//        ArrayList<> filterObjects = new ArrayList<>;
+
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+
         ArrayList<Entrant> entrants = new ArrayList<>();
 
 //        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
@@ -496,6 +504,45 @@ public class DataModel extends TModel<TView>{
                         }
                     }
                 });
+    }
+
+    public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
+        if (entrantIds == null || entrantIds.isEmpty()) {
+            cb.onSuccess(new ArrayList<Entrant>()); // Return empty list immediately
+            return;
+        }
+
+        ArrayList<Entrant> results = new ArrayList<>();
+        AtomicInteger activeFetches = new AtomicInteger(entrantIds.size());
+
+        for (String id : entrantIds) {
+            getEntrant(id, new GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    if (obj instanceof Entrant) {
+                        synchronized (results) {
+                            results.add((Entrant) obj);
+                        }
+                    }
+                    checkCompletion();
+                }
+
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) { checkCompletion(); }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("DataModel", "Failed to fetch entrant: " + id);
+                    checkCompletion();
+                }
+
+                private void checkCompletion() {
+                    if (activeFetches.decrementAndGet() == 0) {
+                        cb.onSuccess(results); // Return the full list
+                    }
+                }
+            });
+        }
     }
 
 }

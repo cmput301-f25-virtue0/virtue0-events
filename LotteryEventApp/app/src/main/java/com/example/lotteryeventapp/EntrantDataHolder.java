@@ -14,6 +14,30 @@ public class EntrantDataHolder {
 
     private ArrayList<String> waitlistedEvents = new ArrayList<>();
 
+    private ArrayList<String> invitedEvents = new ArrayList<>();
+
+    private ArrayList<String> attendedEvents = new ArrayList<>();
+
+    public void setWaitlistedEvents(ArrayList<String> waitlistedEvents) {
+        this.waitlistedEvents = waitlistedEvents;
+    }
+
+    public ArrayList<String> getInvitedEvents() {
+        return invitedEvents;
+    }
+
+    public void setInvitedEvents(ArrayList<String> invitedEvents) {
+        this.invitedEvents = invitedEvents;
+    }
+
+    public ArrayList<String> getAttendedEvents() {
+        return attendedEvents;
+    }
+
+    public void setAttendedEvents(ArrayList<String> attendedEvents) {
+        this.attendedEvents = attendedEvents;
+    }
+
     public ArrayList<String> getWaitlistedEvents() {
         return waitlistedEvents;
     }
@@ -50,6 +74,8 @@ public class EntrantDataHolder {
         this.notifications.addAll(entrant.getNotifications());
         this.notificationOptOut = entrant.isNotificationOptOut();
         this.waitlistedEvents.addAll(entrant.getWaitlistedEvents());
+        this.invitedEvents.addAll(entrant.getInvitedEvents());
+        this.attendedEvents.addAll(entrant.getAttendedEvents());
     }
 
     public EntrantDataHolder(Map<String, Object> data, String deviceId) {
@@ -58,19 +84,22 @@ public class EntrantDataHolder {
         this.phone = (String) data.get("phone");
         this.deviceId = deviceId;
 
-        List<Object> waitlisted = (List<Object>) data.get("waitlistedEvents");
-        if (waitlisted != null) {
-            for (Object o : waitlisted) {
-                this.waitlistedEvents.add((String) o);
-            }
-        }
-
-        List<Object> notifications = (List<Object>) data.get("notifications");
-        for (Object o: notifications) {
-            this.notifications.add((String) o);
-        }
+        loadList(data, "waitlistedEvents", this.waitlistedEvents);
+        loadList(data, "attendedEvents", this.attendedEvents);
+        loadList(data, "invitedEvents", this.invitedEvents);
+        loadList(data, "notifications", this.notifications);
 
         this.notificationOptOut = (Boolean) data.get("notificationOptOut");
+    }
+
+    //Helper Method
+    private void loadList(Map<String, Object> data, String key, ArrayList<String> target) {
+        List<Object> list = (List<Object>) data.get(key);
+        if (list != null) {
+            for (Object o : list) {
+                if (o != null) target.add((String) o);
+            }
+        }
     }
 
     public Entrant createEntrantInstance() {
@@ -79,6 +108,8 @@ public class EntrantDataHolder {
         entrant.getNotifications().addAll(this.notifications);
         entrant.setNotificationOptOut(this.notificationOptOut);
         entrant.getWaitlistedEvents().addAll(this.waitlistedEvents);
+        entrant.getInvitedEvents().addAll(this.invitedEvents);
+        entrant.getAttendedEvents().addAll(this.attendedEvents);
 
         return entrant;
     }

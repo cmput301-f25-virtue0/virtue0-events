@@ -161,6 +161,11 @@ public class MainActivity extends AppCompatActivity {
         model.getOrganizer(deviceId, new DataModel.GetCallback() {
             @Override
             public void onSuccess(Object obj) {
+                if (obj == null) {
+                    Log.d("OrganizerLoad", "Organizer not found (obj is null), creating new.");
+                    createNewOrganizer(deviceId);
+                    return;
+                }
                 // FOUND: Organizer exists in database
                 Log.d("OrganizerLoad", "Organizer retrieved");
                 organizer = (Organizer) obj;
@@ -211,3 +216,4 @@ public class MainActivity extends AppCompatActivity {
         this.activeHomePageTab = tabIndex;
     }
 }
+
