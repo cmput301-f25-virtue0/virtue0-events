@@ -1,17 +1,17 @@
 // F_Enrolled.java
 package com.example.lotteryeventapp.fragments;
 
-import android.app.AlertDialog;
+import android.net.Uri; 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,20 +21,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.Event;
-import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.List;
-
 
 public class F_Enrolled extends Fragment {
 
     private int role;
     private DataModel model;
     private Event event;
+    private ArrayList<Entrant> currentEnrolledList = new ArrayList<>();
+
+    private ActivityResultLauncher<String> createCsvLauncher;
 
     public static F_Enrolled newInstance(int role) {
         F_Enrolled fragment = new F_Enrolled();
@@ -47,29 +49,49 @@ public class F_Enrolled extends Fragment {
     private ProfileListAdapter.OnProfileClickListener profileListener;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
+
+        // Initialize the file creation launcher
+        createCsvLauncher = registerForActivityResult(new ActivityResultContracts.CreateDocument("text/csv"), uri -> {
+            if (uri != null) {
+                writeCsvToUri(uri);
+            }
+        });
+    }
+
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.enrolled, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         model = ((MainActivity) requireActivity()).getDataModel();
         event = model.getCurrentEvent();
-        toolbar.setNavigationOnClickListener(v -> {
-            // Go back to the Applicants screen
-            ((MainActivity) requireActivity()).showFragment(new F_Applicants());
-        });
 
-        view.findViewById(R.id.btnExportCsv).setOnClickListener(new View.OnClickListener() {
+        //csv button logic
+        view.findViewById(R.id.btnDownloadCsv).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {}
+            public void onClick(View view) {
+                if (currentEnrolledList == null || currentEnrolledList.isEmpty()) {
+                    Toast.makeText(getContext(), "No entrants to export", Toast.LENGTH_SHORT).show();
+                } else {
+                    String filename = "Enrolled_Entrants.csv";
+                    if (event != null && event.getTitle() != null) {
+                        filename = event.getTitle().replaceAll("\\s+", "_") + "_Enrolled.csv";
+                    }
+                    createCsvLauncher.launch(filename);
+                }
+            }
         });
 
         Event cachedEvent = model.getCurrentEvent();
@@ -88,6 +110,7 @@ public class F_Enrolled extends Fragment {
                 @Override
                 public void onSuccess(Object obj) {
                     Event freshEvent = (Event) obj;
+                    event = freshEvent; // Update local reference
                     model.setCurrentEvent(freshEvent); // Update cache
 
                     model.getEntrantsByIds(freshEvent.getAttendee_list(), new DataModel.GetCallback() {
@@ -95,6 +118,9 @@ public class F_Enrolled extends Fragment {
                         public void onSuccess(Object obj) {
                             Log.d("Firebase", "retrieved enrolled list");
                             ArrayList<Entrant> data = (ArrayList<Entrant>) obj;
+
+                            // NEW: Update the class-level list for CSV export
+                            currentEnrolledList = data;
 
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
@@ -142,4 +168,32 @@ public class F_Enrolled extends Fragment {
         }
     }
 
+    // Helper method to write the CSV file
+    private void writeCsvToUri(Uri uri) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Name,Email,Phone,Status\n");
+
+            for (Entrant e : currentEnrolledList) {
+                String name = e.getProfile().getName().replace(",", " ");
+                String email = e.getProfile().getEmail().replace(",", " ");
+                String phone = e.getProfile().getPhone() != null ? e.getProfile().getPhone().replace(",", " ") : "";
+
+                sb.append(name).append(",")
+                        .append(email).append(",")
+                        .append(phone).append(",")
+                        .append("Enrolled\n");
+            }
+
+            try (OutputStream os = requireContext().getContentResolver().openOutputStream(uri)) {
+                if (os != null) {
+                    os.write(sb.toString().getBytes());
+                    Toast.makeText(getContext(), "Export Successful!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CSV", "Error writing CSV", e);
+            Toast.makeText(getContext(), "Failed to export CSV", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

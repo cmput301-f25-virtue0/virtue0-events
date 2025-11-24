@@ -27,7 +27,7 @@
     <string name="cancelled">Cancelled</string>
     <string name="applicants">Applicants list</string>
     <string name="do_lottery_redraw">Draw lottery</string>
-    <string name="export_csv">Export CSV</string>
+    <string name="download_csv">Download CSV file</string>
     <string name="signed_up">Invitation accepted</string>
     <string name="declined">Invitation declined</string>
     <string name="role">Select role</string>
