@@ -515,14 +515,12 @@ public class DataModel extends TModel<TView>{
         }
 
         // Using whereIn loop or individual fetches...
-        // Assuming you are using the AtomicInteger approach we discussed earlier:
+
 
         ArrayList<Entrant> results = new ArrayList<>();
         AtomicInteger activeFetches = new AtomicInteger(entrantIds.size());
 
         for (String id : entrantIds) {
-            // REUSE YOUR WORKING SINGLE FETCH METHOD
-            // This ensures the logic is consistent!
             getEntrant(id, new GetCallback() {
                 @Override
                 public void onSuccess(Object obj) {
