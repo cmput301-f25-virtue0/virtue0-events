@@ -145,7 +145,7 @@
                     android:id="@+id/joinButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="join waiting list"
+                    android:text="Join Waiting List"
                     app:cornerRadius="24dp" />
 
                 <TextView
@@ -167,41 +167,6 @@
                 android:text="@string/show_qr_code"
                 app:cornerRadius="24dp" />
 
-            <LinearLayout
-                android:id="@+id/layoutInvited"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:visibility="gone">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/acceptInvitationBtn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Accept Invitation"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    app:cornerRadius="24dp" />
-
-                <Space
-                    android:layout_width="12dp"
-                    android:layout_height="0dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/rejectInvitationBtn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Reject Invitation"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    app:cornerRadius="24dp" />
-            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutOrganizer"
@@ -250,8 +215,55 @@
                     android:text="Delete Event" />
             </LinearLayout>
 
+
+
         </LinearLayout>
 
+
     </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/layoutInvited"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:visibility="gone"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/leave_button">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/acceptInvitationBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Accept Invitation"
+            app:cornerRadius="24dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rejectInvitationBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Reject Invitation"
+            app:cornerRadius="24dp" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/leave_button"
+        android:visibility="gone"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:text="Leave Event"
+        app:cornerRadius="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

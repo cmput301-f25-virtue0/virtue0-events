@@ -17,7 +17,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -508,14 +510,19 @@ public class DataModel extends TModel<TView>{
 
     public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
         if (entrantIds == null || entrantIds.isEmpty()) {
-            cb.onSuccess(new ArrayList<Entrant>()); // Return empty list immediately
+            cb.onSuccess(new ArrayList<Entrant>());
             return;
         }
+
+        // Using whereIn loop or individual fetches...
+        // Assuming you are using the AtomicInteger approach we discussed earlier:
 
         ArrayList<Entrant> results = new ArrayList<>();
         AtomicInteger activeFetches = new AtomicInteger(entrantIds.size());
 
         for (String id : entrantIds) {
+            // REUSE YOUR WORKING SINGLE FETCH METHOD
+            // This ensures the logic is consistent!
             getEntrant(id, new GetCallback() {
                 @Override
                 public void onSuccess(Object obj) {
@@ -538,11 +545,24 @@ public class DataModel extends TModel<TView>{
 
                 private void checkCompletion() {
                     if (activeFetches.decrementAndGet() == 0) {
-                        cb.onSuccess(results); // Return the full list
+                        cb.onSuccess(results);
                     }
                 }
             });
         }
     }
 
+    public void updateEntrantProfile(Entrant entrant, SetCallback cb) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name",  entrant.getProfile().getName());
+        data.put("email", entrant.getProfile().getEmail());
+        data.put("phone", entrant.getProfile().getPhone());
+
+        entrants.document(entrant.getUid())
+                .update(data)             // partial updates
+                .addOnSuccessListener(v -> cb.onSuccess(entrant.getUid()))
+                .addOnFailureListener(cb::onError);
+    }
+
 }
+

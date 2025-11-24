@@ -21,8 +21,8 @@
     <string name="download_qr_code">Download QR code</string>
     <string name="save_changes">Save changes</string>
     <string name="map">Map</string>
-    <string name="do_lottery">Do lottery</string>
-    <string name="chosen">Chosen</string>
+    <string name="waitlist">Waitlist</string>
+    <string name="invited">Invited</string>
     <string name="enrolled">Enrolled</string>
     <string name="cancelled">Cancelled</string>
     <string name="applicants">Applicants list</string>

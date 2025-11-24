@@ -69,6 +69,7 @@ public class F_EventInfo extends Fragment {
 
         model = ((MainActivity) requireActivity()).getDataModel();
         event = model.getCurrentEvent();
+
         // Set up info based on event
         if (event != null) {
             //Title
@@ -113,7 +114,10 @@ public class F_EventInfo extends Fragment {
 
             if (isInvited) {
                 view.findViewById(R.id.layoutInvited).setVisibility(View.VISIBLE);
+            }
 
+            if (isWaitlisted) {
+                view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
             }
             // Detect button presses
             view.findViewById(R.id.joinButton).setOnClickListener(new View.OnClickListener() {

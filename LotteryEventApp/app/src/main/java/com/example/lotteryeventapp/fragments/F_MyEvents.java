@@ -155,16 +155,16 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
         }
         String entrantId = model.getCurrentEntrant().getUid();
 
-        // 2. FORCE RELOAD from Firestore
+        // reload from Firestore
         model.getEntrant(entrantId, new DataModel.GetCallback() {
             @Override
             public void onSuccess(Object obj) {
                 if (obj instanceof Entrant) {
                     // Update local reference
                     entrant = (Entrant) obj;
-                    model.setCurrentEntrant(entrant); // Update global model too
+                    model.setCurrentEntrant(entrant);
 
-                    // 3. Now Combine the Lists from the FRESH object
+                    //  combine the list from the 'fresh' object
                     Set<String> allEventIds = new HashSet<>();
 
                     if (entrant.getWaitlistedEvents() != null) allEventIds.addAll(entrant.getWaitlistedEvents());
@@ -181,7 +181,7 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
                         return;
                     }
 
-                    // 4. Fetch the actual Event objects
+                    // fetch the actual event objects
                     fetchEventsFromIds(combinedIds);
                 }
             }

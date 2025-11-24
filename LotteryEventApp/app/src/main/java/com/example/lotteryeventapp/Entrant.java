@@ -26,6 +26,8 @@ public class Entrant {
     private ArrayList<String> attendedEvents = new ArrayList<>();
 
 
+
+
     /**
      * Constructs a new entrant
      * @param uid a unique identifier from their device
@@ -208,22 +210,6 @@ public class Entrant {
      * @param email
      * @param phone
      */
-    public void updateProfile(String name, String email, String phone) {
-        profile.setName(name);
-        profile.setEmail(email);
-        profile.setPhone(phone);
-        DataModel model = new DataModel();
-        model.setEntrant(this, new DataModel.SetCallback() {
-            @Override
-            public void onSuccess(String msg) {
-                Log.d("Firebase", "written");
-            }
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-            }
-        });
-    }
 
     /**
      * deletes entrant's profile
@@ -297,6 +283,24 @@ public class Entrant {
 
     public void removeAttendedEvent(String eventId) {
         attendedEvents.remove(eventId);
+    }
+
+    public void updateProfile(String name, String email, String phone) {
+        profile.setName(name);
+        profile.setEmail(email);
+        profile.setPhone(phone);
+
+        DataModel model = new DataModel();
+        model.updateEntrantProfile(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("Firebase", "profile updated");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "profile update failed", e);
+            }
+        });
     }
 
 }
