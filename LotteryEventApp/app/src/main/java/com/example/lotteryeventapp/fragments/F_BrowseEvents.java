@@ -18,6 +18,7 @@ import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -65,7 +66,17 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
 
         Log.i("CURRENT ROLE BROWSE", "Current BROWSE user role is: " + role);
         model = ((MainActivity) requireActivity()).getDataModel();
-        currentOrganizer = model.getCurrentOrganizer().getUid();
+        Organizer currentOrganizer = model.getCurrentOrganizer();
+        if (currentOrganizer != null) {
+            // Safe to use UID
+            this.currentOrganizer = currentOrganizer.getUid();
+        } else {
+            // Organizer not loaded yet.
+            // For Browse Events, if you are an Entrant, this might be fine (null is allowed).
+            // If you are an Organizer, you might want to show a loading spinner or retry.
+            Log.w("F_BrowseEvents", "Organizer object is null. Data might still be loading.");
+            this.currentOrganizer = null;
+        }
 
         // Initialize views
         rv = v.findViewById(R.id.rvEvents);
@@ -76,7 +87,7 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         // Initialize adapter with an empty list initially
-        adapter = new EventAdapter(new ArrayList<>(), role,this, currentOrganizer);
+        adapter = new EventAdapter(new ArrayList<>(), role,this, currentOrganizer.getUid());
         rv.setAdapter(adapter);
 
         // Configure Toolbar visibility and navigation
