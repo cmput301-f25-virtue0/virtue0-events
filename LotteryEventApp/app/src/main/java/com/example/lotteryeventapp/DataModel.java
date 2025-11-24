@@ -451,8 +451,7 @@ public class DataModel extends TModel<TView>{
         getAllEvents(cb, false);
     }
 
-    public void getUsableEntrants(Event event, GetCallback cb){
-
+    public void getUsableWaitlistEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getWaitlist();
 
         if (entrantsIds == null || entrantsIds.isEmpty()) {
@@ -461,6 +460,33 @@ public class DataModel extends TModel<TView>{
             return;
         }
 
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        if (entrantsIds.size() == 0)
+
+//        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
+            this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
+                                    entrants.add(data.createEntrantInstance());
+                                }
+                                cb.onSuccess(entrants);
+                            } else {
+                                Log.d("Firestore", "Error getting documents: ", task.getException());
+                                cb.onError(task.getException());
+                            }
+                        }
+                    });
+    }
+
+
+    public void getUsableInvitedListEntrants(Event event, DataModel.GetCallback cb){
+        List entrantsIds = event.getInvited_list();
+//        ArrayList<> filterObjects = new ArrayList<>;
         ArrayList<Entrant> entrants = new ArrayList<>();
 
 //        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
@@ -482,7 +508,6 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
-
     public void getUsableEvents(Organizer organizer, GetCallback cb){
         List eventsIds = organizer.getEvents();
 //        ArrayList<> filterObjects = new ArrayList<>;

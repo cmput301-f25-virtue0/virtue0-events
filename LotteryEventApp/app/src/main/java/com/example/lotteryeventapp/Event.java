@@ -2,7 +2,16 @@ package com.example.lotteryeventapp;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -506,6 +515,108 @@ public class Event {
 
         // update event in firebase
         this.drawn = true;
+        DataModel model = new DataModel();
+
+        Event event = this;
+        if(!this.waitlist.isEmpty()) {
+            model.getUsableWaitlistEntrants(this, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ArrayList<Entrant> waitlist = (ArrayList<Entrant>) obj;
+                    for (int i = 0; i < waitlist.size(); i++) {
+                        Entrant rejected_entrant = waitlist.get(i);
+                        Rejection rejection = new Rejection(event.uid, rejected_entrant.getUid(), "Sorry, you were not selected to attend this event");
+                        model.setNotification(rejection, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+                                rejected_entrant.addNotification(rejection.getUid());
+                                model.setEntrant(rejected_entrant, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }
+
+        if(!this.invited_list.isEmpty()) {
+            model.getUsableInvitedListEntrants(this, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ArrayList<Entrant> invitedList = (ArrayList<Entrant>) obj;
+                    for (int i = 0; i < invitedList.size(); i++) {
+                        Entrant invited_entrant = invitedList.get(i);
+                        Invitation invitation = new Invitation(event.uid, invited_entrant.getUid(), "Congratulations, you are welcome to sign up for this event");
+                        model.setNotification(invitation, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+                                invited_entrant.addNotification(invitation.getUid());
+                                model.setEntrant(invited_entrant, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }
+
+
+
+//            Event event = this;
         model.setEvent(this, new DataModel.SetCallback() {
             @Override public void onSuccess(String msg) { Log.d("Lottery", "Event lottery saved."); }
             @Override public void onError(Exception e) {}

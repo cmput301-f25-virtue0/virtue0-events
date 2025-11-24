@@ -78,7 +78,7 @@ public class F_Lottery extends Fragment {
         RecyclerView rv = view.findViewById(R.id.rvEntrants);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        model.getUsableEntrants(event,new DataModel.GetCallback() {
+        model.getUsableWaitlistEntrants(event,new DataModel.GetCallback() {
 
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
