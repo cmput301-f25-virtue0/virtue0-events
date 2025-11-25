@@ -23,6 +23,10 @@ import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -332,6 +336,34 @@ public class F_EventInfo extends Fragment {
         if (event.getWaitlist_limit() > 0 && event.getWaitlistAmount() >= event.getWaitlist_limit()) {
             Toast.makeText(getContext(), "Waitlist is full.", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        try {
+            // Format example: "Mon, Nov 25, 2024 at 10:30 AM"
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy 'at' h:mm a", Locale.ENGLISH);
+            Date currentTime = new Date();
+
+            // Check Start Date
+            String startStr = event.getRegistration_start();
+            if (startStr != null && !startStr.isEmpty()) {
+                Date startDate = sdf.parse(startStr);
+                if (startDate != null && currentTime.before(startDate)) {
+                    Toast.makeText(getContext(), "Registration has not started yet.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            String endStr = event.getRegistration_deadline();
+            if (endStr != null && !endStr.isEmpty()) {
+                Date endDate = sdf.parse(endStr);
+                if (endDate != null && currentTime.after(endDate)) {
+                    Toast.makeText(getContext(), "Registration deadline has passed.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+        } catch (Exception e) {
+            Log.e("JoinWaitlist", "Date parsing error. Check format matches: EEE, MMM d, yyyy 'at' h:mm a", e);
         }
 
         //  Update Local Objects
