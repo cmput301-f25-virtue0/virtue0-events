@@ -274,7 +274,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Lottery Explanation"
+                android:text="Lottery Guidelines"
                 android:layout_marginStart="13dp"
                 android:layout_marginTop="10dp"
                 app:layout_constraintTop_toTopOf="parent"
