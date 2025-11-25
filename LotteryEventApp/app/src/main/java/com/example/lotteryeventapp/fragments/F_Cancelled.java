@@ -1,10 +1,15 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +23,7 @@ import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Messaging;
 import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -33,6 +39,7 @@ public class F_Cancelled extends Fragment {
     private RecyclerView rv;
     private TextView tvCount;
     private ProfileListAdapter adapter;
+    private Button btnMessageCancelled;
     private final List<Entrant> cancelledEntrants = new ArrayList<>();
 
     public static F_Cancelled newInstance(int myRole) {
@@ -64,6 +71,7 @@ public class F_Cancelled extends Fragment {
 
         model = ((MainActivity) requireActivity()).getDataModel();
         event = model.getCurrentEvent();
+        btnMessageCancelled = view.findViewById(R.id.btnMessageCancelled);
 
         // Toolbar setup
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
@@ -96,6 +104,59 @@ public class F_Cancelled extends Fragment {
         } else {
             Log.e("F_Cancelled", "Event is null");
         }
+//        btnMessageCancelled.setOnClickListener(v -> {
+//            EditText input = new EditText(requireContext());
+//            input.setInputType(InputType.TYPE_CLASS_TEXT);
+//            new AlertDialog.Builder(requireContext())
+//                    .setView(input)
+//                    .setTitle("Message Cancelled List")
+//                    .setPositiveButton("Send", (dialog, which) -> {
+//                        String message = input.getText().toString();
+//                        for(int i=0;i<cancelledEntrants.size();i++){
+//                            Entrant entrant = cancelledEntrants.get(i);
+//                            Messaging messaging = new Messaging(event.getUid(),entrant.getUid(),message);
+//                            model.setNotification(messaging, new DataModel.SetCallback() {
+//                                @Override
+//                                public void onSuccess(String msg) {
+//                                    Log.d("Firebase", "written");
+//                                    entrant.addNotification(messaging.getUid());
+//                                    model.setEntrant(entrant, new DataModel.SetCallback() {
+//                                        @Override
+//                                        public void onSuccess(String msg) {
+//                                            Log.d("Firebase", "written");
+//                                        }
+//
+//                                        @Override
+//                                        public void onError(Exception e) {
+//                                            Log.e("Firebase", "fail");
+//                                        }
+//                                    });
+//                                }
+//
+//                                @Override
+//                                public void onError(Exception e) {
+//                                    Log.e("Firebase", "fail");
+//                                }
+//                            });
+//
+//
+//
+//
+//
+//                        }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//                        Toast.makeText(requireContext(), "Message sent to cancelled list", Toast.LENGTH_SHORT).show();
+//                    }).setNegativeButton("Cancel", null).show();
+//
+//        });
     }
 
     private void loadCancelledList() {
