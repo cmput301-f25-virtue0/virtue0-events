@@ -15,12 +15,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
+import com.example.lotteryeventapp.Invitation;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Messaging;
 import com.example.lotteryeventapp.Notification;
 import com.example.lotteryeventapp.NotificationAdapter;
 import com.example.lotteryeventapp.R;
+import com.example.lotteryeventapp.Rejection;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,26 +69,43 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
             Log.e("F_Notification", "Activity is not MainActivity");
             return;
         }
-
+        NotificationAdapter.OnNotificationClickListener listener = this;
         recyclerView = view.findViewById(R.id.rvNotification);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         notificationList = new ArrayList<>();
+        model.getUsableNotifications(model.getCurrentEntrant(),new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-        adapter = new NotificationAdapter(notificationList, this);
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+                ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
+                adapter = new NotificationAdapter(notificationList, listener);
 
-        recyclerView.setAdapter(adapter);
+                recyclerView.setAdapter(adapter);
 
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> {
-            if (role == 0) {
-                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
-            } else {
-                ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+                MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+                toolbar.setNavigationOnClickListener(v -> {
+                    if (role == 0) {
+                        ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
+                    } else {
+                        ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
             }
         });
 
-        fetchNotifications();
+
+
+//        fetchNotifications();
     }
 
     private void fetchNotifications() {
@@ -144,6 +165,16 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
                 }
             });
         }
-        Toast.makeText(getContext(), notification.getMessage(), Toast.LENGTH_SHORT).show();
+        if(notification.getClass()== Invitation.class){
+            model.setCurrentNotification(notification);
+            ((MainActivity) requireActivity()).showFragment(F_Acceptance.newInstance(2));
+
+        }else if(notification.getClass()== Rejection.class){
+
+        }else if(notification.getClass() == Messaging.class){
+            Toast.makeText(getContext(), notification.getMessage(), Toast.LENGTH_SHORT).show();
+
+        }
+//        ((MainActivity) requireActivity()).showFragment(F_Applicants.newInstance(2));
     }
 }
