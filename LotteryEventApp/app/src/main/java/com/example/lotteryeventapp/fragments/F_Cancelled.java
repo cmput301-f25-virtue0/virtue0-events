@@ -86,7 +86,6 @@ public class F_Cancelled extends Fragment {
 
             @Override
             public void onDeleteClick(Entrant entrant, int position) {
-                //This sort of violates Liskov's Substitution Principle lol
                 Toast.makeText(getContext(), "Action not implemented", Toast.LENGTH_SHORT).show();
             }
         });

@@ -148,21 +148,25 @@ public class DataModel extends TModel<TView>{
         entrantRef.get()
                 .addOnSuccessListener(entrantSnap -> {
                     if (entrantSnap.exists()) {
-                        EntrantDataHolder entrantData = new EntrantDataHolder(entrantSnap.getData(), deviceId);
-
-                        Log.d("Firestore", "Firestore fetch succeeded: Entrant " + deviceId);
-                        cb.onSuccess(entrantData.createEntrantInstance());
-                    }else {
-                        Log.e("Firestore", "Firestore fetch failed: Entrant " + deviceId + " does not exist");
-                        cb.onSuccess(null); //This signals no entrant for this device
+                        try {
+                            // This now uses the updated robust constructor
+                            EntrantDataHolder entrantData = new EntrantDataHolder(entrantSnap.getData(), deviceId);
+                            cb.onSuccess(entrantData.createEntrantInstance());
+                        } catch (Exception e) {
+                            Log.e("DataModel", "CRASH: Could not parse entrant " + deviceId, e);
+                            // Return null so the list fetching can continue with other valid entrants
+                            cb.onSuccess(null);
+                        }
+                    } else {
+                        Log.e("DataModel", "Entrant not found: " + deviceId);
+                        cb.onSuccess(null);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Firestore", "Firestore fetch failed: Entrant " + deviceId + "\n" + e.getMessage());
+                    Log.e("DataModel", "Firestore fetch failed: " + deviceId, e);
                     cb.onError(e);
                 });
     }
-
     public void deleteEntrant(Entrant entrant, DeleteCallback cb) {
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
         entrantRef.delete()
@@ -538,10 +542,6 @@ public class DataModel extends TModel<TView>{
             cb.onSuccess(new ArrayList<Entrant>());
             return;
         }
-
-        // Using whereIn loop or individual fetches...
-
-
         ArrayList<Entrant> results = new ArrayList<>();
         AtomicInteger activeFetches = new AtomicInteger(entrantIds.size());
 
@@ -585,6 +585,31 @@ public class DataModel extends TModel<TView>{
                 .update(data)             // partial updates
                 .addOnSuccessListener(v -> cb.onSuccess(entrant.getUid()))
                 .addOnFailureListener(cb::onError);
+    }
+
+
+    public void getAllEntrants(GetCallback cb) {
+        this.entrants.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Entrant> entrantList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    try {
+                        EntrantDataHolder data = new EntrantDataHolder(document.getData(), document.getId());
+                        Entrant entrant = data.createEntrantInstance();
+
+                        if (entrant != null) {
+                            entrantList.add(entrant);
+                        }
+                    } catch (Exception e) {
+                        Log.e("DataModel", "Skipping invalid entrant doc: " + document.getId());
+                    }
+                }
+                cb.onSuccess(entrantList);
+            } else {
+                Log.e("DataModel", "Error getting all entrants", task.getException());
+                cb.onError(task.getException());
+            }
+        });
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.lotteryeventapp;
 
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,67 +10,20 @@ public class EntrantDataHolder {
     private String email;
     private String phone;
     private String deviceId;
-    private ArrayList<String> notifications = new ArrayList<String>();
-    private boolean notificationOptOut;
+    private ArrayList<String> notifications = new ArrayList<>();
+    private boolean notificationOptOut = false;
 
     private ArrayList<String> waitlistedEvents = new ArrayList<>();
-
     private ArrayList<String> invitedEvents = new ArrayList<>();
-
     private ArrayList<String> attendedEvents = new ArrayList<>();
 
-    public void setWaitlistedEvents(ArrayList<String> waitlistedEvents) {
-        this.waitlistedEvents = waitlistedEvents;
-    }
-
-    public ArrayList<String> getInvitedEvents() {
-        return invitedEvents;
-    }
-
-    public void setInvitedEvents(ArrayList<String> invitedEvents) {
-        this.invitedEvents = invitedEvents;
-    }
-
-    public ArrayList<String> getAttendedEvents() {
-        return attendedEvents;
-    }
-
-    public void setAttendedEvents(ArrayList<String> attendedEvents) {
-        this.attendedEvents = attendedEvents;
-    }
-
-    public ArrayList<String> getWaitlistedEvents() {
-        return waitlistedEvents;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public ArrayList<String> getNotifications() {
-        return notifications;
-    }
-
-    public boolean isNotificationOptOut() {
-        return notificationOptOut;
-    }
 
     public EntrantDataHolder(Entrant entrant) {
-        this.name = entrant.getProfile().getName();
-        this.email = entrant.getProfile().getEmail();
-        this.phone = entrant.getProfile().getPhone();
+        if (entrant.getProfile() != null) {
+            this.name = entrant.getProfile().getName();
+            this.email = entrant.getProfile().getEmail();
+            this.phone = entrant.getProfile().getPhone();
+        }
         this.deviceId = entrant.getUid();
         this.notifications.addAll(entrant.getNotifications());
         this.notificationOptOut = entrant.isNotificationOptOut();
@@ -78,33 +32,62 @@ public class EntrantDataHolder {
         this.attendedEvents.addAll(entrant.getAttendedEvents());
     }
 
+
     public EntrantDataHolder(Map<String, Object> data, String deviceId) {
-        this.name = (String) data.get("name");
-        this.email = (String) data.get("email");
-        this.phone = (String) data.get("phone");
         this.deviceId = deviceId;
 
-        loadList(data, "waitlistedEvents", this.waitlistedEvents);
-        loadList(data, "attendedEvents", this.attendedEvents);
-        loadList(data, "invitedEvents", this.invitedEvents);
-        loadList(data, "notifications", this.notifications);
+        try {
 
-        this.notificationOptOut = (Boolean) data.get("notificationOptOut");
+            Object profileObj = data.get("profile");
+            if (profileObj instanceof Map) {
+                Map<String, Object> profileMap = (Map<String, Object>) profileObj;
+                this.name = safeString(profileMap.get("name"));
+                this.email = safeString(profileMap.get("email"));
+                this.phone = safeString(profileMap.get("phone"));
+            } else {
+
+                this.name = safeString(data.get("name"));
+                this.email = safeString(data.get("email"));
+                this.phone = safeString(data.get("phone"));
+            }
+
+
+            loadList(data, "waitlistedEvents", this.waitlistedEvents);
+            loadList(data, "attendedEvents", this.attendedEvents);
+            loadList(data, "invitedEvents", this.invitedEvents);
+            loadList(data, "notifications", this.notifications);
+
+
+            this.notificationOptOut = Boolean.TRUE.equals(data.get("notificationOptOut"));
+
+        } catch (Exception e) {
+            Log.e("EntrantDataHolder", "Error parsing data for " + deviceId, e);
+            this.name = "Error Parsing";
+        }
     }
 
-    //Helper Method
+    private String safeString(Object o) {
+        return o != null ? String.valueOf(o) : "";
+    }
+
     private void loadList(Map<String, Object> data, String key, ArrayList<String> target) {
-        List<Object> list = (List<Object>) data.get(key);
-        if (list != null) {
+        Object listObj = data.get(key);
+        if (listObj instanceof List) {
+            List<?> list = (List<?>) listObj;
             for (Object o : list) {
-                if (o != null) target.add((String) o);
+                if (o != null) target.add(String.valueOf(o));
             }
         }
     }
 
     public Entrant createEntrantInstance() {
-        Entrant.Profile profile = new Entrant.Profile(this.name, this.email, this.phone);
+        String finalName = (name == null) ? "Unknown" : name;
+        String finalEmail = (email == null) ? "" : email;
+        String finalPhone = (phone == null) ? "" : phone;
+
+        Entrant.Profile profile = new Entrant.Profile(finalName, finalEmail, finalPhone);
         Entrant entrant = new Entrant(this.deviceId, profile);
+
         entrant.getNotifications().addAll(this.notifications);
         entrant.setNotificationOptOut(this.notificationOptOut);
         entrant.getWaitlistedEvents().addAll(this.waitlistedEvents);
@@ -113,4 +96,15 @@ public class EntrantDataHolder {
 
         return entrant;
     }
+
+
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getPhone() { return phone; }
+    public String getDeviceId() { return deviceId; }
+    public ArrayList<String> getNotifications() { return notifications; }
+    public boolean isNotificationOptOut() { return notificationOptOut; }
+    public ArrayList<String> getWaitlistedEvents() { return waitlistedEvents; }
+    public ArrayList<String> getInvitedEvents() { return invitedEvents; }
+    public ArrayList<String> getAttendedEvents() { return attendedEvents; }
 }

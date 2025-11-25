@@ -170,9 +170,8 @@ public class F_CreateEditEvent extends Fragment {
                     boolean track_geo = swGeo.isChecked();
                     String organizer = model.getCurrentOrganizer().getUid();
 
-                    // Differentiate between Create and Edit
                     if (type == 0) {
-                        // create new event (will be automatically added to the database)
+                        // create new event
                         Event makeEvent = new Event(title, dateTime, location,regStart, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit, organizer);
                         model.setEvent(makeEvent, new DataModel.SetCallback() {
@@ -237,8 +236,6 @@ public class F_CreateEditEvent extends Fragment {
                         }
 
                         //Update the existing event
-//                        event.editEvent(dateTime, location, regDeadline,
-//                                details, track_geo, true, waitlist_limit, attendee_limit);
                         Toast.makeText(getContext(), "Event Updated", Toast.LENGTH_SHORT).show();
                         model.setEvent(event, new DataModel.SetCallback() {
                             @Override
