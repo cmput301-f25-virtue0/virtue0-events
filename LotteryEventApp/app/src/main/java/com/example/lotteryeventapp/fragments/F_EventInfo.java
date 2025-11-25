@@ -287,6 +287,22 @@ public class F_EventInfo extends Fragment {
             Bitmap qrBitmap = generateQRCodeBitmap(content);
             showDialogWithQR(qrBitmap);
         });
+
+        view.findViewById(R.id.btnDeleteEvent).setOnClickListener(v-> {
+            if (getContext() == null) return;
+
+            Event delEvent = event;
+
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete '" + delEvent.getTitle() + "'? This will remove it from all users.")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        performCascadeDelete(delEvent);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+
     }
 
     /**
@@ -538,7 +554,12 @@ public class F_EventInfo extends Fragment {
             public void onSuccess() {
                 if (isAdded() && getContext() != null) {
                     Toast.makeText(getContext(), "Event and references deleted", Toast.LENGTH_SHORT).show();
-                    ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(role));
+
+                    if (role == 1) { //organizer role
+                        ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(role));
+                    } else { //admin role
+                        ((MainActivity) requireActivity()).showFragment(F_BrowseEvents.newInstance(role));
+                    }
                 }
             }
 
