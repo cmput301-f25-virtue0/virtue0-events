@@ -19,6 +19,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -157,22 +158,17 @@ public class DataModel extends TModel<TView>{
         entrantRef.get()
                 .addOnSuccessListener(entrantSnap -> {
                     if (entrantSnap.exists()) {
-                        try {
-                            // This now uses the updated robust constructor
-                            EntrantDataHolder entrantData = new EntrantDataHolder(entrantSnap.getData(), deviceId);
-                            cb.onSuccess(entrantData.createEntrantInstance());
-                        } catch (Exception e) {
-                            Log.e("DataModel", "CRASH: Could not parse entrant " + deviceId, e);
-                            // Return null so the list fetching can continue with other valid entrants
-                            cb.onSuccess(null);
-                        }
-                    } else {
-                        Log.e("DataModel", "Entrant not found: " + deviceId);
-                        cb.onSuccess(null);
+                        EntrantDataHolder entrantData = new EntrantDataHolder(entrantSnap.getData(), deviceId);
+
+                        Log.d("Firestore", "Firestore fetch succeeded: Entrant " + deviceId);
+                        cb.onSuccess(entrantData.createEntrantInstance());
+                    }else {
+                        Log.e("Firestore", "Firestore fetch failed: Entrant " + deviceId + " does not exist");
+                        cb.onSuccess(null); //This signals no entrant for this device
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("DataModel", "Firestore fetch failed: " + deviceId, e);
+                    Log.e("Firestore", "Firestore fetch failed: Entrant " + deviceId + "\n" + e.getMessage());
                     cb.onError(e);
                 });
     }
@@ -474,7 +470,7 @@ public class DataModel extends TModel<TView>{
         }
 
         ArrayList<Entrant> entrants = new ArrayList<>();
-        if (entrantsIds.size() == 0)
+        if (!entrantsIds.isEmpty())
 
 //        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
             this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
@@ -501,30 +497,43 @@ public class DataModel extends TModel<TView>{
         List entrantsIds = event.getInvited_list();
 //        ArrayList<> filterObjects = new ArrayList<>;
         ArrayList<Entrant> entrants = new ArrayList<>();
-
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
 //        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
-        this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
-                                entrants.add(data.createEntrantInstance());
+        if (!entrantsIds.isEmpty()) {
+
+            this.entrants.whereIn(FieldPath.documentId(), entrantsIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    EntrantDataHolder data = new EntrantDataHolder(document.getData(), document.getId());
+                                    entrants.add(data.createEntrantInstance());
+                                }
+                                cb.onSuccess(entrants);
+                            } else {
+                                Log.d("Firestore", "Error getting documents: ", task.getException());
+                                cb.onError(task.getException());
                             }
-                            cb.onSuccess(entrants);
-                        } else {
-                            Log.d("Firestore", "Error getting documents: ", task.getException());
-                            cb.onError(task.getException());
                         }
-                    }
-                });
+                    });
+        }
     }
 
     public void getUsableNotifications(Entrant entrant, DataModel.GetCallback cb){
         List notificationIds = entrant.getNotifications();
         ArrayList<Notification> notifications = new ArrayList<>();
+        if (notificationIds == null || notificationIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Notification>());
+            return;
+        }
+
         this.notifications.whereIn(FieldPath.documentId(),  notificationIds)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
