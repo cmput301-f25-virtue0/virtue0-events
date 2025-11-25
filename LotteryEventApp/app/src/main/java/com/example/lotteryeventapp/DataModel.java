@@ -35,6 +35,7 @@ public class DataModel extends TModel<TView>{
     private Entrant currentEntrant;
     private Organizer currentOrg;
     private Event currentEvent;
+    private Notification currentNotification;
 
     private ArrayList<Event> cachedEvents = null;
 
@@ -116,6 +117,13 @@ public class DataModel extends TModel<TView>{
     public void setCurrentEntrant(Entrant thisEntrant) {
         currentEntrant = thisEntrant;
     }
+    public Notification getCurrentNotification() {
+        return currentNotification;
+    }
+    public void setCurrentNotification(Notification thisNotification) {
+        currentNotification = thisNotification;
+    }
+
     public Organizer getCurrentOrganizer() {
         return currentOrg;
     }
@@ -505,6 +513,37 @@ public class DataModel extends TModel<TView>{
                                 entrants.add(data.createEntrantInstance());
                             }
                             cb.onSuccess(entrants);
+                        } else {
+                            Log.d("Firestore", "Error getting documents: ", task.getException());
+                            cb.onError(task.getException());
+                        }
+                    }
+                });
+    }
+
+    public void getUsableNotifications(Entrant entrant, DataModel.GetCallback cb){
+        List notificationIds = entrant.getNotifications();
+        ArrayList<Notification> notifications = new ArrayList<>();
+        this.notifications.whereIn(FieldPath.documentId(),  notificationIds)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String notifType = (String) document.getData().get("notificationType");
+                                if(Objects.equals(notifType, "INVITATION")){
+                                    InvitationDataHolder data = new InvitationDataHolder(document.getData(),document.getId());
+                                    notifications.add(data.createInvitationInstance());
+                                }else if(Objects.equals(notifType, "REJECTION")){
+                                    RejectionDataHolder data = new RejectionDataHolder(document.getData(),document.getId());
+                                    notifications.add(data.createRejectionInstance());
+                                }else if(Objects.equals(notifType, "MESSAGING")){
+                                    MessagingDataHolder data = new MessagingDataHolder(document.getData(),document.getId());
+                                    notifications.add(data.createMessagingInstance());
+                                }
+                            }
+                            cb.onSuccess(notifications);
                         } else {
                             Log.d("Firestore", "Error getting documents: ", task.getException());
                             cb.onError(task.getException());

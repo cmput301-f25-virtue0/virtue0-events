@@ -111,6 +111,17 @@ public class Entrant {
      */
     public void removeNotification(String notification) {
         this.notifications.remove(notification);
+        DataModel model = new DataModel();
+        model.setEntrant(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                Log.d("Firebase", "written");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
     }
 
     /**

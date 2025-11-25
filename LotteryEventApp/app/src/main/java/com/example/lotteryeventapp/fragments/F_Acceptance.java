@@ -38,8 +38,10 @@ public class F_Acceptance extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        //mark notification as read
-        // todo
+        model = ((MainActivity) requireActivity()).getDataModel();
+
+        this.notif = (Invitation) this.model.getCurrentNotification();
+
 
         // Detect button presses
         view.findViewById(R.id.backArrowAccept).setOnClickListener(new View.OnClickListener() {
