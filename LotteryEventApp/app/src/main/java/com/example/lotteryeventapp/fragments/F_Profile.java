@@ -22,8 +22,6 @@ import com.example.lotteryeventapp.R;
 
 public class F_Profile extends Fragment {
     private DataModel model;
-
-    //role = 0 for entrant, role = 1 for organizer
     public F_Profile(DataModel myModel) {
         model = myModel;
     }
@@ -32,20 +30,18 @@ public class F_Profile extends Fragment {
     private TextView tvName, tvEmail, tvPhone, tvUID;
     private Switch notificationSwitch;
 
-    private Entrant entrant; //temporary entrant for now
+    private Entrant entrant;
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-        // Inflate the layout for this fragment & get the count text view
         return inflater.inflate(R.layout.profile, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Detect button presses
         view.findViewById(R.id.backArrowProfile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +61,7 @@ public class F_Profile extends Fragment {
         btnEditEmail = view.findViewById(R.id.btnEditEmail);
         btnEditPhone = view.findViewById(R.id.btnEditPhone);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
+        ImageButton btnLotteryInfo = view.findViewById(R.id.lotteryExplanationBtn);
 
         if (entrant != null) {
             tvName.setText(entrant.getProfile().getName());
@@ -125,6 +122,15 @@ public class F_Profile extends Fragment {
 //            EntrantRepository.getInstance().save(entrant); //example for now, when database completed
         });
 
+        btnLotteryInfo.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.lottery_explanation_title)
+                    .setMessage(R.string.lottery_explanation_body)
+                    .setPositiveButton(R.string.close, (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
+        });
 
     }
 }

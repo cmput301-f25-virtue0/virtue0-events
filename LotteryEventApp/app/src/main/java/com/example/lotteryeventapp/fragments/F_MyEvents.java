@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickListener {
@@ -39,6 +42,8 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
     private RecyclerView rv;
     private EventAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private View rootView;
 
     public static F_MyEvents newInstance(int role) {
         F_MyEvents fragment = new F_MyEvents();
@@ -65,25 +70,85 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.rootView = view;
 
         Log.i("CURRENT ROLE MY_EVENTS", "Current MY_EVENTS user role is: " + role);
         model = ((MainActivity) requireActivity()).getDataModel();
 
 
-        // Initialize views
-        rv = view.findViewById(R.id.rvEvents);
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        if (role == 1) {
+            // ORGANIZER ROLE
+            if (model.getCurrentOrganizer() != null) {
+                this.organizer = model.getCurrentOrganizer();
+                setupUI(organizer.getUid());
+            } else {
+                Log.w("F_MyEvents", "Organizer null on rotation. Refetching...");
+                String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        // Setup RecyclerView and Adapter
+                model.getOrganizer(deviceId, new DataModel.GetCallback() {
+                    @Override
+                    public void onSuccess(Object obj) {
+                        if (isAdded() && getActivity() != null) {
+                            organizer = (Organizer) obj;
+                            model.setCurrentOrganizer(organizer);
+                            setupUI(organizer.getUid());
+                        }
+                    }
+                    @Override
+                    public <T extends Enum<T>> void onSuccess(Object obj, T type) {}
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("F_MyEvents", "Failed to reload organizer", e);
+                    }
+                });
+            }
+        } else {
+            // ENTRANT ROLE
+            if (model.getCurrentEntrant() != null) {
+                this.entrant = model.getCurrentEntrant();
+                setupUI(entrant.getUid());
+            } else {
+                Log.w("F_MyEvents", "Entrant null on rotation. Refetching...");
+                String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+
+                model.getEntrant(deviceId, new DataModel.GetCallback() {
+                    @Override
+                    public void onSuccess(Object obj) {
+                        if (isAdded() && getActivity() != null) {
+                            entrant = (Entrant) obj;
+                            model.setCurrentEntrant(entrant);
+                            setupUI(entrant.getUid());
+                        }
+                    }
+                    @Override
+                    public <T extends Enum<T>> void onSuccess(Object obj, T type) {}
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("F_MyEvents", "Failed to reload entrant", e);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Helper method to initialize the RecyclerView and Adapter.
+     * Only called once we have a valid User ID.
+     */
+    private void setupUI(String userId) {
+        if (rootView == null) return;
+
+        // Initialize views
+        rv = rootView.findViewById(R.id.rvEvents);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.toolbar);
+
+        // Setup RecyclerView
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Set adapter based on role
-        if (role == 1) {
-            adapter = new EventAdapter(new ArrayList<>(), role, this, model.getCurrentOrganizer().getUid());
-        } else{
-            adapter = new EventAdapter(new ArrayList<>(), role, this, model.getCurrentEntrant().getUid());
-        }
+        // Set adapter
+        adapter = new EventAdapter(new ArrayList<>(), role, this, userId);
         rv.setAdapter(adapter);
 
         // Configure Toolbar visibility
@@ -102,12 +167,17 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh data when returning to the fragment
-        fetchEvents(false);
+
+        if (adapter != null) {
+            fetchEvents(false);
+        }
     }
 
     private void fetchEvents(boolean forceRefresh) {
         Log.d("F_MyEvents", "Fetching events for role: " + role);
+
+
+        if (swipeRefreshLayout == null) return;
 
         if (role == 1) {
             fetchOrganizerEvents();
@@ -123,18 +193,19 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
         // Ensure organizer is loaded
         if (organizer == null) {
             organizer = model.getCurrentOrganizer();
-            if (organizer == null) {
-                Log.e("F_MyEvents", "Current Organizer is null");
-                swipeRefreshLayout.setRefreshing(false);
-                return;
-            }
+        }
+
+        if (organizer == null) {
+            Log.e("F_MyEvents", "Current Organizer is null");
+            swipeRefreshLayout.setRefreshing(false);
+            return;
         }
 
         ArrayList<String> createdEventIds = organizer.getEvents(); // Get list of created event IDs
 
         // If no created events, clear list and stop refreshing
         if (createdEventIds == null || createdEventIds.isEmpty()) {
-            adapter.setItems(new ArrayList<>());
+            if (adapter != null) adapter.setItems(new ArrayList<>());
             swipeRefreshLayout.setRefreshing(false);
             return;
         }
@@ -147,25 +218,53 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
      */
     private void fetchEntrantEvents() {
         // Ensure entrant is loaded
-        if (entrant == null) {
-            entrant = model.getCurrentEntrant();
-            if (entrant == null) {
-                Log.e("F_MyEvents", "Current Entrant is null");
-                swipeRefreshLayout.setRefreshing(false);
-                return;
-            }
-        }
-
-        ArrayList<String> waitlistedIds = entrant.getWaitlistedEvents(); // Get list of waitlisted IDs
-
-        // If no waitlisted events, clear list and stop refreshing
-        if (waitlistedIds == null || waitlistedIds.isEmpty()) {
-            adapter.setItems(new ArrayList<>());
+        Entrant current = model.getCurrentEntrant();
+        if (current == null) {
             swipeRefreshLayout.setRefreshing(false);
             return;
         }
+        String entrantId = current.getUid();
 
-        fetchEventsFromIds(waitlistedIds);
+        // reload from Firestore to ensure lists are up to date
+        model.getEntrant(entrantId, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+                if (obj instanceof Entrant) {
+                    // Update local reference
+                    entrant = (Entrant) obj;
+                    model.setCurrentEntrant(entrant);
+
+                    // combine the list from the 'fresh' object
+                    Set<String> allEventIds = new HashSet<>();
+
+                    if (entrant.getWaitlistedEvents() != null) allEventIds.addAll(entrant.getWaitlistedEvents());
+                    if (entrant.getInvitedEvents() != null) allEventIds.addAll(entrant.getInvitedEvents());
+                    if (entrant.getAttendedEvents() != null) allEventIds.addAll(entrant.getAttendedEvents());
+
+                    ArrayList<String> combinedIds = new ArrayList<>(allEventIds);
+
+                    if (combinedIds.isEmpty()) {
+                        if (isAdded() && adapter != null) {
+                            adapter.setItems(new ArrayList<>());
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        return;
+                    }
+
+                    // fetch the actual event objects
+                    fetchEventsFromIds(combinedIds);
+                }
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {}
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("F_MyEvents", "Failed to refresh entrant profile", e);
+                if (isAdded()) swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     /**
@@ -201,8 +300,13 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
                         if (isAdded() && getActivity() != null) {
                             requireActivity().runOnUiThread(() -> {
                                 Log.d("F_MyEvents", "Retrieved " + fetchedEvents.size() + " events.");
-                                adapter.setItems(fetchedEvents);
-                                swipeRefreshLayout.setRefreshing(false);
+                                if (adapter != null) {
+                                    adapter.setItems(fetchedEvents);
+                                    adapter.notifyDataSetChanged();
+                                }
+                                if (swipeRefreshLayout != null) {
+                                    swipeRefreshLayout.setRefreshing(false);
+                                }
                             });
                         }
                     }
