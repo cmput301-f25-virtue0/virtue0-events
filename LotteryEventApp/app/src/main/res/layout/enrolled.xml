@@ -63,12 +63,12 @@
                     tools:text="(Event name • 20 enrolled)" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnExportCsv"
+                    android:id="@+id/btnDownloadCsv"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/export_csv"
+                    android:text="@string/download_csv"
                     app:icon="@android:drawable/stat_sys_download"
                     app:iconPadding="8dp"
                     app:strokeWidth="1dp" />

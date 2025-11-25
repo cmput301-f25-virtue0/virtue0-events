@@ -17,8 +17,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Used for interactions with the database.
@@ -168,7 +171,6 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
-
     public void deleteEntrant(Entrant entrant, DeleteCallback cb) {
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
         entrantRef.delete()
@@ -459,7 +461,13 @@ public class DataModel extends TModel<TView>{
 
     public void getUsableWaitlistEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getWaitlist();
-//        ArrayList<> filterObjects = new ArrayList<>;
+
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+
         ArrayList<Entrant> entrants = new ArrayList<>();
         if (entrantsIds.size() == 0)
 
@@ -564,4 +572,80 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
+        if (entrantIds == null || entrantIds.isEmpty()) {
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+        ArrayList<Entrant> results = new ArrayList<>();
+        AtomicInteger activeFetches = new AtomicInteger(entrantIds.size());
+
+        for (String id : entrantIds) {
+            getEntrant(id, new GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    if (obj instanceof Entrant) {
+                        synchronized (results) {
+                            results.add((Entrant) obj);
+                        }
+                    }
+                    checkCompletion();
+                }
+
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) { checkCompletion(); }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("DataModel", "Failed to fetch entrant: " + id);
+                    checkCompletion();
+                }
+
+                private void checkCompletion() {
+                    if (activeFetches.decrementAndGet() == 0) {
+                        cb.onSuccess(results);
+                    }
+                }
+            });
+        }
+    }
+
+    public void updateEntrantProfile(Entrant entrant, SetCallback cb) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name",  entrant.getProfile().getName());
+        data.put("email", entrant.getProfile().getEmail());
+        data.put("phone", entrant.getProfile().getPhone());
+
+        entrants.document(entrant.getUid())
+                .update(data)             // partial updates
+                .addOnSuccessListener(v -> cb.onSuccess(entrant.getUid()))
+                .addOnFailureListener(cb::onError);
+    }
+
+
+    public void getAllEntrants(GetCallback cb) {
+        this.entrants.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Entrant> entrantList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    try {
+                        EntrantDataHolder data = new EntrantDataHolder(document.getData(), document.getId());
+                        Entrant entrant = data.createEntrantInstance();
+
+                        if (entrant != null) {
+                            entrantList.add(entrant);
+                        }
+                    } catch (Exception e) {
+                        Log.e("DataModel", "Skipping invalid entrant doc: " + document.getId());
+                    }
+                }
+                cb.onSuccess(entrantList);
+            } else {
+                Log.e("DataModel", "Error getting all entrants", task.getException());
+                cb.onError(task.getException());
+            }
+        });
+    }
+
 }
+

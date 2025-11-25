@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
+import com.example.lotteryeventapp.DataModel;
+
 /**
  * This class contains all of the information and functionality of an Event
  */
@@ -24,6 +26,8 @@ public class Event {
     private String date_time;
     private String location;
     private String organizer; //the organizer who created this event
+
+    private String registration_start;
     private String registration_deadline;
     private String details;
     private boolean track_geolocation;
@@ -47,12 +51,13 @@ public class Event {
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public Event(String title, String uid, String date_time, String location, String registration_deadline, String details,
+    public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
                   boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
         this.title = title;
         this.uid = uid;
         this.date_time = date_time;
         this.location = location;
+        this.registration_start = registration_start;
         this.registration_deadline = registration_deadline;
         this.details = details;
         this.track_geolocation = track_geolocation;
@@ -68,12 +73,13 @@ public class Event {
 
     }
 
-    public Event(String title, String date_time, String location, String registration_deadline, String details,
+    public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
         this.title = title;
         this.uid = "";
         this.date_time = date_time;
         this.location = location;
+        this.registration_start = registration_start;
         this.registration_deadline = registration_deadline;
         this.details = details;
         this.track_geolocation = track_geolocation;
@@ -86,6 +92,14 @@ public class Event {
         this.invited_list = new ArrayList<>();
         this.drawn = false;
         this.organizer = organizer;
+    }
+
+    public String getRegistration_start() {
+        return registration_start;
+    }
+
+    public void setRegistration_start(String registration_start) {
+        this.registration_start = registration_start;
     }
 
 
@@ -602,10 +616,11 @@ public class Event {
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
-    public void editEvent(String date_time, String location, String registration_deadline, String details,
+    public void editEvent(String date_time, String location, String registration_start, String registration_deadline, String details,
                           boolean track_geolocation, boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
         setDate_time(date_time);
         setLocation(location);
+        setRegistration_start(registration_start);
         setRegistration_deadline(registration_deadline);
         setDetails(details);
         setTrack_geolocation(track_geolocation);

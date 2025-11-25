@@ -25,6 +25,8 @@ import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickListener {
@@ -147,25 +149,52 @@ public class F_MyEvents extends Fragment implements EventAdapter.OnEventClickLis
      */
     private void fetchEntrantEvents() {
         // Ensure entrant is loaded
-        if (entrant == null) {
-            entrant = model.getCurrentEntrant();
-            if (entrant == null) {
-                Log.e("F_MyEvents", "Current Entrant is null");
-                swipeRefreshLayout.setRefreshing(false);
-                return;
-            }
-        }
-
-        ArrayList<String> waitlistedIds = entrant.getWaitlistedEvents(); // Get list of waitlisted IDs
-
-        // If no waitlisted events, clear list and stop refreshing
-        if (waitlistedIds == null || waitlistedIds.isEmpty()) {
-            adapter.setItems(new ArrayList<>());
+        if (model.getCurrentEntrant() == null) {
             swipeRefreshLayout.setRefreshing(false);
             return;
         }
+        String entrantId = model.getCurrentEntrant().getUid();
 
-        fetchEventsFromIds(waitlistedIds);
+        // reload from Firestore
+        model.getEntrant(entrantId, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+                if (obj instanceof Entrant) {
+                    // Update local reference
+                    entrant = (Entrant) obj;
+                    model.setCurrentEntrant(entrant);
+
+                    //  combine the list from the 'fresh' object
+                    Set<String> allEventIds = new HashSet<>();
+
+                    if (entrant.getWaitlistedEvents() != null) allEventIds.addAll(entrant.getWaitlistedEvents());
+                    if (entrant.getInvitedEvents() != null) allEventIds.addAll(entrant.getInvitedEvents());
+                    if (entrant.getAttendedEvents() != null) allEventIds.addAll(entrant.getAttendedEvents());
+
+                    ArrayList<String> combinedIds = new ArrayList<>(allEventIds);
+
+                    if (combinedIds.isEmpty()) {
+                        if (isAdded()) {
+                            adapter.setItems(new ArrayList<>());
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        return;
+                    }
+
+                    // fetch the actual event objects
+                    fetchEventsFromIds(combinedIds);
+                }
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {}
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("F_MyEvents", "Failed to refresh entrant profile", e);
+                if (isAdded()) swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     /**
