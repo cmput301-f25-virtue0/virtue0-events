@@ -700,5 +700,34 @@ public class DataModel extends TModel<TView>{
         });
     }
 
+
+    public void getAllNotifications(GetCallback cb) {
+        this.notifications.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Notification> notificationList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String notifType = (String) document.getData().get("notificationType");
+                    if(Objects.equals(notifType, "INVITATION")){
+                        InvitationDataHolder data = new InvitationDataHolder(document.getData(),document.getId());
+                        notificationList.add(data.createInvitationInstance());
+                    }else if(Objects.equals(notifType, "REJECTION")){
+                        RejectionDataHolder data = new RejectionDataHolder(document.getData(),document.getId());
+                        notificationList.add(data.createRejectionInstance());
+                    }else if(Objects.equals(notifType, "MESSAGING")){
+                        MessagingDataHolder data = new MessagingDataHolder(document.getData(),document.getId());
+                        notificationList.add(data.createMessagingInstance());
+                    }
+                }
+                cb.onSuccess(notificationList);
+            } else {
+                Log.e("DataModel", "Error getting all entrants", task.getException());
+                cb.onError(task.getException());
+            }
+        });
+
+    }
+
 }
+
+
 
