@@ -375,7 +375,9 @@ public class DataModel extends TModel<TView>{
             data = new InvitationDataHolder((Invitation) notif);
         }else if (notif instanceof Rejection) {
             data = new RejectionDataHolder((Rejection) notif);
-        }else {
+        }else if(notif instanceof Messaging){
+            data = new MessagingDataHolder((Messaging) notif);
+        }else{
             throw new RuntimeException("Unknown notification type");
         }
 
@@ -423,6 +425,11 @@ public class DataModel extends TModel<TView>{
 
                             Log.d("Firestore", "Firestore fetch succeeded: Rejection " + notifId);
                             cb.onSuccess(rejData.createRejectionInstance(), NotificationDataHolder.NotificationType.REJECTION);
+                        }else if(notifType == NotificationDataHolder.NotificationType.MESSAGING){
+                            MessagingDataHolder mesData = new MessagingDataHolder(notifSnap.getData(), notifId);
+
+                            Log.d("Firestore", "Firestore fetch succeeded: Rejection " + notifId);
+                            cb.onSuccess(mesData.createMessagingInstance(), NotificationDataHolder.NotificationType.MESSAGING);
                         }else {
                             Log.e("Firestore", "Firestore fetch failed: Unknown notification type " + notifId);
                             cb.onError(new RuntimeException("Unknown notification type"));
@@ -492,6 +499,38 @@ public class DataModel extends TModel<TView>{
                     });
     }
 
+
+    public void getUsableCancelledEntrants(Event event, DataModel.GetCallback cb){
+        List entrantsIds = event.getCancelled_list();
+
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        if (!entrantsIds.isEmpty())
+
+//        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
+            this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
+                                    entrants.add(data.createEntrantInstance());
+                                }
+                                cb.onSuccess(entrants);
+                            } else {
+                                Log.d("Firestore", "Error getting documents: ", task.getException());
+                                cb.onError(task.getException());
+                            }
+                        }
+                    });
+    }
 
     public void getUsableInvitedListEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getInvited_list();

@@ -85,6 +85,16 @@ public class F_Cancelled extends Fragment {
 
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        TextView tvTitle = view.findViewById(R.id.tvEventName);
+        tvCount = view.findViewById(R.id.tvListSize);
+
+        if (event != null) {
+            if (tvTitle != null) tvTitle.setText(event.getTitle());
+//            fetchCancelledEntrants();
+            loadCancelledList();
+        } else {
+            Log.e("F_Cancelled", "Event is null");
+        }
         // Initialize adapter with empty list first
         adapter = new ProfileListAdapter(cancelledEntrants, new ProfileListAdapter.OnProfileClickListener() {
             @Override
@@ -99,71 +109,74 @@ public class F_Cancelled extends Fragment {
         });
         rv.setAdapter(adapter);
 
-        if (event != null) {
-            loadCancelledList();
-        } else {
-            Log.e("F_Cancelled", "Event is null");
-        }
-//        btnMessageCancelled.setOnClickListener(v -> {
-//            EditText input = new EditText(requireContext());
-//            input.setInputType(InputType.TYPE_CLASS_TEXT);
-//            new AlertDialog.Builder(requireContext())
-//                    .setView(input)
-//                    .setTitle("Message Cancelled List")
-//                    .setPositiveButton("Send", (dialog, which) -> {
-//                        String message = input.getText().toString();
-//                        for(int i=0;i<cancelledEntrants.size();i++){
-//                            Entrant entrant = cancelledEntrants.get(i);
-//                            Messaging messaging = new Messaging(event.getUid(),entrant.getUid(),message);
-//                            model.setNotification(messaging, new DataModel.SetCallback() {
-//                                @Override
-//                                public void onSuccess(String msg) {
-//                                    Log.d("Firebase", "written");
-//                                    entrant.addNotification(messaging.getUid());
-//                                    model.setEntrant(entrant, new DataModel.SetCallback() {
-//                                        @Override
-//                                        public void onSuccess(String msg) {
-//                                            Log.d("Firebase", "written");
-//                                        }
-//
-//                                        @Override
-//                                        public void onError(Exception e) {
-//                                            Log.e("Firebase", "fail");
-//                                        }
-//                                    });
-//                                }
-//
-//                                @Override
-//                                public void onError(Exception e) {
-//                                    Log.e("Firebase", "fail");
-//                                }
-//                            });
-//
-//
-//
-//
-//
-//                        }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//                        Toast.makeText(requireContext(), "Message sent to cancelled list", Toast.LENGTH_SHORT).show();
-//                    }).setNegativeButton("Cancel", null).show();
-//
-//        });
+
+        btnMessageCancelled.setOnClickListener(v -> {
+            EditText input = new EditText(requireContext());
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            new AlertDialog.Builder(requireContext())
+                    .setView(input)
+                    .setTitle("Message Cancelled List")
+                    .setPositiveButton("Send", (dialog, which) -> {
+                        String message = input.getText().toString();
+                        model.getUsableCancelledEntrants(event,new DataModel.GetCallback() {
+                            @Override
+                            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                            }
+                            @Override
+                            public void onSuccess(Object obj) {
+                                Log.d("Firebase", "retrieved");
+                                ArrayList<Entrant> cancelledEntrants = (ArrayList<Entrant>) obj;
+                                for(int i=0;i<cancelledEntrants.size();i++){
+                                    Entrant entrant = cancelledEntrants.get(i);
+                                    if(!entrant.isNotificationOptOut()) {
+                                        Messaging messaging = new Messaging(event.getUid(), entrant.getUid(), message);
+                                        model.setNotification(messaging, new DataModel.SetCallback() {
+                                            @Override
+                                            public void onSuccess(String msg) {
+                                                Log.d("Firebase", "written");
+                                                entrant.addNotification(messaging.getUid());
+                                                model.setEntrant(entrant, new DataModel.SetCallback() {
+                                                    @Override
+                                                    public void onSuccess(String msg) {
+                                                        Log.d("Firebase", "written");
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Log.e("Firebase", "fail");
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Log.e("Firebase", "fail");
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                                Toast.makeText(requireContext(), "Message sent to cancelled list", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }).setNegativeButton("Cancel", null).show();
+
+        });
     }
 
     private void loadCancelledList() {
         ArrayList<String> cancelledIds = event.getCancelled_list();
 
         if (tvCount != null) {
-            tvCount.setText(String.valueOf(cancelledIds.size()));
+            tvCount.setText(String.valueOf(cancelledIds.size()) + " Cancelled");
         }
 
         if (cancelledIds == null || cancelledIds.isEmpty()) {
@@ -179,15 +192,7 @@ public class F_Cancelled extends Fragment {
                 List<Entrant> result = (List<Entrant>) obj;
 
                 if (isAdded() && getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        cancelledEntrants.clear();
-                        cancelledEntrants.addAll(result);
-                        adapter.notifyDataSetChanged();
-
-                        if (tvCount != null) {
-                            tvCount.setText(String.valueOf(cancelledEntrants.size()));
-                        }
-                    });
+                    getActivity().runOnUiThread(() -> setupAdapter(result));
                 }
             }
 
@@ -202,5 +207,22 @@ public class F_Cancelled extends Fragment {
                 }
             }
         });
+    }
+    private void setupAdapter(List<Entrant> entrants) {
+        ProfileListAdapter.OnProfileClickListener listener = new ProfileListAdapter.OnProfileClickListener() {
+            @Override
+            public void onProfileClick(Entrant entrant, int position) {
+                Toast.makeText(getContext(), entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDeleteClick(Entrant entrant, int position) {
+                Toast.makeText(getContext(), "Cancelling invite for " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
+                // Logic to remove entrant from chosen list goes here
+            }
+        };
+
+        adapter = new ProfileListAdapter(entrants, listener);
+        rv.setAdapter(adapter);
     }
 }
