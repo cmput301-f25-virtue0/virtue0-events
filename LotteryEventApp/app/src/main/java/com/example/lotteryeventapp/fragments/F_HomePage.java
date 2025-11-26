@@ -1,79 +1,106 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.CaptureAct;
 import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
 import com.example.lotteryeventapp.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 public class F_HomePage extends Fragment {
+    private static final String ARG_ROLE = "role";
+
     private int role;
+    private int currentTab = 0;
     private DataModel model;
 
 
-    //role = 0 for entrant, role = 1 for organizer
-    public F_HomePage(int myRole, DataModel myModel) {
-        this.role = myRole;
-        model = myModel;
+    public static F_HomePage newInstance(int role) {
+        F_HomePage fragment = new F_HomePage();
+        Bundle args = new Bundle();
+        args.putInt(ARG_ROLE, role);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
-        // Inflate the layout for this fragment & get the count text view
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            this.role = getArguments().getInt(ARG_ROLE);
+        }
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.homepage, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        Log.i("CURRENT ROLE", "Current user role is: " + role);
 
         ViewPager2 pager = view.findViewById(R.id.view_pager);
         TabLayout tabs = view.findViewById(R.id.tab_layout);
+
+
+        model = ((MainActivity) requireActivity()).getDataModel();
+
         pager.setAdapter(new ViewPagerAdapter(this, role, model));
+
+        int savedTab = ((MainActivity) requireActivity()).getActiveHomePageTab();
+
+        pager.setCurrentItem(savedTab, false); // false disables ViewPager scroll animation
+
+        TabLayout.Tab initialTab = tabs.getTabAt(savedTab);
+        if (initialTab != null) {
+            initialTab.select(); // Selects the tab before the view is drawn
+        }
+
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 pager.setCurrentItem(tab.getPosition());
+                ((MainActivity) requireActivity()).setActiveHomePageTab(tab.getPosition());
             }
-
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
+            public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
         pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                tabs.getTabAt(position).select();
+                TabLayout.Tab tab = tabs.getTabAt(position);
+                if (tab != null && !tab.isSelected()) {
+                    tab.select();
+                }
+                ((MainActivity) requireActivity()).setActiveHomePageTab(position);
             }
         });
 
-        //Back button
-        view.findViewById(R.id.backButtonHome).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_SelectRole(model));
-            }
-        });
 
-        // Set up page based on role
+        view.findViewById(R.id.backButtonHome).setOnClickListener(v ->
+                ((MainActivity) requireActivity()).showFragment(new F_SelectRole())
+        );
+
         if (role == 0) {
             view.findViewById(R.id.Notification).setVisibility(View.VISIBLE);
             view.findViewById(R.id.Profile).setVisibility(View.VISIBLE);
@@ -81,45 +108,71 @@ public class F_HomePage extends Fragment {
             view.findViewById(R.id.QRCodeButton).setVisibility(View.VISIBLE);
             view.findViewById(R.id.newEventButton).setVisibility(View.INVISIBLE);
 
-            // Detect button presses
-            view.findViewById(R.id.Notification).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
-                }
-            });
-            view.findViewById(R.id.Profile).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_Profile(model));
-                }
-            });
-            view.findViewById(R.id.filterButton).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ;
-                }
-            });
-            view.findViewById(R.id.QRCodeButton).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) { ; }
-            });
-        }
+            view.findViewById(R.id.Notification).setOnClickListener(v ->
+                    ((MainActivity) requireActivity()).showFragment(F_Notification.newInstance(0))
+            );
+            view.findViewById(R.id.Profile).setOnClickListener(v ->
+                    ((MainActivity) requireActivity()).showFragment(new F_Profile(model))
+            );
 
-        else if (role == 1) {
-            view.findViewById(R.id.Notification).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.Profile).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.filterButton).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.QRCodeButton).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.QRCodeButton).setOnClickListener(v->
+            {
+                scanCode();
+            });
+
+        } else if (role == 1) {
+            view.findViewById(R.id.Notification).setVisibility(View.GONE);
+            view.findViewById(R.id.Profile).setVisibility(View.GONE);
+            view.findViewById(R.id.filterButton).setVisibility(View.GONE);
+            view.findViewById(R.id.QRCodeButton).setVisibility(View.GONE);
             view.findViewById(R.id.newEventButton).setVisibility(View.VISIBLE);
 
-            // Detect button presses
-            view.findViewById(R.id.newEventButton).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.newEventButton).setOnClickListener(v ->
+                    ((MainActivity) requireActivity()).showFragment(F_CreateEditEvent.newInstance(0))
+            );
+        }
+    }
+
+    private void scanCode() {
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Volume up to flash on");
+        options.setBeepEnabled(false);
+        options.setOrientationLocked(false);
+        options.setCaptureActivity(CaptureAct.class);
+        barcodeLauncher.launch(options);
+    }
+
+    ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
+        if (result.getContents() != null) {
+            String scannedEventId = result.getContents();
+            Log.d("QRScan", "Scanned ID: " + scannedEventId);
+            model = ((MainActivity) requireActivity()).getDataModel();
+            model.getEvent(scannedEventId, new DataModel.GetCallback() {
                 @Override
-                public void onClick(View view) {
-                    ((MainActivity) requireActivity()).showFragment(new F_CreateEditEvent(0, model));
+                public void onSuccess(Object obj) {
+                    // Event found. Cast it and set it as current
+                    Event scannedEvent = (Event) obj;
+                    model.setCurrentEvent(scannedEvent);
+
+                    if (isAdded() && getActivity() != null) {
+                        Toast.makeText(getContext(), "Found Event: " + scannedEvent.getTitle(), Toast.LENGTH_SHORT).show();
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(0));
+                    }
+            }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    // Not used here
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("QRScan", "Event not found", e);
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Error: Event not found. Invalid QR Code.", Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }
-    }
+    });
+
 }

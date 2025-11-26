@@ -19,6 +19,15 @@ public class Entrant {
     private ArrayList<String> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
 
+    private ArrayList<String> waitlistedEvents = new ArrayList<>();
+
+    private ArrayList<String> invitedEvents = new ArrayList<>();
+
+    private ArrayList<String> attendedEvents = new ArrayList<>();
+
+
+
+
     /**
      * Constructs a new entrant
      * @param uid a unique identifier from their device
@@ -28,6 +37,22 @@ public class Entrant {
     public Entrant(String uid, Profile profile) {
         this.uid = Objects.requireNonNull(uid, "uid");
         this.profile = Objects.requireNonNull(profile, "profile");
+    }
+
+    public ArrayList<String> getAttendedEvents() {
+        return attendedEvents;
+    }
+
+    public void setAttendedEvents(ArrayList<String> attendedEvents) {
+        this.attendedEvents = attendedEvents;
+    }
+
+    public ArrayList<String> getInvitedEvents() {
+        return invitedEvents;
+    }
+
+    public void setInvitedEvents(ArrayList<String> invitedEvents) {
+        this.invitedEvents = invitedEvents;
     }
 
     /**
@@ -86,6 +111,17 @@ public class Entrant {
      */
     public void removeNotification(String notification) {
         this.notifications.remove(notification);
+        DataModel model = new DataModel();
+        model.setEntrant(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                Log.d("Firebase", "written");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
     }
 
     /**
@@ -132,6 +168,11 @@ public class Entrant {
             setName(name);
             setEmail(email);
             setPhone(phone);
+        }
+        public Profile() {
+            setName("");
+            setEmail("default@example.com");
+            setPhone("");
         }
 
         public String getName() {
@@ -180,22 +221,6 @@ public class Entrant {
      * @param email
      * @param phone
      */
-    public void updateProfile(String name, String email, String phone) {
-        profile.setName(name);
-        profile.setEmail(email);
-        profile.setPhone(phone);
-        DataModel model = new DataModel();
-        model.setEntrant(this, new DataModel.SetCallback() {
-            @Override
-            public void onSuccess(String msg) {
-                Log.d("Firebase", "written");
-            }
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-            }
-        });
-    }
 
     /**
      * deletes entrant's profile
@@ -235,6 +260,58 @@ public class Entrant {
     @Override
     public int hashCode() {
         return Objects.hash(uid);
+    }
+
+    public void addWaitlistedEvent(String eventId) {
+        if (!waitlistedEvents.contains(eventId)) {
+            waitlistedEvents.add(eventId);
+        }
+    }
+
+    public void removeWaitlistedEvent(String eventId) {
+        waitlistedEvents.remove(eventId);
+    }
+
+    public ArrayList<String> getWaitlistedEvents() {
+        return waitlistedEvents;
+    }
+
+    public void addInvitedEvent(String eventId) {
+        if (!invitedEvents.contains(eventId)) {
+            invitedEvents.add(eventId);
+        }
+    }
+
+    public void removeInvitedEvent(String eventId) {
+        invitedEvents.remove(eventId);
+    }
+
+    public void addAttendedEvent(String eventId) {
+        if (!attendedEvents.contains(eventId)) {
+            attendedEvents.add(eventId);
+        }
+    }
+
+    public void removeAttendedEvent(String eventId) {
+        attendedEvents.remove(eventId);
+    }
+
+    public void updateProfile(String name, String email, String phone) {
+        profile.setName(name);
+        profile.setEmail(email);
+        profile.setPhone(phone);
+
+        DataModel model = new DataModel();
+        model.updateEntrantProfile(this, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String id) {
+                Log.d("Firebase", "profile updated");
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "profile update failed", e);
+            }
+        });
     }
 
 }

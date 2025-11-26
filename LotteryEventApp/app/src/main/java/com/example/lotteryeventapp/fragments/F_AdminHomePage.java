@@ -1,11 +1,13 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
@@ -17,10 +19,20 @@ public class F_AdminHomePage extends Fragment {
     private int role;
     private DataModel model;
 
-    public F_AdminHomePage(int myRole, DataModel myModel) {
+    public static F_AdminHomePage newInstance(int myRole){
+        F_AdminHomePage fragment = new F_AdminHomePage();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
-        this.role = myRole;
-        model = myModel;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            this.role = getArguments().getInt("role");
+        }
     }
 
     @Override
@@ -33,25 +45,28 @@ public class F_AdminHomePage extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        Log.i("CURRENT ROLE", "Current user role is: " + role);
+        model = ((MainActivity) requireActivity()).getDataModel();
+
         // Detect button presses
         view.findViewById(R.id.btnProfiles).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_ProfilesList(2, model));
+                ((MainActivity) requireActivity()).showFragment(F_ProfilesList.newInstance(2));
             }
         });
 
         view.findViewById(R.id.btnImages).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminImages(2, model));
+                ((MainActivity) requireActivity()).showFragment(F_AdminImages.newInstance(2));
             }
         });
 
         view.findViewById(R.id.btnEvents).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_BrowseEvents(2, model));
+                ((MainActivity) requireActivity()).showFragment(F_BrowseEvents.newInstance(2));
             }
         });
 
@@ -64,7 +79,7 @@ public class F_AdminHomePage extends Fragment {
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmin);
         toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(new F_SelectRole(model));
+            ((MainActivity) requireActivity()).showFragment(new F_SelectRole());
         });
     }
 }

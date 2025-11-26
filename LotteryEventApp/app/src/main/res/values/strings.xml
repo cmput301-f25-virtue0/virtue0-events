@@ -16,18 +16,18 @@
     <string name="require_geolocation">Require geolocation</string>
     <string name="geo_help">Geolocation help</string>
     <string name="save_draft">Save draft</string>
-    <string name="publish_generate_qr">Publish and generate QR code</string>
+    <string name="btnFinalize">Publish event</string>
     <string name="edit_event">Edit event</string>
     <string name="download_qr_code">Download QR code</string>
     <string name="save_changes">Save changes</string>
     <string name="map">Map</string>
-    <string name="do_lottery">Do lottery</string>
-    <string name="chosen">Chosen</string>
+    <string name="waitlist">Waitlist</string>
+    <string name="invited">Invited</string>
     <string name="enrolled">Enrolled</string>
     <string name="cancelled">Cancelled</string>
     <string name="applicants">Applicants list</string>
     <string name="do_lottery_redraw">Draw lottery</string>
-    <string name="export_csv">Export CSV</string>
+    <string name="download_csv">Download CSV file</string>
     <string name="signed_up">Invitation accepted</string>
     <string name="declined">Invitation declined</string>
     <string name="role">Select role</string>
@@ -36,7 +36,7 @@
     <string name="admin">Administrator</string>
     <string name="choose_a_role_to_continue">Choose a role to continue</string>
     <string name="sign_in_as">Sign in as</string>
-    <string name="browse_events">Browse Events\n</string>
+    <string name="browse_events">Browse Events</string>
     <string name="my_events">My Events</string>
     <string name="add_events">Add events</string>
     <string name="notifications">Notifications</string>
@@ -45,4 +45,13 @@
     <string name="images">Images</string>
     <string name="delete">Delete</string>
     <string name="in_waitlist">in waitlist</string>
-</resources>
+    <string name="user_id">Your user ID</string>
+    <string name="edit_name">edit name</string>
+    <string name="name">Name</string>
+    <string name="phone_number">Phone number</string>
+    <string name="edit_phone_number">edit phone number</string>
+    <string name="email">Email</string>
+    <string name="show_qr_code">Show QR Code</string>
+    <string name="lottery_explanation_title">How the Lottery Works</string>
+    <string name="lottery_explanation_body">To sign up for an event, you join a waiting list during the open registration window rather than securing a spot immediately. Since the selection process is random, joining the list early does not increase your chances of being chosen.\n\nOnce the registration period closes, the system performs a lottery draw and notifies the selected entrants. If you receive an invitation, you must formally accept it to confirm your attendance; if you decline, the system automatically draws a new applicant from the waiting list to fill the vacancy.</string>
+    <string name="close">Close</string></resources>

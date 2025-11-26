@@ -23,4 +23,5 @@ public class InvitationDataHolder extends NotificationDataHolder{
 
         return inv;
     }
+
 }

@@ -11,6 +11,8 @@ public class EventDataHolder {
     private String uid;
     private String dateTime;
     private String location;
+
+    private String registrationStart;
     private String registrationDeadline;
     private String details;
     private boolean trackGeolocation;
@@ -23,10 +25,15 @@ public class EventDataHolder {
     private ArrayList<String> invitedList = new ArrayList<String>();
     private boolean drawn;
 
+    private String organizer;
+//    private boolean redraw;
+
     public EventDataHolder(Event event) {
+        this.uid = event.getUid();
         this.title = event.getTitle();
         this.dateTime = event.getDate_time();
         this.location = event.getLocation();
+        this.registrationStart = event.getRegistration_start();
         this.registrationDeadline = event.getRegistration_deadline();
         this.details = event.getDetails();
         this.trackGeolocation = event.willTrack_geolocation();
@@ -38,35 +45,176 @@ public class EventDataHolder {
         this.cancelledList.addAll(event.getCancelled_list());
         this.invitedList.addAll(event.getInvited_list());
         this.drawn = event.isDrawn();
+        this.organizer = event.getOrganizer();
+//        this.redraw = event.isDrawn();
+    }
+
+    public String getRegistrationStart() {
+        return registrationStart;
+    }
+
+    public void setRegistrationStart(String registrationStart) {
+        this.registrationStart = registrationStart;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getRegistrationDeadline() {
+        return registrationDeadline;
+    }
+
+    public void setRegistrationDeadline(String registrationDeadline) {
+        this.registrationDeadline = registrationDeadline;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public boolean isTrackGeolocation() {
+        return trackGeolocation;
+    }
+
+    public void setTrackGeolocation(boolean trackGeolocation) {
+        this.trackGeolocation = trackGeolocation;
+    }
+
+    public boolean isWillAutomaticallyRedraw() {
+        return willAutomaticallyRedraw;
+    }
+
+    public void setWillAutomaticallyRedraw(boolean willAutomaticallyRedraw) {
+        this.willAutomaticallyRedraw = willAutomaticallyRedraw;
+    }
+
+    public int getWaitlistLimit() {
+        return waitlistLimit;
+    }
+
+    public void setWaitlistLimit(int waitlistLimit) {
+        this.waitlistLimit = waitlistLimit;
+    }
+
+    public int getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public void setAttendeeLimit(int attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
+    }
+
+    public ArrayList<String> getWaitlist() {
+        return waitlist;
+    }
+
+    public void setWaitlist(ArrayList<String> waitlist) {
+        this.waitlist = waitlist;
+    }
+
+    public ArrayList<String> getAttendeeList() {
+        return attendeeList;
+    }
+
+    public void setAttendeeList(ArrayList<String> attendeeList) {
+        this.attendeeList = attendeeList;
+    }
+
+    public ArrayList<String> getCancelledList() {
+        return cancelledList;
+    }
+
+    public void setCancelledList(ArrayList<String> cancelledList) {
+        this.cancelledList = cancelledList;
+    }
+
+    public ArrayList<String> getInvitedList() {
+        return invitedList;
+    }
+
+    public void setInvitedList(ArrayList<String> invitedList) {
+        this.invitedList = invitedList;
+    }
+
+    public boolean isDrawn() {
+        return drawn;
+    }
+
+    public void setDrawn(boolean drawn) {
+        this.drawn = drawn;
+    }
+
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
     }
 
     public EventDataHolder(Map<String, Object> data, String eventId) {
+        this.uid = eventId;
         this.title = (String) data.get("title");
-        this.dateTime = (String) data.get("date_time");
+        this.dateTime = (String) data.get("dateTime");
         this.location = (String) data.get("location");
-        this.registrationDeadline = (String) data.get("registration_deadline");
+        this.registrationStart = (String) data.get("registrationStart");
+        this.registrationDeadline = (String) data.get("registrationDeadline");
         this.details = (String) data.get("details");
-        this.trackGeolocation = (Boolean) data.get("track_geolocation");
-        this.willAutomaticallyRedraw = (Boolean) data.get("redraw");
-        this.waitlistLimit = (int) data.get("waitlist_limit");
-        this.attendeeLimit = (int) data.get("attendee_limit");
+        this.trackGeolocation = (Boolean) data.get("trackGeolocation");
+        this.willAutomaticallyRedraw = (Boolean) data.get("willAutomaticallyRedraw");
+        this.waitlistLimit = ((Long) data.get("waitlistLimit")).intValue();
+        this.attendeeLimit = ((Long) data.get("attendeeLimit")).intValue();
+        this.organizer = (String) data.get("organizer");
 
         List<Object> waitlist = (List<Object>) data.get("waitlist");
         for (Object o: waitlist) {
             this.waitlist.add((String) o);
         }
 
-        List<Object> attendeeList = (List<Object>) data.get("attendee_list");
+        List<Object> attendeeList = (List<Object>) data.get("attendeeList");
         for (Object o: attendeeList) {
             this.attendeeList.add((String) o);
         }
 
-        List<Object> cancelledList = (List<Object>) data.get("cancelled_list");
+        List<Object> cancelledList = (List<Object>) data.get("cancelledList");
         for (Object o: cancelledList) {
             this.cancelledList.add((String) o);
         }
 
-        List<Object> invitedList = (List<Object>) data.get("invited_list");
+        List<Object> invitedList = (List<Object>) data.get("invitedList");
         for (Object o: invitedList) {
             this.invitedList.add((String) o);
         }
@@ -75,13 +223,14 @@ public class EventDataHolder {
     }
 
     public Event createEventInstance() {
-        Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationDeadline, this.details,
-                this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit);
+        Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationStart, this.registrationDeadline, this.details,
+                this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit, this.organizer);
 
         event.getWaitlist().addAll(this.waitlist);
         event.getAttendee_list().addAll(this.attendeeList);
         event.getCancelled_list().addAll(this.cancelledList);
         event.getInvited_list().addAll(this.invitedList);
+        event.setOrganizer(organizer);
 
         event.setDrawn(this.drawn);
 

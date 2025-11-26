@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class contains a collection of events created by an organizer
@@ -45,11 +46,12 @@ public class Organizer {
     public ArrayList<Event> getUsableEvents() throws InterruptedException {
         DataModel model = new DataModel();
         ArrayList<Event> events = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(getEvents().size());
+        CountDownLatch latch = new CountDownLatch(this.events.size());
         for (String event_id: getEvents()) {
             model.getEvent(event_id, new DataModel.GetCallback() {
                 @Override
                 public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                    latch.countDown();
 
                 }
                 @Override

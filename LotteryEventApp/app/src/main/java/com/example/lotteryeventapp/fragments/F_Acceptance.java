@@ -15,12 +15,17 @@ import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 public class F_Acceptance extends Fragment {
-    private Invitation notif; //Note: 'Notification' here does not seem to be the same as our notification class(?) Conflicting with base Android Class?
+
+    private int role;
+    private Invitation notif;
     private DataModel model;
 
-    public F_Acceptance(Invitation myNotif, DataModel myModel) {
-        this.notif = myNotif;
-        model = myModel;
+    public static F_Acceptance newInstance(int myRole){
+        F_Acceptance fragment = new F_Acceptance();
+        Bundle args = new Bundle();
+        args.putInt("role", myRole);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -33,14 +38,16 @@ public class F_Acceptance extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        //mark notification as read
-        // todo
+        model = ((MainActivity) requireActivity()).getDataModel();
+
+        this.notif = (Invitation) this.model.getCurrentNotification();
+
 
         // Detect button presses
         view.findViewById(R.id.backArrowAccept).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_Notification.newInstance(0));
             }
         });
 
@@ -49,7 +56,7 @@ public class F_Acceptance extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(getContext(), getString(R.string.signed_up), Toast.LENGTH_SHORT).show();
                 notif.signUp();
-                ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_Notification.newInstance(0));
             }
         });
 
@@ -58,7 +65,7 @@ public class F_Acceptance extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(getContext(), getString(R.string.declined), Toast.LENGTH_SHORT).show();
                 notif.decline();
-                ((MainActivity) requireActivity()).showFragment(new F_Notification(0, model));
+                ((MainActivity) requireActivity()).showFragment(F_Notification.newInstance(0));
             }
         });
     }

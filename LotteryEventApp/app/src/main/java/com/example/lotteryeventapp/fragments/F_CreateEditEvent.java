@@ -1,44 +1,55 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.DataModel;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
-import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.w3c.dom.Text;
+
 import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class F_CreateEditEvent extends Fragment {
     private int type;
     private DataModel model;
     private Event event;
 
-    //type = 0 for create, type = 1 for edit
-    public F_CreateEditEvent(int myType) {
-        this.type = myType;
-        this.event = null;
+    private final Calendar eventDateCalendar = Calendar.getInstance();
+
+    private final Calendar regStartCalendar = Calendar.getInstance();
+
+    private final Calendar regDeadlineCalendar = Calendar.getInstance();
+
+    private final String DATE_FORMAT = "EEE, MMM d, yyyy 'at' h:mm a";
+
+    public static F_CreateEditEvent newInstance(int myType) {
+        F_CreateEditEvent fragment = new F_CreateEditEvent();
+        Bundle args = new Bundle();
+        args.putInt("type", myType);
+        fragment.setArguments(args);
+        return fragment;
     }
 
-
-    // This constructor is used for "edit"
-    public F_CreateEditEvent(int myType, DataModel myModel) {
-        this.type = myType;
-        model = myModel;
-        event = model.getCurrentEvent();
-    }
 
     @Override
     public View onCreateView(
@@ -46,11 +57,25 @@ public class F_CreateEditEvent extends Fragment {
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment & get the count text view
+        if (getArguments() != null) {
+            this.type = getArguments().getInt("type");
+        }
         return inflater.inflate(R.layout.edit_and_create_event, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarCreateEvent);
+        model = ((MainActivity) requireActivity()).getDataModel();
+        event = model.getCurrentEvent();
+
+        TextInputEditText etRegOpens = view.findViewById(R.id.etRegOpens);
+        TextInputEditText etWhen = view.findViewById(R.id.etWhen);
+        TextInputEditText etRegCloses = view.findViewById(R.id.etRegCloses);
+
+        setupDateTimePicker(etWhen, eventDateCalendar);
+        setupDateTimePicker(etRegOpens, regStartCalendar);
+        setupDateTimePicker(etRegCloses, regDeadlineCalendar);
+
 
         //If editing, fill out information with existing event info
         if (this.type == 1 && this.event != null) {
@@ -67,11 +92,20 @@ public class F_CreateEditEvent extends Fragment {
             myText = view.findViewById(R.id.etLocation);
             myText.setText(Objects.requireNonNullElse(event.getLocation(), ""));
 
-            myText = view.findViewById(R.id.etWhen);
-            myText.setText(Objects.requireNonNullElse(event.getDate_time(), ""));
+            if (event.getDate_time() != null) {
+                etWhen.setText(event.getDate_time());
+                parseDateStringIntoCalendar(event.getDate_time(), eventDateCalendar);
+            }
 
-            myText = view.findViewById(R.id.etRegCloses);
-            myText.setText(Objects.requireNonNullElse(event.getRegistration_deadline(), ""));
+            if (event.getRegistration_start() != null) {
+                etRegOpens.setText(event.getRegistration_start());
+                parseDateStringIntoCalendar(event.getRegistration_start(), regStartCalendar);
+            }
+
+            if (event.getRegistration_deadline() != null) {
+                etRegCloses.setText(event.getRegistration_deadline());
+                parseDateStringIntoCalendar(event.getRegistration_deadline(), regDeadlineCalendar);
+            }
 
             myText = view.findViewById(R.id.etCapacity);
             myText.setText(String.valueOf(event.getAttendee_limit()));
@@ -81,6 +115,8 @@ public class F_CreateEditEvent extends Fragment {
 
             MaterialSwitch mySwitch = view.findViewById(R.id.switchGeo);
             mySwitch.setChecked(event.willTrack_geolocation()); // Use getter
+            Button finalize = view.findViewById(R.id.btnFinalize);
+            finalize.setText("Update Event");
         } else {
             // This is "create" mode
             toolbar.setTitle("Create Event");
@@ -88,14 +124,14 @@ public class F_CreateEditEvent extends Fragment {
 
         toolbar.setNavigationOnClickListener(v -> {
             if (type == 1) {
-                ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
             }
             else {
-                ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             }
         });
 
-        view.findViewById(R.id.btnPublish).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.btnFinalize).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -114,9 +150,15 @@ public class F_CreateEditEvent extends Fragment {
                     String details = etDetails.getText().toString();
                     String location = etLocation.getText().toString();
                     String dateTime = etWhen.getText().toString();
+                    String regStart = etRegOpens.getText().toString();
                     String regDeadline = etRegCloses.getText().toString();
                     String capacityStr = etCapacity.getText().toString();
                     String waitlistStr = etWaitlist.getText().toString();
+
+                    if (regStartCalendar.after(regDeadlineCalendar)) {
+                        Toast.makeText(getContext(), "Registration must start before it closes!", Toast.LENGTH_LONG).show();
+                        return;
+                    }
 
                     if (title.isEmpty() || details.isEmpty() || location.isEmpty() || dateTime.isEmpty() ||
                             regDeadline.isEmpty() || capacityStr.isEmpty() || waitlistStr.isEmpty()) {
@@ -126,17 +168,30 @@ public class F_CreateEditEvent extends Fragment {
                     int attendee_limit = Integer.parseInt(capacityStr);
                     int waitlist_limit = Integer.parseInt(waitlistStr);
                     boolean track_geo = swGeo.isChecked();
+                    String organizer = model.getCurrentOrganizer().getUid();
 
-                    // Differentiate between Create and Edit
                     if (type == 0) {
-                        // create new event (will be automatically added to the database)
-                        Event makeEvent = new Event(title, dateTime, location, regDeadline,
-                                details, track_geo, true, waitlist_limit, attendee_limit);
-                        DataModel model = new DataModel();
+                        // create new event
+                        Event makeEvent = new Event(title, dateTime, location,regStart, regDeadline,
+                                details, track_geo, true, waitlist_limit, attendee_limit, organizer);
                         model.setEvent(makeEvent, new DataModel.SetCallback() {
                             @Override
                             public void onSuccess(String msg) {
                                 Log.d("Firebase", "written");
+                                Organizer organizer = model.getCurrentOrganizer();
+                                organizer.addEvent(makeEvent.getUid());
+                                model.setOrganizer(organizer, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String msg) {
+                                        Log.d("Firebase", "written");
+
+                                    }
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Log.e("Firebase", "fail");
+                                    }
+                                });
+
                             }
                             @Override
                             public void onError(Exception e) {
@@ -146,7 +201,7 @@ public class F_CreateEditEvent extends Fragment {
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
                         model.setCurrentEvent(makeEvent);
                         //View newly created event
-                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
 
                     } else {
                         // update existing event
@@ -154,28 +209,118 @@ public class F_CreateEditEvent extends Fragment {
                         event.setDetails(details);
                         event.setLocation(location);
                         event.setDate_time(dateTime);
+                        event.setRegistration_start(regStart);
                         event.setRegistration_deadline(regDeadline);
                         event.setAttendee_limit(attendee_limit);
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
+                        event.setOrganizer(organizer);
+
+                        Organizer currentOrganizer = model.getCurrentOrganizer();
+                        if (!currentOrganizer.getEvents().contains(event.getUid())) {
+
+                            // Add it locally
+                            currentOrganizer.addEvent(event.getUid());
+
+                            // Save the updated organizer to Firebase
+                            model.setOrganizer(currentOrganizer, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "Linked missing event to Organizer");
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "Failed to update Organizer link");
+                                }
+                            });
+                        }
 
                         //Update the existing event
-                        event.editEvent(dateTime, location, regDeadline,
-                                details, track_geo, true, waitlist_limit, attendee_limit);
                         Toast.makeText(getContext(), "Event Updated", Toast.LENGTH_SHORT).show();
+                        model.setEvent(event, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String msg) {
+                                Log.d("Firebase", "written");
+
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
                     }
 
                     if (type == 1) {
-                        ((MainActivity) requireActivity()).showFragment(new F_EventInfo(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
                     }
                     else {
-                        ((MainActivity) requireActivity()).showFragment(new F_HomePage(1, model));
+                        ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
                     }
 
                 } catch(Exception e) {
-                    Toast.makeText(getContext(), "Please fill all missing fields!", Toast.LENGTH_SHORT).show();
+                    throw new RuntimeException(e);
+//                    Toast.makeText(getContext(), "Please fill all missing fields!", Toast.LENGTH_SHORT).show();
                 }
+
+
             }
         });
     }
+
+    private void setupDateTimePicker(TextInputEditText editText, Calendar calendar) {
+        editText.setOnClickListener(v -> {
+            // Show Date Picker
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    requireContext(),
+                    (view, year, month, dayOfMonth) -> {
+                        calendar.set(Calendar.YEAR, year);
+                        calendar.set(Calendar.MONTH, month);
+                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                        // Show Time Picker immediately after Date Picker
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                                requireContext(),
+                                (timeView, hourOfDay, minute) -> {
+                                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                    calendar.set(Calendar.MINUTE, minute);
+
+                                    // Update the EditText
+                                    updateLabel(editText, calendar);
+                                },
+                                calendar.get(Calendar.HOUR_OF_DAY),
+                                calendar.get(Calendar.MINUTE),
+                                false // Use 12 hour format (AM/PM)
+                        );
+                        timePickerDialog.show();
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            datePickerDialog.show();
+        });
+    }
+
+    /**
+     * Updates the EditText with the formatted date string
+     */
+    private void updateLabel(TextInputEditText editText, Calendar calendar) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+        editText.setText(sdf.format(calendar.getTime()));
+    }
+
+    /**
+     * Tries to parse existing strings back into the calendar to prevent overwriting
+     * with "Today" when editing.
+     */
+    private void parseDateStringIntoCalendar(String dateString, Calendar calendar) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+            calendar.setTime(Objects.requireNonNull(sdf.parse(dateString)));
+        } catch (Exception e) {
+            // If parsing fails (e.g. old data format), just leave calendar as 'now'
+            Log.w("DateParse", "Could not parse date: " + dateString);
+        }
+    }
 }
+

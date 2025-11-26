@@ -54,7 +54,7 @@
 
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/do_lottery"
+                        android:text="@string/waitlist"
                         app:icon="@drawable/lottery"
                         app:iconPadding="8dp"
                         app:cornerRadius="12dp" />
@@ -66,7 +66,7 @@
                         android:id="@+id/btnChosen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/chosen"
+                        android:text="@string/invited"
                         app:icon="@drawable/profile"
                         app:iconPadding="8dp"
                         app:cornerRadius="12dp" />

@@ -19,8 +19,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
     @NonNull @Override
     public Fragment createFragment(int position) {
-        if (position == 0) return new F_BrowseEvents(role, model);
-        return new F_MyEvents(role, model);
+        if (position == 0) return F_BrowseEvents.newInstance(role);
+        return F_MyEvents.newInstance(role);
     }
 
     @Override

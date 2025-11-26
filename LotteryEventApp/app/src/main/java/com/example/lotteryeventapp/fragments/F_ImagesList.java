@@ -33,7 +33,7 @@ public class F_ImagesList extends Fragment {
         view.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(new F_AdminHomePage(2, model));
+                ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
             }
         });
     }
