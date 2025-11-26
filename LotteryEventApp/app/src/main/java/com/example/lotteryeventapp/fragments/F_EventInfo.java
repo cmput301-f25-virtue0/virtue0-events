@@ -228,8 +228,11 @@ public class F_EventInfo extends Fragment {
                     view.findViewById(R.id.layoutInvited).setVisibility(View.VISIBLE);
                 }
 
+                View leaveBtn = view.findViewById(R.id.leave_button);
+
                 if (isWaitlisted) {
-                    view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
+                    leaveBtn.setVisibility(View.VISIBLE);
+                    leaveBtn.setOnClickListener(v -> leaveWaitlist());
                 }
 
                 // Click Listeners
@@ -605,6 +608,59 @@ public class F_EventInfo extends Fragment {
                 Log.e("DeleteEvent", "Error deleting event doc", e);
                 if (isAdded() && getContext() != null) {
                     Toast.makeText(getContext(), "Failed to delete event", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void leaveWaitlist() {
+        if (event == null || model.getCurrentEntrant() == null) {
+            Toast.makeText(getContext(), "Error: Data not loaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Entrant currentEntrant = model.getCurrentEntrant();
+        String entrantId = currentEntrant.getUid();
+
+        // update local objects
+        event.waitlistRemove(entrantId);
+        currentEntrant.removeWaitlistedEvent(event.getUid());
+
+        // update event in firebase
+        model.setEvent(event, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                // event update successful, now update entrant
+                model.setEntrant(currentEntrant, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String id) {
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Left the waitlist.", Toast.LENGTH_SHORT).show();
+                            setupUI(getView()); // refresh the UI to show join button again
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // revert on failure
+                        event.waitlistAdd(entrantId);
+                        currentEntrant.addWaitlistedEvent(event.getUid());
+                        Log.e("LeaveWaitlist", "Failed to update entrant", e);
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Error updating profile.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Revert on failure
+                event.waitlistAdd(entrantId);
+                currentEntrant.addWaitlistedEvent(event.getUid());
+                Log.e("LeaveWaitlist", "Failed to update event", e);
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Failed to leave waitlist.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
