@@ -182,12 +182,18 @@ public class F_EventInfo extends Fragment {
     private void setupUI(View view) {
         if (event == null) return;
 
-        // Title, Date, Location, Desc
+        // Title, Event Date, Registration Date, Location, Desc
         TextView myText = view.findViewById(R.id.eventName);
         myText.setText(event.getTitle());
 
         myText = view.findViewById(R.id.eventDateTime);
         myText.setText(event.getDate_time());
+
+        myText = view.findViewById(R.id.tvRegStart);
+        myText.setText("Registration Start: " + event.getRegistration_start());
+
+        myText = view.findViewById(R.id.tvRegEnd);
+        myText.setText("Registration Deadline: " + event.getRegistration_deadline());
 
         myText = view.findViewById(R.id.eventLocation);
         myText.setText(event.getLocation());
@@ -211,15 +217,11 @@ public class F_EventInfo extends Fragment {
                 boolean isWaitlisted = event.getWaitlist() != null && event.getWaitlist().contains(currentEntrant.getUid());
                 boolean isAttending = event.getAttendee_list() != null && event.getAttendee_list().contains(currentEntrant.getUid());
                 boolean isInvited = event.getInvited_list() != null && event.getInvited_list().contains(currentEntrant.getUid());
+                boolean isCancelled = event.getCancelled_list() != null && event.getCancelled_list().contains(currentEntrant.getUid());
 
-                if (!isAttending || !isInvited) {
-                    view.findViewById(R.id.layoutEntrant).setVisibility(View.VISIBLE);
-                }
-                view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
-                view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
 
-                if (isWaitlisted || isAttending || isInvited) {
-                    view.findViewById(R.id.joinButton).setVisibility(View.GONE);
+                if (isAttending || isInvited || isCancelled || isWaitlisted) {
+                    view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
                 }
 
                 if (isInvited) {
@@ -354,9 +356,12 @@ public class F_EventInfo extends Fragment {
             }
 
             String endStr = event.getRegistration_deadline();
+            String eventDateStr = event.getDate_time();
+
             if (endStr != null && !endStr.isEmpty()) {
                 Date endDate = sdf.parse(endStr);
-                if (endDate != null && currentTime.after(endDate)) {
+                Date eventDate = sdf.parse(eventDateStr);
+                if ((endDate != null && currentTime.after(endDate)) || currentTime.after(eventDate)) {
                     Toast.makeText(getContext(), "Registration deadline has passed.", Toast.LENGTH_SHORT).show();
                     return;
                 }
