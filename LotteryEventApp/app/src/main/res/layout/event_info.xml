@@ -83,9 +83,36 @@
                 android:id="@+id/eventDateTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="Sat, Nov 9 • 10:00 AM – 11:30 AM" />
+
+            <LinearLayout
+                android:id="@+id/layoutRegistrationDates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvRegStart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="#388E3C"
+                    tools:text="Reg Start: Nov 1, 2024 at 9:00 AM"/>
+
+                <TextView
+                    android:id="@+id/tvRegEnd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="@android:color/holo_red_dark"
+                    tools:text="Deadline: Nov 8, 2024 at 11:59 PM"/>
+
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/eventLocation"
@@ -267,3 +294,4 @@
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

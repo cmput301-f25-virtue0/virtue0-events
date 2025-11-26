@@ -182,12 +182,18 @@ public class F_EventInfo extends Fragment {
     private void setupUI(View view) {
         if (event == null) return;
 
-        // Title, Date, Location, Desc
+        // Title, Event Date, Registration Date, Location, Desc
         TextView myText = view.findViewById(R.id.eventName);
         myText.setText(event.getTitle());
 
         myText = view.findViewById(R.id.eventDateTime);
         myText.setText(event.getDate_time());
+
+        myText = view.findViewById(R.id.tvRegStart);
+        myText.setText("Registration Start: " + event.getRegistration_start());
+
+        myText = view.findViewById(R.id.tvRegEnd);
+        myText.setText("Registration Deadline: " + event.getRegistration_deadline());
 
         myText = view.findViewById(R.id.eventLocation);
         myText.setText(event.getLocation());
@@ -211,23 +217,22 @@ public class F_EventInfo extends Fragment {
                 boolean isWaitlisted = event.getWaitlist() != null && event.getWaitlist().contains(currentEntrant.getUid());
                 boolean isAttending = event.getAttendee_list() != null && event.getAttendee_list().contains(currentEntrant.getUid());
                 boolean isInvited = event.getInvited_list() != null && event.getInvited_list().contains(currentEntrant.getUid());
+                boolean isCancelled = event.getCancelled_list() != null && event.getCancelled_list().contains(currentEntrant.getUid());
 
-                if (!isAttending || !isInvited) {
-                    view.findViewById(R.id.layoutEntrant).setVisibility(View.VISIBLE);
-                }
-                view.findViewById(R.id.layoutOrganizer).setVisibility(View.GONE);
-                view.findViewById(R.id.layoutAdmin).setVisibility(View.GONE);
 
-                if (isWaitlisted || isAttending || isInvited) {
-                    view.findViewById(R.id.joinButton).setVisibility(View.GONE);
+                if (isAttending || isInvited || isCancelled || isWaitlisted) {
+                    view.findViewById(R.id.layoutEntrant).setVisibility(View.GONE);
                 }
 
                 if (isInvited) {
                     view.findViewById(R.id.layoutInvited).setVisibility(View.VISIBLE);
                 }
 
+                View leaveBtn = view.findViewById(R.id.leave_button);
+
                 if (isWaitlisted) {
-                    view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
+                    leaveBtn.setVisibility(View.VISIBLE);
+                    leaveBtn.setOnClickListener(v -> leaveWaitlist());
                 }
 
                 // Click Listeners
@@ -354,9 +359,12 @@ public class F_EventInfo extends Fragment {
             }
 
             String endStr = event.getRegistration_deadline();
+            String eventDateStr = event.getDate_time();
+
             if (endStr != null && !endStr.isEmpty()) {
                 Date endDate = sdf.parse(endStr);
-                if (endDate != null && currentTime.after(endDate)) {
+                Date eventDate = sdf.parse(eventDateStr);
+                if ((endDate != null && currentTime.after(endDate)) || currentTime.after(eventDate)) {
                     Toast.makeText(getContext(), "Registration deadline has passed.", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -600,6 +608,59 @@ public class F_EventInfo extends Fragment {
                 Log.e("DeleteEvent", "Error deleting event doc", e);
                 if (isAdded() && getContext() != null) {
                     Toast.makeText(getContext(), "Failed to delete event", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void leaveWaitlist() {
+        if (event == null || model.getCurrentEntrant() == null) {
+            Toast.makeText(getContext(), "Error: Data not loaded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Entrant currentEntrant = model.getCurrentEntrant();
+        String entrantId = currentEntrant.getUid();
+
+        // update local objects
+        event.waitlistRemove(entrantId);
+        currentEntrant.removeWaitlistedEvent(event.getUid());
+
+        // update event in firebase
+        model.setEvent(event, new DataModel.SetCallback() {
+            @Override
+            public void onSuccess(String msg) {
+                // event update successful, now update entrant
+                model.setEntrant(currentEntrant, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String id) {
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Left the waitlist.", Toast.LENGTH_SHORT).show();
+                            setupUI(getView()); // refresh the UI to show join button again
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // revert on failure
+                        event.waitlistAdd(entrantId);
+                        currentEntrant.addWaitlistedEvent(event.getUid());
+                        Log.e("LeaveWaitlist", "Failed to update entrant", e);
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Error updating profile.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Revert on failure
+                event.waitlistAdd(entrantId);
+                currentEntrant.addWaitlistedEvent(event.getUid());
+                Log.e("LeaveWaitlist", "Failed to update event", e);
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Failed to leave waitlist.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
