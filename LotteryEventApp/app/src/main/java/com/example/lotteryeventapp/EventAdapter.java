@@ -91,6 +91,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             boolean isWaitlisted = e.getWaitlist() != null && e.getWaitlist().contains(currentEntrantId);
             boolean isAttending = e.getAttendee_list() != null && e.getAttendee_list().contains(currentEntrantId);
             boolean isInvited = e.getInvited_list() != null && e.getInvited_list().contains(currentEntrantId);
+            boolean isCancelled = e.getCancelled_list() != null && e.getCancelled_list().contains(currentEntrantId);
+
 
             if (isAttending) {
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
@@ -106,6 +108,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
                 h.tvJoinedTag.setText("WAITLISTED");
                 h.tvJoinedTag.setBackgroundColor(Color.GRAY); // Default Gray
+            }
+            else if (isCancelled) {
+                h.tvJoinedTag.setVisibility(View.VISIBLE);
+                h.tvJoinedTag.setText("CANCELLED");
+                h.tvJoinedTag.setBackgroundColor(Color.parseColor("#F44336")); // Red
             }
         }
 
@@ -147,7 +154,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             tvDate   = itemView.findViewById(R.id.tvDate);
             btnDelete = itemView.findViewById(R.id.btnDelete);
             tvOwnerTag = itemView.findViewById(R.id.tvOwnerTag);
-            tvJoinedTag = itemView.findViewById(R.id.tvJoinedTag);
+            tvJoinedTag = itemView.findViewById(R.id.tvTag);
 
 
 

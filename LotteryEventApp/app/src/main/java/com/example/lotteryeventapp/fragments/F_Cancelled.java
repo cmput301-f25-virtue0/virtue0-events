@@ -33,7 +33,6 @@ public class F_Cancelled extends Fragment {
     private RecyclerView rv;
     private TextView tvCount;
     private ProfileListAdapter adapter;
-    private final List<Entrant> cancelledEntrants = new ArrayList<>();
 
     public static F_Cancelled newInstance(int myRole) {
         F_Cancelled fragment = new F_Cancelled();
@@ -73,41 +72,34 @@ public class F_Cancelled extends Fragment {
             });
         }
 
+        // Initialize Views
         rv = view.findViewById(R.id.rvCancelled);
+        tvCount = view.findViewById(R.id.tvListSize);
 
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Initialize adapter with empty list first
-        adapter = new ProfileListAdapter(cancelledEntrants, new ProfileListAdapter.OnProfileClickListener() {
-            @Override
-            public void onProfileClick(Entrant entrant, int position) {
-                Toast.makeText(requireContext(), "Profile: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDeleteClick(Entrant entrant, int position) {
-                Toast.makeText(getContext(), "Action not implemented", Toast.LENGTH_SHORT).show();
-            }
-        });
-        rv.setAdapter(adapter);
-
         if (event != null) {
-            loadCancelledList();
+            fetchCancelledEntrants();
         } else {
             Log.e("F_Cancelled", "Event is null");
         }
     }
 
-    private void loadCancelledList() {
+    /**
+     * Fetches the list of entrant IDs from the event's cancelled list
+     * and retrieves their profile data from Firestore.
+     */
+    private void fetchCancelledEntrants() {
         ArrayList<String> cancelledIds = event.getCancelled_list();
 
+        // Update count immediately if possible
         if (tvCount != null) {
             tvCount.setText(String.valueOf(cancelledIds.size()));
         }
 
+        // Handle empty list case
         if (cancelledIds == null || cancelledIds.isEmpty()) {
-            cancelledEntrants.clear();
-            adapter.notifyDataSetChanged();
+            setupAdapter(new ArrayList<>());
             return;
         }
 
@@ -115,18 +107,11 @@ public class F_Cancelled extends Fragment {
         model.getEntrantsByIds(cancelledIds, new DataModel.GetCallback() {
             @Override
             public void onSuccess(Object obj) {
-                List<Entrant> result = (List<Entrant>) obj;
+                List<Entrant> loadedEntrants = (List<Entrant>) obj;
 
+                // Update UI on main thread
                 if (isAdded() && getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        cancelledEntrants.clear();
-                        cancelledEntrants.addAll(result);
-                        adapter.notifyDataSetChanged();
-
-                        if (tvCount != null) {
-                            tvCount.setText(String.valueOf(cancelledEntrants.size()));
-                        }
-                    });
+                    requireActivity().runOnUiThread(() -> setupAdapter(loadedEntrants));
                 }
             }
 
@@ -135,11 +120,46 @@ public class F_Cancelled extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                Log.e("F_Cancelled", "Failed to load cancelled entrants", e);
+                Log.e("F_Cancelled", "Error fetching cancelled list", e);
                 if (getContext() != null) {
                     Toast.makeText(getContext(), "Error loading list", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    /**
+     * Sets up the RecyclerView adapter with the fetched list of entrants.
+     */
+    private void setupAdapter(List<Entrant> entrants) {
+        // Update count text again after fetch
+
+        TextView myText = getView().findViewById(R.id.tvEventName);
+        myText.setText(event.getTitle());
+
+
+        if (tvCount != null) {
+            tvCount.setText(String.valueOf(entrants.size())+" cancelled");
+        }
+
+        if (entrants == null) {
+            entrants = new ArrayList<>();
+            Log.e("F_Cancelled", "Entrants list is null");
+        }
+
+        ProfileListAdapter.OnProfileClickListener listener = new ProfileListAdapter.OnProfileClickListener() {
+            @Override
+            public void onProfileClick(Entrant entrant, int position) {
+                Toast.makeText(getContext(), entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDeleteClick(Entrant entrant, int position) {
+                Toast.makeText(getContext(), "Action not implemented for Cancelled list", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        adapter = new ProfileListAdapter(entrants, listener);
+        rv.setAdapter(adapter);
     }
 }
