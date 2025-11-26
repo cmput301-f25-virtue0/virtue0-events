@@ -56,7 +56,7 @@ public class F_Applicants extends Fragment {
             Toast.makeText(requireContext(), "Error: No event selected to run the lottery.", Toast.LENGTH_LONG).show();
             // Go back to the organizer's home page (role 1)
             ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
-            return; // Stop execution of onViewCreated
+            return;
         }
         toolbar.setNavigationOnClickListener(v -> {
             ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));

@@ -160,8 +160,5 @@ public class F_Profile extends Fragment {
                     }).setNegativeButton("Cancel", null).show();
         });
 
-        }
-
-
     }
-
+}

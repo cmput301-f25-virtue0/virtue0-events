@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:title="@string/do_lottery"
+            app:title="@string/waitlist"
             app:titleTextColor="@color/white"
             app:titleCentered="true"
             app:navigationIcon="@drawable/back_arrow_sized"

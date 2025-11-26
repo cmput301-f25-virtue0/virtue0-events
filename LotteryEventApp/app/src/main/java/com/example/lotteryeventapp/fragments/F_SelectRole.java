@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -37,6 +38,12 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnEntrant).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (model.getCurrentOrganizer() == null || model.getCurrentEntrant() == null) {
+                    Toast.makeText(getContext(), "Loading profile... please wait.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
                 ((MainActivity) requireActivity()).setActiveHomePageTab(0);
                 ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
             }
@@ -45,6 +52,12 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnOrganizer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (model.getCurrentOrganizer() == null ||  model.getCurrentEntrant() == null) {
+                    Toast.makeText(getContext(), "Loading profile... please wait.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 ((MainActivity) requireActivity()).setActiveHomePageTab(0);
                 ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(1));
             }

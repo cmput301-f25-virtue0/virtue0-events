@@ -13,10 +13,13 @@ public abstract class NotificationDataHolder {
 
     public enum NotificationType {
         INVITATION,
-        REJECTION;
+        REJECTION,
+        MESSAGING;
 
         public static final NotificationType INV = INVITATION;
         public static final NotificationType REJ = REJECTION;
+        public static final NotificationType MES = MESSAGING;
+
     }
 
     public NotificationDataHolder(Notification notif, NotificationType notifType) {
@@ -30,7 +33,7 @@ public abstract class NotificationDataHolder {
     }
 
     public NotificationDataHolder(Map<String, Object> data, String uid) {
-        this.uid = (String) data.get("uid");
+        this.uid = uid;
         this.event = (String) data.get("event");
         this.entrant = (String) data.get("entrant");
         this.message = (String) data.get("message");
