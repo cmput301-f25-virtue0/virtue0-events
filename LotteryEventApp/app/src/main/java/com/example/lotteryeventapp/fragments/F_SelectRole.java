@@ -1,9 +1,15 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
+import com.google.api.Distribution;
 
 public class F_SelectRole extends Fragment {
     private DataModel model;
@@ -59,7 +66,41 @@ public class F_SelectRole extends Fragment {
         view.findViewById(R.id.btnAdmin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+                EditText username = new EditText(requireContext());
+                username.setHint("Username");
+                EditText password = new EditText(requireContext());
+                password.setHint("Password");
+                password.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+                LinearLayout layout = new LinearLayout(requireContext());
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.addView(username);
+                layout.addView(password);
+
+                AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                        .setTitle("Admin Login")
+                        .setView(layout)
+                        .setNegativeButton("Cancel", null)
+                        .setPositiveButton("Log in", null)
+                        .create();
+
+                dialog.show();
+
+
+                Button loginButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                loginButton.setOnClickListener(v -> {
+                    String uname = username.getText().toString();
+                    String pword = password.getText().toString();
+                    if (uname.equals("Admin1") && pword.equals("123456")) {
+                        dialog.dismiss();
+                        ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+                    } else {
+                        Toast.makeText(requireContext(),
+                                "Invalid Username or Password",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
     }

@@ -624,6 +624,60 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
+    public interface ListCallback<T> {
+        /**
+         * Called on successful fetch of a list from the database
+         * @param list list of instances retrieved from the database
+         */
+        void onSuccess(List<T> list);
+
+        /**
+         * Called on failed fetch from database
+         * @param e exception thrown
+         */
+        void onError(Exception e);
+    }
+
+    public void getAllEntrants(ListCallback<Entrant> cb) {
+        this.entrants
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> entrantList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            EntrantDataHolder data =
+                                    new EntrantDataHolder(document.getData(), document.getId());
+                            entrantList.add(data.createEntrantInstance());
+                        }
+                        Log.d("Firestore", "Successfully fetched " + entrantList.size() + " entrants.");
+                        cb.onSuccess(entrantList);
+                    } else {
+                        Log.e("Firestore", "Error getting entrants: ", task.getException());
+                        cb.onError(task.getException());
+                    }
+                });
+    }
+    public void getAllOrganizers(ListCallback<Organizer> cb) {
+        this.organizers
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Organizer> organizerList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            OrganizerDataHolder data = new OrganizerDataHolder(document.getData(), document.getId());
+                            organizerList.add(data.createOrganizerInstance());
+
+                        }
+                        Log.d("Firestore", "Successfully fetched " + organizerList.size() + " organizers.");
+                        cb.onSuccess(organizerList);
+                    } else {
+                        Log.e("Firestore", "Error getting organizers: ", task.getException());
+                        cb.onError(task.getException());
+                    }
+                });
+    }
+
+
 
     public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
         if (entrantIds == null || entrantIds.isEmpty()) {
