@@ -23,6 +23,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public interface OnEventClickListener {
         void onEventClick(@NonNull Event event, int position);
+        void onDeleteClick(Event delEvent, int delPosition);
     }
 
     private final List<Event> items = new ArrayList<>();

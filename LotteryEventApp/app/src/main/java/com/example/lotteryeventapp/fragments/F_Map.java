@@ -13,13 +13,18 @@ import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.R;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.appbar.MaterialToolbar;
 
-public class F_Map extends Fragment {
+public class F_Map extends Fragment implements OnMapReadyCallback {
 
     private int role;
     private DataModel model;
     private Event event;
+
+    private GoogleMap gmap;
 
     public static F_Map newInstance(int myRole){
         F_Map fragment = new F_Map();
@@ -59,6 +64,15 @@ public class F_Map extends Fragment {
             ((MainActivity) requireActivity()).showFragment(new F_Applicants());
         });
 
-        // TODO: Add map initialization logic here
+        // Set up the map view
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_view);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        gmap = googleMap;
+
     }
 }

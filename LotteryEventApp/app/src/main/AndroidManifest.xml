@@ -29,6 +29,9 @@
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_REAL_API_KEY_HERE"/>
     </application>
 
 </manifest>
