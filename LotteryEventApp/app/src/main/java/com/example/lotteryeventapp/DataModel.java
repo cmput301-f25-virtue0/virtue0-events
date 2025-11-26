@@ -17,7 +17,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Used for interactions with the database.
@@ -32,6 +37,7 @@ public class DataModel extends TModel<TView>{
     private Entrant currentEntrant;
     private Organizer currentOrg;
     private Event currentEvent;
+    private Notification currentNotification;
 
     private ArrayList<Event> cachedEvents = null;
 
@@ -113,6 +119,13 @@ public class DataModel extends TModel<TView>{
     public void setCurrentEntrant(Entrant thisEntrant) {
         currentEntrant = thisEntrant;
     }
+    public Notification getCurrentNotification() {
+        return currentNotification;
+    }
+    public void setCurrentNotification(Notification thisNotification) {
+        currentNotification = thisNotification;
+    }
+
     public Organizer getCurrentOrganizer() {
         return currentOrg;
     }
@@ -159,7 +172,6 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
-
     public void deleteEntrant(Entrant entrant, DeleteCallback cb) {
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
         entrantRef.delete()
@@ -448,50 +460,100 @@ public class DataModel extends TModel<TView>{
         getAllEvents(cb, false);
     }
 
-    public void getUsableWaitlistEntrants(Event event, GetCallback cb){
+    public void getUsableWaitlistEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getWaitlist();
-//        ArrayList<> filterObjects = new ArrayList<>;
+
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+
         ArrayList<Entrant> entrants = new ArrayList<>();
-        if (entrantsIds.size() == 0)
+        if (!entrantsIds.isEmpty())
 
 //        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
-        this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
-                                entrants.add(data.createEntrantInstance());
+            this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
+                                    entrants.add(data.createEntrantInstance());
+                                }
+                                cb.onSuccess(entrants);
+                            } else {
+                                Log.d("Firestore", "Error getting documents: ", task.getException());
+                                cb.onError(task.getException());
                             }
-                            cb.onSuccess(entrants);
-                        } else {
-                            Log.d("Firestore", "Error getting documents: ", task.getException());
-                            cb.onError(task.getException());
                         }
-                    }
-                });
+                    });
     }
 
 
-    public void getUsableInvitedListEntrants(Event event, GetCallback cb){
+    public void getUsableInvitedListEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getInvited_list();
 //        ArrayList<> filterObjects = new ArrayList<>;
         ArrayList<Entrant> entrants = new ArrayList<>();
-
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
 //        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
-        this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
+        if (!entrantsIds.isEmpty()) {
+
+            this.entrants.whereIn(FieldPath.documentId(), entrantsIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    EntrantDataHolder data = new EntrantDataHolder(document.getData(), document.getId());
+                                    entrants.add(data.createEntrantInstance());
+                                }
+                                cb.onSuccess(entrants);
+                            } else {
+                                Log.d("Firestore", "Error getting documents: ", task.getException());
+                                cb.onError(task.getException());
+                            }
+                        }
+                    });
+        }
+    }
+
+    public void getUsableNotifications(Entrant entrant, DataModel.GetCallback cb){
+        List notificationIds = entrant.getNotifications();
+        ArrayList<Notification> notifications = new ArrayList<>();
+        if (notificationIds == null || notificationIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Notification>());
+            return;
+        }
+
+        this.notifications.whereIn(FieldPath.documentId(),  notificationIds)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
-                                entrants.add(data.createEntrantInstance());
+                                String notifType = (String) document.getData().get("notificationType");
+                                if(Objects.equals(notifType, "INVITATION")){
+                                    InvitationDataHolder data = new InvitationDataHolder(document.getData(),document.getId());
+                                    notifications.add(data.createInvitationInstance());
+                                }else if(Objects.equals(notifType, "REJECTION")){
+                                    RejectionDataHolder data = new RejectionDataHolder(document.getData(),document.getId());
+                                    notifications.add(data.createRejectionInstance());
+                                }else if(Objects.equals(notifType, "MESSAGING")){
+                                    MessagingDataHolder data = new MessagingDataHolder(document.getData(),document.getId());
+                                    notifications.add(data.createMessagingInstance());
+                                }
                             }
-                            cb.onSuccess(entrants);
+                            cb.onSuccess(notifications);
                         } else {
                             Log.d("Firestore", "Error getting documents: ", task.getException());
                             cb.onError(task.getException());
@@ -524,4 +586,80 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
+        if (entrantIds == null || entrantIds.isEmpty()) {
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+        ArrayList<Entrant> results = new ArrayList<>();
+        AtomicInteger activeFetches = new AtomicInteger(entrantIds.size());
+
+        for (String id : entrantIds) {
+            getEntrant(id, new GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    if (obj instanceof Entrant) {
+                        synchronized (results) {
+                            results.add((Entrant) obj);
+                        }
+                    }
+                    checkCompletion();
+                }
+
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) { checkCompletion(); }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("DataModel", "Failed to fetch entrant: " + id);
+                    checkCompletion();
+                }
+
+                private void checkCompletion() {
+                    if (activeFetches.decrementAndGet() == 0) {
+                        cb.onSuccess(results);
+                    }
+                }
+            });
+        }
+    }
+
+    public void updateEntrantProfile(Entrant entrant, SetCallback cb) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name",  entrant.getProfile().getName());
+        data.put("email", entrant.getProfile().getEmail());
+        data.put("phone", entrant.getProfile().getPhone());
+
+        entrants.document(entrant.getUid())
+                .update(data)             // partial updates
+                .addOnSuccessListener(v -> cb.onSuccess(entrant.getUid()))
+                .addOnFailureListener(cb::onError);
+    }
+
+
+    public void getAllEntrants(GetCallback cb) {
+        this.entrants.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Entrant> entrantList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    try {
+                        EntrantDataHolder data = new EntrantDataHolder(document.getData(), document.getId());
+                        Entrant entrant = data.createEntrantInstance();
+
+                        if (entrant != null) {
+                            entrantList.add(entrant);
+                        }
+                    } catch (Exception e) {
+                        Log.e("DataModel", "Skipping invalid entrant doc: " + document.getId());
+                    }
+                }
+                cb.onSuccess(entrantList);
+            } else {
+                Log.e("DataModel", "Error getting all entrants", task.getException());
+                cb.onError(task.getException());
+            }
+        });
+    }
+
 }
+

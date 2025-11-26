@@ -20,13 +20,15 @@ public class MainActivity extends AppCompatActivity {
     private Entrant entrant;
     private Organizer organizer;
     private int activeHomePageTab = 0;
+
+    private String deviceID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         model = new DataModel();
-        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         loadEntrant(deviceID);
         loadOrganizer(deviceID);
@@ -161,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
         model.getOrganizer(deviceId, new DataModel.GetCallback() {
             @Override
             public void onSuccess(Object obj) {
+                if (obj == null) {
+                    Log.d("OrganizerLoad", "Organizer not found (obj is null), creating new.");
+                    createNewOrganizer(deviceId);
+                    return;
+                }
                 // FOUND: Organizer exists in database
                 Log.d("OrganizerLoad", "Organizer retrieved");
                 organizer = (Organizer) obj;
@@ -210,4 +217,13 @@ public class MainActivity extends AppCompatActivity {
     public void setActiveHomePageTab(int tabIndex) {
         this.activeHomePageTab = tabIndex;
     }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+    }
 }
+

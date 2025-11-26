@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:title="@string/chosen"
+            app:title="@string/invited"
             app:titleTextColor="@color/white"
             app:titleCentered="true"
             app:navigationIcon="@drawable/back_arrow_sized"

@@ -59,6 +59,11 @@ public class Invitation extends Notification{
         model.getEntrant(entrant, new DataModel.GetCallback() {
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
                 Entrant entrant = (Entrant) obj;
                 entrant.removeNotification(invitation.getUid());
                 model.setEntrant(entrant, new DataModel.SetCallback() {
@@ -71,10 +76,6 @@ public class Invitation extends Notification{
                         Log.e("Firebase", "fail");
                     }
                 });
-            }
-            @Override
-            public void onSuccess(Object obj) {
-                Log.d("Firebase", "retrieved");
             }
             @Override
             public void onError(Exception e) {
@@ -91,6 +92,23 @@ public class Invitation extends Notification{
         DataModel model = new DataModel();
         String entrant = this.entrant;
         Invitation invitation = this;
+        model.getEntrant(entrant, new DataModel.GetCallback() {
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+            @Override
+            public void onSuccess(Object obj) {
+                Log.d("Firebase", "retrieved");
+                Entrant entrant = (Entrant) obj;
+                entrant.removeNotification(invitation.getUid());
+
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e("Firebase", "fail");
+            }
+        });
         model.getEvent(event, new DataModel.GetCallback() {
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
@@ -120,30 +138,6 @@ public class Invitation extends Notification{
                 Log.e("Firebase", "fail");
             }
         });
-        model.getEntrant(entrant, new DataModel.GetCallback() {
-            @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-                Entrant entrant = (Entrant) obj;
-                entrant.removeNotification(invitation.getUid());
-                model.setEntrant(entrant, new DataModel.SetCallback() {
-                    @Override
-                    public void onSuccess(String msg) {
-                        Log.d("Firebase", "written");
-                    }
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e("Firebase", "fail");
-                    }
-                });
-            }
-            @Override
-            public void onSuccess(Object obj) {
-                Log.d("Firebase", "retrieved");
-            }
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-            }
-        });
+
     }
 }
