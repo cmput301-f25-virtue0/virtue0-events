@@ -6,10 +6,15 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
+import android.util.Log;
 import android.widget.ImageView;
+
+import com.google.firebase.firestore.Blob;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ImageDataHolder {
     byte[] imageBlob;
@@ -43,6 +48,24 @@ public class ImageDataHolder {
 
     public ImageDataHolder(byte[] imageBlob) {
         this.imageBlob = imageBlob;
+
+        if (this.exceedsMaxDocumentSize()) {
+            throw new UnsupportedOperationException("Image is too large.");
+        }
+    }
+
+    public ImageDataHolder(Map<String, Object> data) {
+        this.uid = (String) data.get("uid");
+
+        Object objectBlob = data.get("imageBlob");
+        if (objectBlob instanceof byte[]) {
+            this.imageBlob = (byte[]) objectBlob;
+        }else if (objectBlob instanceof Blob) {
+            Blob blob = (Blob) objectBlob;
+            this.imageBlob = blob.toBytes();
+        }else {
+            throw new UnsupportedOperationException("Image has blob stored in unsupported type");
+        }
 
         if (this.exceedsMaxDocumentSize()) {
             throw new UnsupportedOperationException("Image is too large.");
