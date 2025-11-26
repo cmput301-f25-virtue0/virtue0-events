@@ -7,77 +7,215 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
-import com.example.lotteryeventapp.ProfileListAdapter;
-import com.example.lotteryeventapp.DataModel;
+import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
-import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.tabs.TabLayout;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-
 
 public class F_ProfilesList extends Fragment {
 
-    private int role;
     private DataModel model;
-    private ProfileListAdapter.OnProfileClickListener profileListener;
+    private RecyclerView rvProfiles;
+    private TabLayout tabProfiles;
+    private ProfileListAdapter adapter;
 
-    //role = 0 for entrant, role = 1 for organizer, role = 2 for admin
-    public static F_ProfilesList newInstance(int myRole) {
-        F_ProfilesList fragment = new F_ProfilesList();
-        Bundle args = new Bundle();
-        args.putInt("role", myRole);
-        fragment.setArguments(args);
-        return fragment;
+    public F_ProfilesList() {
+        // empty constructor
     }
 
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
-        // Inflate the layout for this fragment & get the count text view
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         return inflater.inflate(R.layout.admin_profile_list, container, false);
     }
 
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        model = ((MainActivity) requireActivity()).getDataModel();
-        RecyclerView rv = view.findViewById(R.id.rvProfiles);
-        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-        List<Entrant> data = Arrays.asList(
-                new Entrant("device1", new Entrant.Profile("Daniel", "dk8@ualberta.ca", "780-123-4567")),
+    @Override
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-                new Entrant("device2", new Entrant.Profile("Alice", "a@b.com", "555-1234")),
+        MainActivity activity = (MainActivity) requireActivity();
+        model = activity.getDataModel();
 
-                new Entrant("device3", new Entrant.Profile("Bob", "b@c.com", "555-5678"))
+        Toolbar toolbar = view.findViewById(R.id.toolbarAdmProfile);
+        rvProfiles = view.findViewById(R.id.rvProfiles);
+        tabProfiles = view.findViewById(R.id.tabProfiles);
+
+        toolbar.setNavigationOnClickListener(v ->
+                ((MainActivity) requireActivity())
+                        .showFragment(F_AdminHomePage.newInstance(2))
         );
 
-        this.profileListener = new ProfileListAdapter.OnProfileClickListener() {
+        // RecyclerView
+        rvProfiles.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new ProfileListAdapter(new ArrayList<>());
+        rvProfiles.setAdapter(adapter);
+
+        tabProfiles.addTab(tabProfiles.newTab().setText("Entrants"));
+        tabProfiles.addTab(tabProfiles.newTab().setText("Organizers"));
+
+        loadEntrants();
+
+        tabProfiles.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onProfileClick(Entrant entrant, int position) {
-                Toast.makeText(requireContext(), "Profile clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
+            public void onTabSelected(TabLayout.Tab tab) {
+                if ("Entrants".contentEquals(tab.getText())) {
+                    loadEntrants();
+                } else {
+                    loadOrganizers();
+                }
             }
 
-            @Override
-            public void onDeleteClick(Entrant entrant, int position) {
-                Toast.makeText(requireContext(), "Delete clicked: " + entrant.getProfile().getName(), Toast.LENGTH_SHORT).show();
-                // TODO: Handle delete
-            }
-        };
-
-        rv.setAdapter(new ProfileListAdapter(data, profileListener));
-
-
-        // Detect button presses
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmProfile);
-        toolbar.setNavigationOnClickListener(v -> {
-            ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
+    private void loadEntrants() {
+        model.getAllEntrants(new DataModel.ListCallback<Entrant>() {
+            @Override
+            public void onSuccess(List<Entrant> list) {
+                List<ProfileRow> rows = new ArrayList<>();
+                for (Entrant e : list) {
+                    String name = e.getProfile() != null ? e.getProfile().getName() : "";
+                    String email = e.getProfile() != null ? e.getProfile().getEmail() : "";
+                    rows.add(new ProfileRow(
+                            e.getUid(),
+                            name,
+                            email,
+                            "Entrant"
+                    ));
+                }
+                adapter.updateData(rows);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(),
+                        "Failed to load entrants",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadOrganizers() {
+        model.getAllOrganizers(new DataModel.ListCallback<Organizer>() {
+            @Override
+            public void onSuccess(List<Organizer> list) {
+                List<ProfileRow> rows = new ArrayList<>();
+                for (Organizer o : list) {
+                    // If Organizer has profile later, you can show more details
+                    rows.add(new ProfileRow(
+                            o.getUid(),
+                            "",    // name unknown for now
+                            "",
+                            "Organizer"
+                    ));
+                }
+                adapter.updateData(rows);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(),
+                        "Failed to load organizers",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    static class ProfileRow {
+        String uid;
+        String name;
+        String email;
+        String role;
+
+        ProfileRow(String uid, String name, String email, String role) {
+            this.uid = uid;
+            this.name = name;
+            this.email = email;
+            this.role = role;
+        }
+    }
+
+    static class ProfileListAdapter extends RecyclerView.Adapter<ProfileViewHolder> {
+
+        private final List<ProfileRow> items;
+
+        ProfileListAdapter(List<ProfileRow> items) {
+            this.items = items;
+        }
+
+        void updateData(List<ProfileRow> newItems) {
+            items.clear();
+            items.addAll(newItems);
+            notifyDataSetChanged();
+        }
+
+        @NonNull
+        @Override
+        public ProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                    int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(android.R.layout.simple_list_item_2, parent, false);
+            return new ProfileViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ProfileViewHolder holder,
+                                     int position) {
+            ProfileRow row = items.get(position);
+
+            String line1;
+            if (!row.name.isEmpty()) {
+                line1 = row.name;
+            } else {
+                line1 = row.uid;
+            }
+
+            String line2;
+            if (!row.email.isEmpty()) {
+                line2 = "Email: " + row.email;
+            } else {
+                line2 = "UID: " + row.uid;
+            }
+
+            holder.bind(line1, line2);
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+    }
+
+
+    static class ProfileViewHolder extends RecyclerView.ViewHolder {
+
+        private final android.widget.TextView text1;
+        private final android.widget.TextView text2;
+
+        ProfileViewHolder(@NonNull View itemView) {
+            super(itemView);
+            text1 = itemView.findViewById(android.R.id.text1);
+            text2 = itemView.findViewById(android.R.id.text2);
+        }
+
+        void bind(String line1, String line2) {
+            text1.setText(line1);
+            text2.setText(line2);
+        }
+    }
 }
