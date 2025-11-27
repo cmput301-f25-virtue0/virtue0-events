@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
+import android.os.Build;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.Blob;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class ImageDataHolder {
     Blob imageBlob;
-    String uid;
+    String uid = "";
     final int MAX_SIZE_BYTES = 1048576;
 
     public ImageDataHolder(ImageView imageView) {
@@ -26,6 +27,14 @@ public class ImageDataHolder {
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
             bitmap = bitmapDrawable.getBitmap();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Check if version contains hardware bitmaps
+                if (bitmap.getConfig() == Bitmap.Config.HARDWARE) {
+                    // Convert hardware bitmap to software bitmap
+                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+                }
+            }
         }else if (drawable instanceof VectorDrawable) {
             bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
