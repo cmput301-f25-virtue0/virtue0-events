@@ -39,6 +39,7 @@ public class Event {
     private ArrayList<String> cancelled_list;
     private ArrayList<String> invited_list;
     private boolean drawn;
+    private String image;
 
     /**
      * Creates an Event
@@ -255,6 +256,14 @@ public class Event {
      */
     public void setAttendee_limit(int attendee_limit) {
         this.attendee_limit = attendee_limit;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     /**

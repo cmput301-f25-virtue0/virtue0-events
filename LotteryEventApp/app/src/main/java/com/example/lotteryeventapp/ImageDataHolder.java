@@ -85,7 +85,7 @@ public class ImageDataHolder {
         return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
-    private boolean exceedsMaxDocumentSize() {
+    public boolean exceedsMaxDocumentSize() {
         int byteSize = 0;
 
         String key1 = "uid";
