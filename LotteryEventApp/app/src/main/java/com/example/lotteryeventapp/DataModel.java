@@ -2,12 +2,14 @@ package com.example.lotteryeventapp;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.Blob;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldPath;
@@ -32,6 +34,7 @@ public class DataModel extends TModel<TView>{
     private final CollectionReference entrants;
     private final CollectionReference organizers;
     private final CollectionReference admins;
+    private final CollectionReference images;
     private final CollectionReference events;
     private final CollectionReference notifications;
     private Entrant currentEntrant;
@@ -50,6 +53,7 @@ public class DataModel extends TModel<TView>{
         this.admins = db.collection("admins");
         this.events = db.collection("events");
         this.notifications = db.collection("notifications");
+        this.images = db.collection("images");
         // add more as we go
 
         // Ignore below code chunk, saved for if snapshotListeners are needed at any point
@@ -139,6 +143,69 @@ public class DataModel extends TModel<TView>{
         currentEvent = thisEvent;
     }
 
+    public void setImage(ImageDataHolder image, SetCallback cb) {
+        if (!image.getUid().isEmpty()) {
+            // Existing image
+            throw new UnsupportedOperationException("Image already exists in database. Updating images is unsupported.");
+        }else {
+            // New image
+            this.images.add(image)
+                    .addOnSuccessListener(documentReference -> {
+                        image.setUid(documentReference.getId());
+
+                        Log.d("Firestore", "Firestore set succeeded: Added image " + image.getUid());
+                        cb.onSuccess(image.getUid());
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firestore", "Firestore set failed: Could not add image");
+                        cb.onError(e);
+                    });
+        }
+    }
+
+    public void getImage(String imageId, GetCallback cb) {
+        DocumentReference imageRef = this.images.document(imageId);
+        imageRef.get()
+                .addOnSuccessListener(imageSnap -> {
+                    if (imageSnap.exists()) {
+                        try {
+                            ImageDataHolder image = new ImageDataHolder(imageSnap.getData());
+
+                            Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
+                            cb.onSuccess(image);
+                        }catch (Exception e) {
+                            if (e.getMessage().equals("Image has blob stored in unsupported type")) {
+                                Log.e("Firestore", "Firestore fetch failed: Image " + imageId + " has blob stored in unsupported type");
+                                cb.onError(e);
+                            }else {
+                                Log.e("Firestore", "Firestore fetch failed: Image " + imageId + "\n" + e.getMessage());
+                                cb.onError(e);
+                            }
+                        }
+                    }else {
+                        Log.e("Firestore", "Firestore fetch failed: Image " + imageId + " does not exist");
+                        cb.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Firestore fetch failed: Image " + imageId + "\n" + e.getMessage());
+                    cb.onError(e);
+                });
+    }
+
+    public void deleteImage(ImageDataHolder image, DeleteCallback cb) {
+        DocumentReference imageRef = this.images.document(image.getUid());
+        imageRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Firestore delete succeeded: Image " + image.getUid());
+                    cb.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Firestore delete failed: Image " + image.getUid() + "\n" + e.getMessage());
+                    cb.onError(e);
+                });
+    }
+
     public void setEntrant(Entrant entrant, SetCallback cb) {
         EntrantDataHolder data = new EntrantDataHolder(entrant);
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
@@ -172,6 +239,7 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
+
     public void deleteEntrant(Entrant entrant, DeleteCallback cb) {
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
         entrantRef.delete()
@@ -186,6 +254,7 @@ public class DataModel extends TModel<TView>{
     }
 
     // Can throw an exception outside of callback
+    // I don't remember what this above comment was referring to :facepalm:
     public void setOrganizer(Organizer organizer, SetCallback cb) {
         OrganizerDataHolder data = new OrganizerDataHolder(organizer);
         DocumentReference organizerRef = this.organizers.document(organizer.getUid());
