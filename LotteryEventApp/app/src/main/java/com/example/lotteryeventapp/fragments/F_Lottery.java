@@ -1,10 +1,14 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +22,9 @@ import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
+import com.example.lotteryeventapp.Messaging;
+import com.example.lotteryeventapp.Notification;
+import com.example.lotteryeventapp.NotificationAdapter;
 import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -41,7 +48,7 @@ public class F_Lottery extends Fragment {
     private RecyclerView rv;
     private TextView tvEventName;
     private TextView tvWaitlistSize;
-
+    private Button btnMessageWaitlist;
     private ProfileListAdapter adapter;
 
     public static F_Lottery newInstance(int role) {
@@ -77,6 +84,7 @@ public class F_Lottery extends Fragment {
         model = ((MainActivity) requireActivity()).getDataModel();
         Event cachedEvent = model.getCurrentEvent();
         String eventId = cachedEvent != null ? cachedEvent.getUid() : null;
+        btnMessageWaitlist = view.findViewById(R.id.btnMessageWaitlist);
 
 
         tvEventName = view.findViewById(R.id.tvEventName);
@@ -107,6 +115,66 @@ public class F_Lottery extends Fragment {
             });
         }
 
+        btnMessageWaitlist.setOnClickListener(v -> {
+            EditText input = new EditText(requireContext());
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            new AlertDialog.Builder(requireContext())
+                    .setView(input)
+                    .setTitle("Message Waitlist")
+                    .setPositiveButton("Send", (dialog, which) -> {
+                        String message = input.getText().toString();
+                        model.getUsableWaitlistEntrants(event,new DataModel.GetCallback() {
+                            @Override
+                            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                            }
+                            @Override
+                            public void onSuccess(Object obj) {
+                                Log.d("Firebase", "retrieved");
+                                ArrayList<Entrant> waitlistEntrants = (ArrayList<Entrant>) obj;
+                                for(int i=0;i<waitlistEntrants.size();i++){
+                                    Entrant entrant = waitlistEntrants.get(i);
+                                    if(!entrant.isNotificationOptOut()) {
+                                        Messaging messaging = new Messaging(event.getUid(), entrant.getUid(), message);
+                                        model.setNotification(messaging, new DataModel.SetCallback() {
+                                            @Override
+                                            public void onSuccess(String msg) {
+                                                Log.d("Firebase", "written");
+                                                entrant.addNotification(messaging.getUid());
+                                                model.setEntrant(entrant, new DataModel.SetCallback() {
+                                                    @Override
+                                                    public void onSuccess(String msg) {
+                                                        Log.d("Firebase", "written");
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Log.e("Firebase", "fail");
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Log.e("Firebase", "fail");
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                                Toast.makeText(requireContext(), "Message sent to waitlist", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }).setNegativeButton("Cancel", null).show();
+
+        });
 
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ProfileListAdapter(

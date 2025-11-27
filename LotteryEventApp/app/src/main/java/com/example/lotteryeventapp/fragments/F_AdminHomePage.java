@@ -52,7 +52,7 @@ public class F_AdminHomePage extends Fragment {
         view.findViewById(R.id.btnProfiles).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) requireActivity()).showFragment(F_ProfilesList.newInstance(2));
+                ((MainActivity) requireActivity()).showFragment(new F_ProfilesList());
             }
         });
 
@@ -73,7 +73,8 @@ public class F_AdminHomePage extends Fragment {
         view.findViewById(R.id.btnNotifications).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ;
+                ((MainActivity) requireActivity()).showFragment(F_Notification.newInstance(2));
+
             }
         });
 

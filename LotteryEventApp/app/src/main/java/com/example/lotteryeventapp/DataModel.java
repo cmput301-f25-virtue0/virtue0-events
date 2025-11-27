@@ -2,12 +2,14 @@ package com.example.lotteryeventapp;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.common.data.DataHolder;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.Blob;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldPath;
@@ -32,6 +34,7 @@ public class DataModel extends TModel<TView>{
     private final CollectionReference entrants;
     private final CollectionReference organizers;
     private final CollectionReference admins;
+    private final CollectionReference images;
     private final CollectionReference events;
     private final CollectionReference notifications;
     private Entrant currentEntrant;
@@ -50,6 +53,7 @@ public class DataModel extends TModel<TView>{
         this.admins = db.collection("admins");
         this.events = db.collection("events");
         this.notifications = db.collection("notifications");
+        this.images = db.collection("images");
         // add more as we go
 
         // Ignore below code chunk, saved for if snapshotListeners are needed at any point
@@ -139,6 +143,69 @@ public class DataModel extends TModel<TView>{
         currentEvent = thisEvent;
     }
 
+    public void setImage(ImageDataHolder image, SetCallback cb) {
+        if (!image.getUid().isEmpty()) {
+            // Existing image
+            throw new UnsupportedOperationException("Image already exists in database. Updating images is unsupported.");
+        }else {
+            // New image
+            this.images.add(image)
+                    .addOnSuccessListener(documentReference -> {
+                        image.setUid(documentReference.getId());
+
+                        Log.d("Firestore", "Firestore set succeeded: Added image " + image.getUid());
+                        cb.onSuccess(image.getUid());
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firestore", "Firestore set failed: Could not add image");
+                        cb.onError(e);
+                    });
+        }
+    }
+
+    public void getImage(String imageId, GetCallback cb) {
+        DocumentReference imageRef = this.images.document(imageId);
+        imageRef.get()
+                .addOnSuccessListener(imageSnap -> {
+                    if (imageSnap.exists()) {
+                        try {
+                            ImageDataHolder image = new ImageDataHolder(imageSnap.getData());
+
+                            Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
+                            cb.onSuccess(image);
+                        }catch (Exception e) {
+                            if (e.getMessage().equals("Image has blob stored in unsupported type")) {
+                                Log.e("Firestore", "Firestore fetch failed: Image " + imageId + " has blob stored in unsupported type");
+                                cb.onError(e);
+                            }else {
+                                Log.e("Firestore", "Firestore fetch failed: Image " + imageId + "\n" + e.getMessage());
+                                cb.onError(e);
+                            }
+                        }
+                    }else {
+                        Log.e("Firestore", "Firestore fetch failed: Image " + imageId + " does not exist");
+                        cb.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Firestore fetch failed: Image " + imageId + "\n" + e.getMessage());
+                    cb.onError(e);
+                });
+    }
+
+    public void deleteImage(ImageDataHolder image, DeleteCallback cb) {
+        DocumentReference imageRef = this.images.document(image.getUid());
+        imageRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Firestore delete succeeded: Image " + image.getUid());
+                    cb.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Firestore delete failed: Image " + image.getUid() + "\n" + e.getMessage());
+                    cb.onError(e);
+                });
+    }
+
     public void setEntrant(Entrant entrant, SetCallback cb) {
         EntrantDataHolder data = new EntrantDataHolder(entrant);
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
@@ -172,6 +239,7 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
+
     public void deleteEntrant(Entrant entrant, DeleteCallback cb) {
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
         entrantRef.delete()
@@ -186,6 +254,7 @@ public class DataModel extends TModel<TView>{
     }
 
     // Can throw an exception outside of callback
+    // I don't remember what this above comment was referring to :facepalm:
     public void setOrganizer(Organizer organizer, SetCallback cb) {
         OrganizerDataHolder data = new OrganizerDataHolder(organizer);
         DocumentReference organizerRef = this.organizers.document(organizer.getUid());
@@ -375,7 +444,9 @@ public class DataModel extends TModel<TView>{
             data = new InvitationDataHolder((Invitation) notif);
         }else if (notif instanceof Rejection) {
             data = new RejectionDataHolder((Rejection) notif);
-        }else {
+        }else if(notif instanceof Messaging){
+            data = new MessagingDataHolder((Messaging) notif);
+        }else{
             throw new RuntimeException("Unknown notification type");
         }
 
@@ -423,6 +494,11 @@ public class DataModel extends TModel<TView>{
 
                             Log.d("Firestore", "Firestore fetch succeeded: Rejection " + notifId);
                             cb.onSuccess(rejData.createRejectionInstance(), NotificationDataHolder.NotificationType.REJECTION);
+                        }else if(notifType == NotificationDataHolder.NotificationType.MESSAGING){
+                            MessagingDataHolder mesData = new MessagingDataHolder(notifSnap.getData(), notifId);
+
+                            Log.d("Firestore", "Firestore fetch succeeded: Rejection " + notifId);
+                            cb.onSuccess(mesData.createMessagingInstance(), NotificationDataHolder.NotificationType.MESSAGING);
                         }else {
                             Log.e("Firestore", "Firestore fetch failed: Unknown notification type " + notifId);
                             cb.onError(new RuntimeException("Unknown notification type"));
@@ -492,6 +568,38 @@ public class DataModel extends TModel<TView>{
                     });
     }
 
+
+    public void getUsableCancelledEntrants(Event event, DataModel.GetCallback cb){
+        List entrantsIds = event.getCancelled_list();
+
+        if (entrantsIds == null || entrantsIds.isEmpty()) {
+            // If list is empty, return an empty list.
+            cb.onSuccess(new ArrayList<Entrant>());
+            return;
+        }
+
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        if (!entrantsIds.isEmpty())
+
+//        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
+            this.entrants.whereIn(FieldPath.documentId(),   entrantsIds)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    EntrantDataHolder data = new EntrantDataHolder(document.getData(),document.getId());
+                                    entrants.add(data.createEntrantInstance());
+                                }
+                                cb.onSuccess(entrants);
+                            } else {
+                                Log.d("Firestore", "Error getting documents: ", task.getException());
+                                cb.onError(task.getException());
+                            }
+                        }
+                    });
+    }
 
     public void getUsableInvitedListEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getInvited_list();
@@ -585,6 +693,60 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
+    public interface ListCallback<T> {
+        /**
+         * Called on successful fetch of a list from the database
+         * @param list list of instances retrieved from the database
+         */
+        void onSuccess(List<T> list);
+
+        /**
+         * Called on failed fetch from database
+         * @param e exception thrown
+         */
+        void onError(Exception e);
+    }
+
+    public void getAllEntrants(ListCallback<Entrant> cb) {
+        this.entrants
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Entrant> entrantList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            EntrantDataHolder data =
+                                    new EntrantDataHolder(document.getData(), document.getId());
+                            entrantList.add(data.createEntrantInstance());
+                        }
+                        Log.d("Firestore", "Successfully fetched " + entrantList.size() + " entrants.");
+                        cb.onSuccess(entrantList);
+                    } else {
+                        Log.e("Firestore", "Error getting entrants: ", task.getException());
+                        cb.onError(task.getException());
+                    }
+                });
+    }
+    public void getAllOrganizers(ListCallback<Organizer> cb) {
+        this.organizers
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Organizer> organizerList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            OrganizerDataHolder data = new OrganizerDataHolder(document.getData(), document.getId());
+                            organizerList.add(data.createOrganizerInstance());
+
+                        }
+                        Log.d("Firestore", "Successfully fetched " + organizerList.size() + " organizers.");
+                        cb.onSuccess(organizerList);
+                    } else {
+                        Log.e("Firestore", "Error getting organizers: ", task.getException());
+                        cb.onError(task.getException());
+                    }
+                });
+    }
+
+
 
     public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
         if (entrantIds == null || entrantIds.isEmpty()) {
@@ -661,5 +823,34 @@ public class DataModel extends TModel<TView>{
         });
     }
 
+
+    public void getAllNotifications(GetCallback cb) {
+        this.notifications.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Notification> notificationList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String notifType = (String) document.getData().get("notificationType");
+                    if(Objects.equals(notifType, "INVITATION")){
+                        InvitationDataHolder data = new InvitationDataHolder(document.getData(),document.getId());
+                        notificationList.add(data.createInvitationInstance());
+                    }else if(Objects.equals(notifType, "REJECTION")){
+                        RejectionDataHolder data = new RejectionDataHolder(document.getData(),document.getId());
+                        notificationList.add(data.createRejectionInstance());
+                    }else if(Objects.equals(notifType, "MESSAGING")){
+                        MessagingDataHolder data = new MessagingDataHolder(document.getData(),document.getId());
+                        notificationList.add(data.createMessagingInstance());
+                    }
+                }
+                cb.onSuccess(notificationList);
+            } else {
+                Log.e("DataModel", "Error getting all entrants", task.getException());
+                cb.onError(task.getException());
+            }
+        });
+
+    }
+
 }
+
+
 
