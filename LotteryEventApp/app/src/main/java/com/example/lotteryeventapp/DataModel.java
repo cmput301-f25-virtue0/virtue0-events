@@ -393,6 +393,8 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
+
+    @Deprecated
     public void getAllEvents(GetCallback cb, boolean forceRefresh){
 
         // Check cache first
