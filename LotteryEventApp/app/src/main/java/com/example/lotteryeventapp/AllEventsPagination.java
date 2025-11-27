@@ -1,13 +1,5 @@
 package com.example.lotteryeventapp;
 
-import android.util.Log;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
-import com.google.firebase.firestore.AggregateQuery;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -15,7 +7,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 public class AllEventsPagination extends FirestorePagination {
 

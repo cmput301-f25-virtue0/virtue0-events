@@ -2,14 +2,11 @@ package com.example.lotteryeventapp;
 
 import android.util.Log;
 
-import com.google.firebase.firestore.AggregateQuery;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class FirestorePagination {
