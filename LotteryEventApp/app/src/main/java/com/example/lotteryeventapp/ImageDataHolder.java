@@ -30,9 +30,9 @@ public class ImageDataHolder {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Check if version contains hardware bitmaps
-                if (bitmap.getConfig() == Bitmap.Config.HARDWARE) {
+                if (bitmap.getConfig() == Bitmap.Config.HARDWARE || bitmap.getConfig() == null) {
                     // Convert hardware bitmap to software bitmap
-                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
                 }
             }
         }else if (drawable instanceof VectorDrawable) {
