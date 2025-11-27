@@ -24,6 +24,7 @@ public class EventDataHolder {
     private ArrayList<String> cancelledList = new ArrayList<String>();
     private ArrayList<String> invitedList = new ArrayList<String>();
     private boolean drawn;
+    private String image;
 
     private String organizer;
 //    private boolean redraw;
@@ -46,6 +47,7 @@ public class EventDataHolder {
         this.invitedList.addAll(event.getInvited_list());
         this.drawn = event.isDrawn();
         this.organizer = event.getOrganizer();
+        this.image = event.getImage();
 //        this.redraw = event.isDrawn();
     }
 
@@ -185,6 +187,14 @@ public class EventDataHolder {
         this.organizer = organizer;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public EventDataHolder(Map<String, Object> data, String eventId) {
         this.uid = eventId;
         this.title = (String) data.get("title");
@@ -198,6 +208,7 @@ public class EventDataHolder {
         this.waitlistLimit = ((Long) data.get("waitlistLimit")).intValue();
         this.attendeeLimit = ((Long) data.get("attendeeLimit")).intValue();
         this.organizer = (String) data.get("organizer");
+        this.image = (String) data.get("organizer");
 
         List<Object> waitlist = (List<Object>) data.get("waitlist");
         for (Object o: waitlist) {

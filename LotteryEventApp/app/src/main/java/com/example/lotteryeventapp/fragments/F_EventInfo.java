@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.Entrant;
+import com.example.lotteryeventapp.ImageDataHolder;
 import com.example.lotteryeventapp.Organizer;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.lotteryeventapp.MainActivity;
@@ -179,6 +180,30 @@ public class F_EventInfo extends Fragment {
         }
     }
 
+    private void setupImage(View view){
+        String imageUid = event.getImage();
+        if(!imageUid.isEmpty()) {
+            ImageView posterView = view.findViewById(R.id.eventPoster);
+            model.getImage(imageUid, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ImageDataHolder image = (ImageDataHolder) obj;
+                    posterView.setImageBitmap(image.convertToBitmap());
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }
+    }
     private void setupUI(View view) {
         if (event == null) return;
 
@@ -205,7 +230,7 @@ public class F_EventInfo extends Fragment {
         myText = view.findViewById(R.id.waitingListSize);
         String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
         myText.setText(fraction);
-
+        setupImage(view);
 
         // Role specific ui
         if (role == 0) {
