@@ -80,7 +80,7 @@ public class ImageDataHolder {
         }
     }
 
-    public Bitmap getBitmap() {
+    public Bitmap convertToBitmap() {
         byte[] data = this.imageBlob.toBytes();
         return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
@@ -107,10 +107,6 @@ public class ImageDataHolder {
 
     public void setImageBlob(Blob blob) {
         this.imageBlob = blob;
-    }
-
-    public void setImageBlob(byte[] data) {
-        this.imageBlob = Blob.fromBytes(data);
     }
 
     public String getUid() {
