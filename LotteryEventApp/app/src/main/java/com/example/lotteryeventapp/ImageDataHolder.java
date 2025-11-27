@@ -6,18 +6,16 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.Blob;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ImageDataHolder {
-    byte[] imageBlob;
+    Blob imageBlob;
     String uid;
     final int MAX_SIZE_BYTES = 1048576;
 
@@ -38,7 +36,7 @@ public class ImageDataHolder {
         }
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        this.imageBlob = stream.toByteArray();
+        this.imageBlob = Blob.fromBytes(stream.toByteArray());
         bitmap.recycle();
 
         if (this.exceedsMaxDocumentSize()) {
@@ -46,8 +44,16 @@ public class ImageDataHolder {
         }
     }
 
-    public ImageDataHolder(byte[] imageBlob) {
-        this.imageBlob = imageBlob;
+    public ImageDataHolder(Blob blob) {
+        this.imageBlob = blob;
+
+        if (this.exceedsMaxDocumentSize()) {
+            throw new UnsupportedOperationException("Image is too large.");
+        }
+    }
+
+    public ImageDataHolder(byte[] data) {
+        this.imageBlob = Blob.fromBytes(data);
 
         if (this.exceedsMaxDocumentSize()) {
             throw new UnsupportedOperationException("Image is too large.");
@@ -58,14 +64,7 @@ public class ImageDataHolder {
         this.uid = (String) data.get("uid");
 
         Object objectBlob = data.get("imageBlob");
-        if (objectBlob instanceof byte[]) {
-            this.imageBlob = (byte[]) objectBlob;
-        }else if (objectBlob instanceof Blob) {
-            Blob blob = (Blob) objectBlob;
-            this.imageBlob = blob.toBytes();
-        }else {
-            throw new UnsupportedOperationException("Image has blob stored in unsupported type");
-        }
+        this.imageBlob = (Blob) objectBlob;
 
         if (this.exceedsMaxDocumentSize()) {
             throw new UnsupportedOperationException("Image is too large.");
@@ -73,7 +72,8 @@ public class ImageDataHolder {
     }
 
     public Bitmap getBitmap() {
-        return BitmapFactory.decodeByteArray(this.imageBlob, 0, this.imageBlob.length);
+        byte[] data = this.imageBlob.toBytes();
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     private boolean exceedsMaxDocumentSize() {
@@ -85,18 +85,23 @@ public class ImageDataHolder {
 
         String key2 = "imageBlob";
         byteSize += key2.getBytes(StandardCharsets.UTF_8).length + 1;
-        byteSize += this.imageBlob.length;
+        byte[] data = this.imageBlob.toBytes();
+        byteSize += data.length;
 
         return byteSize > this.MAX_SIZE_BYTES;
     }
 
     // Getters and Setters
-    public byte[] getImageBlob() {
-        return imageBlob;
+    public Blob getImageBlob() {
+        return this.imageBlob;
     }
 
-    public void setImageBlob(byte[] blob) {
+    public void setImageBlob(Blob blob) {
         this.imageBlob = blob;
+    }
+
+    public void setImageBlob(byte[] data) {
+        this.imageBlob = Blob.fromBytes(data);
     }
 
     public String getUid() {

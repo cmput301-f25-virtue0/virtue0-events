@@ -168,20 +168,10 @@ public class DataModel extends TModel<TView>{
         imageRef.get()
                 .addOnSuccessListener(imageSnap -> {
                     if (imageSnap.exists()) {
-                        try {
-                            ImageDataHolder image = new ImageDataHolder(imageSnap.getData());
+                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData());
 
-                            Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
-                            cb.onSuccess(image);
-                        }catch (Exception e) {
-                            if (e.getMessage().equals("Image has blob stored in unsupported type")) {
-                                Log.e("Firestore", "Firestore fetch failed: Image " + imageId + " has blob stored in unsupported type");
-                                cb.onError(e);
-                            }else {
-                                Log.e("Firestore", "Firestore fetch failed: Image " + imageId + "\n" + e.getMessage());
-                                cb.onError(e);
-                            }
-                        }
+                        Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
+                        cb.onSuccess(image);
                     }else {
                         Log.e("Firestore", "Firestore fetch failed: Image " + imageId + " does not exist");
                         cb.onSuccess(null);
