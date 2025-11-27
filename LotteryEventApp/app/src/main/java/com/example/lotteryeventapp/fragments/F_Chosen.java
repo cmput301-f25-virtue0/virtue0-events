@@ -1,10 +1,14 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -19,6 +23,7 @@ import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.Messaging;
 import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -36,6 +41,7 @@ public class F_Chosen extends Fragment {
     private RecyclerView rv;
     private ProfileListAdapter adapter;
     private TextView tvCount;
+    private Button btnMessageChosen;
 
     public static F_Chosen newInstance(int role) {
         F_Chosen fragment = new F_Chosen();
@@ -63,6 +69,8 @@ public class F_Chosen extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         model = ((MainActivity) requireActivity()).getDataModel();
         event = model.getCurrentEvent();
+        btnMessageChosen = view.findViewById(R.id.btnMessageChosen);
+
 
         rv = view.findViewById(R.id.rvChosen);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -80,6 +88,70 @@ public class F_Chosen extends Fragment {
             if (tvTitle != null) tvTitle.setText(event.getTitle());
             fetchChosenEntrants();
         }
+
+        btnMessageChosen.setOnClickListener(v -> {
+            EditText input = new EditText(requireContext());
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            new AlertDialog.Builder(requireContext())
+                    .setView(input)
+                    .setTitle("Message Invited List")
+                    .setPositiveButton("Send", (dialog, which) -> {
+                        String message = input.getText().toString();
+                        model.getUsableInvitedListEntrants(event,new DataModel.GetCallback() {
+                            @Override
+                            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                            }
+                            @Override
+                            public void onSuccess(Object obj) {
+                                Log.d("Firebase", "retrieved");
+                                ArrayList<Entrant> invitedEntrants = (ArrayList<Entrant>) obj;
+                                for(int i=0;i<invitedEntrants.size();i++){
+                                    Entrant entrant = invitedEntrants.get(i);
+                                    if(!entrant.isNotificationOptOut()) {
+                                        Messaging messaging = new Messaging(event.getUid(), entrant.getUid(), message);
+                                        model.setNotification(messaging, new DataModel.SetCallback() {
+                                            @Override
+                                            public void onSuccess(String msg) {
+                                                Log.d("Firebase", "written");
+                                                entrant.addNotification(messaging.getUid());
+                                                model.setEntrant(entrant, new DataModel.SetCallback() {
+                                                    @Override
+                                                    public void onSuccess(String msg) {
+                                                        Log.d("Firebase", "written");
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Exception e) {
+                                                        Log.e("Firebase", "fail");
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(Exception e) {
+                                                Log.e("Firebase", "fail");
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                                Toast.makeText(requireContext(), "Message sent to invited list", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+
+                    }).setNegativeButton("Cancel", null).show();
+
+        });
+        
+        
+        
     }
 
     private void fetchChosenEntrants() {

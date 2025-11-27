@@ -102,6 +102,14 @@
         </LinearLayout>
 
         <!-- Entrants list -->
+        <Button
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:id="@+id/btnMessageWaitlist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Message"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvEntrants"
             android:layout_width="match_parent"

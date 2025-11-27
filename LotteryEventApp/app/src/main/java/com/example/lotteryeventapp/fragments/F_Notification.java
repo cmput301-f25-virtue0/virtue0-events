@@ -74,35 +74,60 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         notificationList = new ArrayList<>();
-        model.getUsableNotifications(model.getCurrentEntrant(),new DataModel.GetCallback() {
-            @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+        if (getArguments().getInt(ARG_ROLE)==0) {
+            model.getUsableNotifications(model.getCurrentEntrant(), new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-            }
-            @Override
-            public void onSuccess(Object obj) {
-                Log.d("Firebase", "retrieved");
-                ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
-                adapter = new NotificationAdapter(notificationList, listener);
+                }
 
-                recyclerView.setAdapter(adapter);
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
+                    adapter = new NotificationAdapter(notificationList, listener);
 
-                MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
-                toolbar.setNavigationOnClickListener(v -> {
-                    if (role == 0) {
+                    recyclerView.setAdapter(adapter);
+
+                    MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+                    toolbar.setNavigationOnClickListener(v -> {
                         ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
-                    } else {
+
+                    });
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }else if(getArguments().getInt(ARG_ROLE)==2){
+            model.getAllNotifications(new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
+                    adapter = new NotificationAdapter(notificationList, listener);
+
+                    recyclerView.setAdapter(adapter);
+
+                    MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+                    toolbar.setNavigationOnClickListener(v -> {
                         ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
-                    }
-                });
-            }
+                    });
+                }
 
-            @Override
-            public void onError(Exception e) {
-                Log.e("Firebase", "fail");
-            }
-        });
-
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                }
+            });
+        }
 
 
 //        fetchNotifications();
@@ -151,30 +176,32 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
 
     @Override
     public void onNotificationClick(Notification notification, int position) {
-        if (!notification.isRead()) {
-            notification.markAsRead();
-            model.setNotification(notification, new DataModel.SetCallback() {
-                @Override
-                public void onSuccess(String id) {
-                    adapter.notifyItemChanged(position);
-                }
+        if (getArguments().getInt(ARG_ROLE) == 1) {
+            if (!notification.isRead()) {
+                notification.markAsRead();
+                model.setNotification(notification, new DataModel.SetCallback() {
+                    @Override
+                    public void onSuccess(String id) {
+                        adapter.notifyItemChanged(position);
+                    }
 
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Notification", "Error marking notification as read", e);
-                }
-            });
-        }
-        if(notification.getClass()== Invitation.class){
-            model.setCurrentNotification(notification);
-            ((MainActivity) requireActivity()).showFragment(F_Acceptance.newInstance(2));
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("Notification", "Error marking notification as read", e);
+                    }
+                });
+            }
+            if (notification.getClass() == Invitation.class) {
+                model.setCurrentNotification(notification);
+                ((MainActivity) requireActivity()).showFragment(F_Acceptance.newInstance(2));
 
-        }else if(notification.getClass()== Rejection.class){
+            } else if (notification.getClass() == Rejection.class) {
 
-        }else if(notification.getClass() == Messaging.class){
-            Toast.makeText(getContext(), notification.getMessage(), Toast.LENGTH_SHORT).show();
+            } else if (notification.getClass() == Messaging.class) {
+                Toast.makeText(getContext(), notification.getMessage(), Toast.LENGTH_SHORT).show();
 
-        }
+            }
 //        ((MainActivity) requireActivity()).showFragment(F_Applicants.newInstance(2));
+        }
     }
 }

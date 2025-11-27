@@ -59,6 +59,7 @@ public class ProfileListAdapter extends RecyclerView.Adapter<ProfileListAdapter.
 
         if (profile != null) {
             // Set the entrant's name (and ID for debugging)
+
             String displayText = profile.getName() + " (ID: " + entrant.getUid().substring(0, 6) + "...)";
             h.tvName.setText(displayText);
         } else {

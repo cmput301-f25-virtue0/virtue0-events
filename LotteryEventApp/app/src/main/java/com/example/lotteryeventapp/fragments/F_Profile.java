@@ -6,6 +6,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Switch;
@@ -22,11 +23,14 @@ import com.example.lotteryeventapp.R;
 
 public class F_Profile extends Fragment {
     private DataModel model;
+
+    //role = 0 for entrant, role = 1 for organizer
     public F_Profile(DataModel myModel) {
         model = myModel;
     }
 
-    private ImageButton btnEditName, btnEditEmail, btnEditPhone;
+    private ImageButton btnEditName, btnEditEmail, btnEditPhone, btnLotteryExplanation;
+    private Button btnDeleteProfile;
     private TextView tvName, tvEmail, tvPhone, tvUID;
     private Switch notificationSwitch;
 
@@ -37,11 +41,13 @@ public class F_Profile extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
+        // Inflate the layout for this fragment & get the count text view
         return inflater.inflate(R.layout.profile, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Detect button presses
         view.findViewById(R.id.backArrowProfile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,7 +67,9 @@ public class F_Profile extends Fragment {
         btnEditEmail = view.findViewById(R.id.btnEditEmail);
         btnEditPhone = view.findViewById(R.id.btnEditPhone);
         notificationSwitch = view.findViewById(R.id.notificationSwitch);
-        ImageButton btnLotteryInfo = view.findViewById(R.id.lotteryExplanationBtn);
+        btnLotteryExplanation = view.findViewById(R.id.lotteryExplanationBtn);
+        btnDeleteProfile = view.findViewById(R.id.deleteProfileBtn);
+
 
         if (entrant != null) {
             tvName.setText(entrant.getProfile().getName());
@@ -122,14 +130,34 @@ public class F_Profile extends Fragment {
 //            EntrantRepository.getInstance().save(entrant); //example for now, when database completed
         });
 
-        btnLotteryInfo.setOnClickListener(v -> {
+        btnLotteryExplanation.setOnClickListener(v -> {
+            String explanation = "How the Lottery Registration Works:\n" +
+                    "  • Entrants join an event waitlist during the    registration period.\n" +
+                    "  • After registration closes, a random draw    selects participants.\n" +
+                    "  • Selected entrants receive an invitation to    accept or decline.\n" +
+                    "  • Declined spots are automatically filled by    the next random draw.\n" +
+                    "  • Notifications will inform you of your    status.\n\n" +
+
+                    "This system ensures fairness for everyone, regardless of when they are available to register.";
             new AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.lottery_explanation_title)
-                    .setMessage(R.string.lottery_explanation_body)
-                    .setPositiveButton(R.string.close, (dialog, which) -> {
-                        dialog.dismiss();
-                    })
+                    .setTitle("Guidelines for our lottery system")
+                    .setMessage(explanation).
+                    setPositiveButton("OK", null)
                     .show();
+            });
+
+        btnDeleteProfile.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Profile?")
+                    .setMessage("Are you sure you want to delete your profile?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        entrant.deleteProfile();
+
+                        Toast.makeText(requireContext(),
+                                "Profile Deleted, exiting the app...", Toast.LENGTH_SHORT)
+                                .show();
+                        requireActivity().finishAffinity();
+                    }).setNegativeButton("Cancel", null).show();
         });
 
     }

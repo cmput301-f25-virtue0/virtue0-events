@@ -121,6 +121,11 @@ public class Invitation extends Notification{
                 Event event = (Event) obj;
                 event.invitedListRemove(entrant);
                 event.cancelledListAdd(entrant);
+                try {
+                    event.doLottery();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 model.setEvent(event, new DataModel.SetCallback() {
                     @Override
                     public void onSuccess(String msg) {
