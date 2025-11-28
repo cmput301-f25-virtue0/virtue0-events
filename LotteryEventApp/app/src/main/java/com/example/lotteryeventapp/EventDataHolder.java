@@ -208,7 +208,7 @@ public class EventDataHolder {
         this.waitlistLimit = ((Long) data.get("waitlistLimit")).intValue();
         this.attendeeLimit = ((Long) data.get("attendeeLimit")).intValue();
         this.organizer = (String) data.get("organizer");
-        this.image = (String) data.get("organizer");
+        this.image = (String) data.get("image");
 
         List<Object> waitlist = (List<Object>) data.get("waitlist");
         for (Object o: waitlist) {
@@ -242,7 +242,7 @@ public class EventDataHolder {
         event.getCancelled_list().addAll(this.cancelledList);
         event.getInvited_list().addAll(this.invitedList);
         event.setOrganizer(organizer);
-
+        event.setImage(this.image);
         event.setDrawn(this.drawn);
 
         return event;

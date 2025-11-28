@@ -212,6 +212,7 @@ public class F_CreateEditEvent extends Fragment {
                                 @Override
                                 public void onError(Exception e) {
                                     Log.e("Firebase", "fail");
+//                                    throw new RuntimeException();
                                 }
                             });
                         }else {
