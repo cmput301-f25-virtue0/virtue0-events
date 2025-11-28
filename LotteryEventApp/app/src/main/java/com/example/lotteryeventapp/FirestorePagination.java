@@ -20,11 +20,16 @@ public abstract class FirestorePagination {
     protected int pageSize;
     protected int pageNumber = 0;
     protected int lastPageNumber = -1;
-    protected DocumentSnapshot currentPageFirstSnapshot;
-    protected DocumentSnapshot currentPageLastSnapshot;
 
     protected FirestorePagination() {
 
+    }
+
+    protected FirestorePagination(int pageSize, Query query) {
+        this.pageSize = pageSize;
+        this.baseQuery = query;
+        this.forwardQuery = query.limit(pageSize);
+        this.backQuery = query.limit(pageSize);
     }
 
     public interface PaginationCallback {
@@ -37,10 +42,7 @@ public abstract class FirestorePagination {
     }
 
     public void getNextPage(PaginationCallback cb) {
-        Query query;
         if (this.pageNumber == 0) {
-            query = this.baseQuery.limit(this.pageSize);
-
             AggregateQuery queryCount = this.baseQuery.count();
             CountDownLatch latch = new CountDownLatch(1);
             queryCount
@@ -72,11 +74,9 @@ public abstract class FirestorePagination {
             Log.d("FirestorePagination", "Pagination Success: Already on last page");
             cb.onGetPage(false, null);
             return;
-        }else {
-            query = this.forwardQuery;
         }
 
-        query
+        this.forwardQuery
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -90,9 +90,7 @@ public abstract class FirestorePagination {
                             cb.onGetPage(false, null);
                         }else {
                             // Query returned results
-                            List<DocumentSnapshot> docList = snapshot.getDocuments();
-                            this.currentPageFirstSnapshot = docList.get(0);
-                            this.currentPageLastSnapshot = docList.get(snapshot.size() - 1);
+                            this.updateQueries(snapshot);
                             this.pageNumber++;
 
                             Log.d("FirestorePagination", "Pagination Success: Fetched page " + this.pageNumber);
@@ -122,9 +120,7 @@ public abstract class FirestorePagination {
                     if (task.isSuccessful()) {
                         QuerySnapshot snapshot = task.getResult();
 
-                        List<DocumentSnapshot> docList = snapshot.getDocuments();
-                        this.currentPageFirstSnapshot = docList.get(0);
-                        this.currentPageLastSnapshot = docList.get(snapshot.size() - 1);
+                        this.updateQueries(snapshot);
                         this.pageNumber--;
 
                         Log.d("FirestorePagination", "Pagination Success: Fetched page " + this.pageNumber);
@@ -134,6 +130,14 @@ public abstract class FirestorePagination {
                         cb.onError(task.getException());
                     }
                 });
+    }
+
+    private void updateQueries(QuerySnapshot snapshot) {
+        List<DocumentSnapshot> docList = snapshot.getDocuments();
+        DocumentSnapshot currentPageFirstSnapshot = docList.get(0);
+        DocumentSnapshot currentPageLastSnapshot = docList.get(snapshot.size() - 1);
+        this.forwardQuery = this.baseQuery.startAfter(currentPageLastSnapshot).limit(this.pageSize);
+        this.backQuery = this.baseQuery.endBefore(currentPageFirstSnapshot).limit(this.pageSize);
     }
 
     abstract void createPage(QuerySnapshot snapshot, PaginationCallback cb);

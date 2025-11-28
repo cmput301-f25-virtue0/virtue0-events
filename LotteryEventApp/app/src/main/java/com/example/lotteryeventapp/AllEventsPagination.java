@@ -19,8 +19,8 @@ public class AllEventsPagination extends FirestorePagination {
                 .orderBy("title", Query.Direction.DESCENDING);
 
         this.baseQuery = query;
-        this.forwardQuery = query.startAfter(this.currentPageLastSnapshot).limit(this.pageSize);
-        this.backQuery = query.endBefore(this.currentPageFirstSnapshot).limit(this.pageSize);
+        this.forwardQuery = query.limit(pageSize);
+        this.backQuery = query.limit(pageSize);
     }
 
     @Override
