@@ -15,14 +15,12 @@ public class AllEventsPagination extends FirestorePagination {
         this.pageSize = pageSize;
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        this.forwardQuery = db.collection("events")
-                .orderBy("title", Query.Direction.DESCENDING)
-                .startAfter(this.currentPageLastSnapshot)
-                .limit(this.pageSize);
-        this.backQuery = db.collection("events")
-                .orderBy("title", Query.Direction.DESCENDING)
-                .endBefore(this.currentPageFirstSnapshot)
-                .limit(this.pageSize);
+        Query query = db.collection("events")
+                .orderBy("title", Query.Direction.DESCENDING);
+
+        this.baseQuery = query;
+        this.forwardQuery = query.startAfter(this.currentPageLastSnapshot).limit(this.pageSize);
+        this.backQuery = query.endBefore(this.currentPageFirstSnapshot).limit(this.pageSize);
     }
 
     @Override
