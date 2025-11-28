@@ -86,16 +86,20 @@ public class F_Map extends Fragment implements OnMapReadyCallback {
         gmap = googleMap;
         ArrayList<Entrant.Profile> myEntrants = getEntrants();
 
-        int minx = 99999;
-        int maxx = -99999;
-        int miny = 99999;
-        int maxy = -99999;
+        LatLng pos = new LatLng(53.5267, -115.5256);
+        gmap.addMarker(new MarkerOptions().position(pos).title("testmarker"));
+        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
+
+        /*float minx = 99999;
+        float maxx = -99999;
+        float miny = 99999;
+        float maxy = -99999;
 
         for (int i = 0; i < myEntrants.size(); i++) {
             Entrant.Profile thisProfile = myEntrants.get(i);
             //todo: get location from profile
-            int x = 0;
-            int y = 0;
+            float x = 0;
+            float y = 0;
             String name = "placeholder";
 
             LatLng pos = new LatLng(x, y);
@@ -106,12 +110,12 @@ public class F_Map extends Fragment implements OnMapReadyCallback {
 
             gmap.addMarker(new MarkerOptions().position(pos).title(name));
         }
-        //todo: get zoom & position based on max and min x & y
-        int posx = minx + (maxx - minx) / 2;
-        int posy = miny + (maxy - miny) / 2;
+        //todo: get zoom based on max and min x & y
+        float posx = minx + (maxx - minx) / 2;
+        float posy = miny + (maxy - miny) / 2;
         LatLng position = new LatLng(posx, posy);
         int zoom = 1;
-        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));
+        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));*/
     }
 
     public ArrayList<Entrant.Profile> getEntrants() {

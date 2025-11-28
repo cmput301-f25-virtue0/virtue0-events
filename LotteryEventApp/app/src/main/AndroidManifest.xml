@@ -31,7 +31,7 @@
             android:theme="@style/zxing_CaptureTheme"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_REAL_API_KEY_HERE"/>
+            android:value="AIzaSyARmd0GzoWrFlMildJcMuBhywyV_qWSNvM"/>
     </application>
 
 </manifest>
