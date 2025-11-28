@@ -296,8 +296,24 @@ public class DataModel extends TModel<TView>{
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
 
-    public void getAdmin() {
-        throw new UnsupportedOperationException("Admin not implemented yet");
+    public void getAdmin(String deviceId, GetCallback cb) {
+        DocumentReference adminRef = this.admins.document(deviceId);
+        adminRef.get()
+                .addOnSuccessListener(adminSnap -> {
+                    if (adminSnap.exists()) {
+                        AdminDataHolder adminData = new AdminDataHolder(adminSnap.getData(), deviceId);
+
+                        Log.d("Firestore", "Firestore fetch succeeded: Admin " + deviceId);
+                        cb.onSuccess(adminData);
+                    }else {
+                        Log.e("Firestore", "Firestore fetch failed: Admin " + deviceId + " does not exist");
+                        cb.onError(new RuntimeException("Organizer does not exist"));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Firestore fetch failed: Admin " + deviceId + "\n" + e.getMessage());
+                    cb.onError(e);
+                });
     }
 
     public void deleteAdmin() {
