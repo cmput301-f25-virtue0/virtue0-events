@@ -1,9 +1,27 @@
 package com.example.lotteryeventapp;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.example.lotteryeventapp.fragments.F_SelectRole;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
@@ -14,7 +32,7 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class Entrant {
-    private Profile profile;
+    private Entrant.Profile profile;
     private final String uid;
     private ArrayList<String> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
@@ -24,6 +42,7 @@ public class Entrant {
     private ArrayList<String> invitedEvents = new ArrayList<>();
 
     private ArrayList<String> attendedEvents = new ArrayList<>();
+    private ArrayList<Double> location = new ArrayList<>(2) ;
 
 
 
@@ -34,9 +53,10 @@ public class Entrant {
      * @param profile a profile object containing contact information
      * @throws NullPointerException if id or profile is null
      */
-    public Entrant(String uid, Profile profile) {
+    public Entrant(String uid, Entrant.Profile profile, ArrayList<Double> location) {
         this.uid = Objects.requireNonNull(uid, "uid");
         this.profile = Objects.requireNonNull(profile, "profile");
+        this.location = location;
     }
 
     public ArrayList<String> getAttendedEvents() {
@@ -65,7 +85,7 @@ public class Entrant {
     /**
      * @return profile for this entrant
      */
-    public Profile getProfile() {
+    public Entrant.Profile getProfile() {
         return profile;
     }
 
@@ -149,6 +169,13 @@ public class Entrant {
     }
 
 
+    public ArrayList<Double> getLocation() {
+        return location;
+    }
+
+    public void setLocation(ArrayList<Double> location) {
+        this.location = location;
+    }
 
     /**
      * Represents the entrant's profile containing name, email and phone number
@@ -313,5 +340,6 @@ public class Entrant {
             }
         });
     }
+
 
 }

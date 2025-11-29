@@ -1,7 +1,25 @@
 package com.example.lotteryeventapp;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.example.lotteryeventapp.fragments.F_SelectRole;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +34,7 @@ public class EntrantDataHolder {
     private ArrayList<String> waitlistedEvents = new ArrayList<>();
     private ArrayList<String> invitedEvents = new ArrayList<>();
     private ArrayList<String> attendedEvents = new ArrayList<>();
+    private ArrayList<Double> location = new ArrayList<>(2);
 
 
     public EntrantDataHolder(Entrant entrant) {
@@ -30,11 +49,13 @@ public class EntrantDataHolder {
         this.waitlistedEvents.addAll(entrant.getWaitlistedEvents());
         this.invitedEvents.addAll(entrant.getInvitedEvents());
         this.attendedEvents.addAll(entrant.getAttendedEvents());
+        this.location = entrant.getLocation();
     }
 
 
     public EntrantDataHolder(Map<String, Object> data, String deviceId) {
         this.deviceId = deviceId;
+
 
         try {
 
@@ -59,7 +80,7 @@ public class EntrantDataHolder {
 
 
             this.notificationOptOut = Boolean.TRUE.equals(data.get("notificationOptOut"));
-
+            this.location = (ArrayList<Double>) data.get("location");
         } catch (Exception e) {
             Log.e("EntrantDataHolder", "Error parsing data for " + deviceId, e);
             this.name = "Error Parsing";
@@ -86,13 +107,14 @@ public class EntrantDataHolder {
         String finalPhone = (phone == null) ? "" : phone;
 
         Entrant.Profile profile = new Entrant.Profile(finalName, finalEmail, finalPhone);
-        Entrant entrant = new Entrant(this.deviceId, profile);
+        Entrant entrant = new Entrant(this.deviceId, profile,this.location);
 
         entrant.getNotifications().addAll(this.notifications);
         entrant.setNotificationOptOut(this.notificationOptOut);
         entrant.getWaitlistedEvents().addAll(this.waitlistedEvents);
         entrant.getInvitedEvents().addAll(this.invitedEvents);
         entrant.getAttendedEvents().addAll(this.attendedEvents);
+
 
         return entrant;
     }
@@ -107,4 +129,13 @@ public class EntrantDataHolder {
     public ArrayList<String> getWaitlistedEvents() { return waitlistedEvents; }
     public ArrayList<String> getInvitedEvents() { return invitedEvents; }
     public ArrayList<String> getAttendedEvents() { return attendedEvents; }
+
+    public ArrayList<Double> getLocation() {
+        return location;
+    }
+
+    public void setLocation(ArrayList<Double> location) {
+        this.location = location;
+    }
+
 }

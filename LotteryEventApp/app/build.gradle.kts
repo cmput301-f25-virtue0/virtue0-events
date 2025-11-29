@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation(libs.firebase.firestore)
+    implementation(libs.play.services.location)
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.1")
     implementation(libs.appcompat)
