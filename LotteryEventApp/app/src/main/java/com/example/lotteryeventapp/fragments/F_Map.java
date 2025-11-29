@@ -1,5 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,11 +23,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class F_Map extends Fragment implements OnMapReadyCallback {
 
@@ -82,44 +87,89 @@ public class F_Map extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         gmap = googleMap;
-        ArrayList<Entrant.Profile> myEntrants = getEntrants();
+        if (!event.willTrack_geolocation()) return;
 
-        LatLng pos = new LatLng(53.5267, -115.5256);
-        gmap.addMarker(new MarkerOptions().position(pos).title("testmarker"));
-        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10));
+        new Thread(() -> {
 
-        /*float minx = 99999;
-        float maxx = -99999;
-        float miny = 99999;
-        float maxy = -99999;
+            ArrayList<Entrant> myEntrants = getEntrants(); // still catches InterruptedException inside getEntrants()
+            if (myEntrants.isEmpty()) return;
 
-        for (int i = 0; i < myEntrants.size(); i++) {
-            Entrant.Profile thisProfile = myEntrants.get(i);
-            //todo: get location from profile
-            float x = 0;
-            float y = 0;
-            String name = "placeholder";
+            double minx = Double.MAX_VALUE;
+            double maxx = -Double.MAX_VALUE;
+            double miny = Double.MAX_VALUE;
+            double maxy = -Double.MAX_VALUE;
 
-            LatLng pos = new LatLng(x, y);
-            if (x < minx) {minx = x;}
-            if (x > maxx) {maxx = x;}
-            if (y < miny) {miny = y;}
-            if (y > maxy) {maxy = y;}
+            // Prepare markers
+            ArrayList<MarkerOptions> markerOptionsList = new ArrayList<>();
 
-            gmap.addMarker(new MarkerOptions().position(pos).title(name));
-        }
-        //todo: get zoom based on max and min x & y
-        float posx = minx + (maxx - minx) / 2;
-        float posy = miny + (maxy - miny) / 2;
-        LatLng position = new LatLng(posx, posy);
-        int zoom = 1;
-        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));*/
+            for (Entrant thisEntrant : myEntrants) {
+                ArrayList<Double> thisPos = thisEntrant.getLocation();
+                double y = thisPos.get(0);
+                double x = thisPos.get(1);
+
+                Log.d("coords", y + ", " + x);
+
+                String name = thisEntrant.getProfile().getName();
+
+                // Geocoding in background thread
+                if (x >= -90 && x <= 90 && y >= -180 && y <= 180) {
+                    try {
+                        Geocoder geo = new Geocoder(requireContext(), Locale.getDefault());
+                        List<Address> results = geo.getFromLocation(x, y, 1);
+                        if (results != null && !results.isEmpty()) {
+                            Address addr = results.get(0);
+                            if (addr.getLocality() != null) {
+                                name += ", " + addr.getLocality();
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                LatLng myLatLng = new LatLng(x, y);
+                markerOptionsList.add(new MarkerOptions().position(myLatLng).title(name));
+
+                // Update bounds
+                minx = Math.min(minx, x);
+                maxx = Math.max(maxx, x);
+                miny = Math.min(miny, y);
+                maxy = Math.max(maxy, y);
+            }
+
+            double finalMinx = minx, finalMaxx = maxx, finalMiny = miny, finalMaxy = maxy;
+
+            // Post UI updates to main thread
+            requireActivity().runOnUiThread(() -> {
+                // Add markers to the map
+                for (MarkerOptions options : markerOptionsList) {
+                    gmap.addMarker(options);
+                }
+
+                // Animate camera to fit bounds
+                if (!markerOptionsList.isEmpty()) {
+                    LatLng southwest = new LatLng(finalMinx, finalMiny);
+                    LatLng northeast = new LatLng(finalMaxx, finalMaxy);
+                    LatLngBounds bounds = new LatLngBounds(southwest, northeast);
+                    gmap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
+                }
+            });
+        }).start();
     }
 
-    public ArrayList<Entrant.Profile> getEntrants() {
-        //todo: add a way of fetching all entrants from the waiting list, chosen, and enrolled.
-        return new ArrayList<Entrant.Profile>();
+    public ArrayList<Entrant> getEntrants() {
+        ArrayList<Entrant> total = new ArrayList<Entrant>();
+        try {
+            ArrayList<Entrant> waitlist = event.getUsableWaitList();
+            ArrayList<Entrant> invited = event.getUsableInvitedList();
+            ArrayList<Entrant> attendees = event.getUsableAttendeeList();
+            total.addAll(waitlist);
+            total.addAll(invited);
+            total.addAll(attendees);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 }
