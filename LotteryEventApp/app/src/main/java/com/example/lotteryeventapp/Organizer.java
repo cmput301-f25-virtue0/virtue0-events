@@ -1,10 +1,8 @@
 package com.example.lotteryeventapp;
 
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class contains a collection of events created by an organizer
