@@ -6,7 +6,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.content.Context;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -17,12 +16,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.fragments.F_SelectRole;
-import com.example.lotteryeventapp.DataModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.Firebase;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION,
         };
 
-
+        // much of this code is taken from GeeksforGeeks: https://www.geeksforgeeks.org/android/android-how-to-request-permissions-in-android-application/
         List<String> permissionsToRequest = new ArrayList<>();
 
         // Filter out the permissions that are not yet granted

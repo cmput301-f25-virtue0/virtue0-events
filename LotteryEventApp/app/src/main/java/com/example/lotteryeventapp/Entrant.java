@@ -1,27 +1,8 @@
 package com.example.lotteryeventapp;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.os.Bundle;
-import android.provider.Settings;
+
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
-import com.example.lotteryeventapp.fragments.F_SelectRole;
-
-import com.google.android.gms.tasks.OnSuccessListener;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
@@ -340,6 +321,4 @@ public class Entrant {
             }
         });
     }
-
-
 }

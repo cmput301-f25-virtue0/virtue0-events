@@ -1,21 +1,11 @@
 package com.example.lotteryeventapp;
 
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FieldPath;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import com.example.lotteryeventapp.DataModel;
+
 
 /**
  * This class contains all of the information and functionality of an Event
