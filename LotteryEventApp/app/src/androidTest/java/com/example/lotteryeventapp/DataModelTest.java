@@ -501,11 +501,11 @@ public class DataModelTest {
     }
 
     public Event permanentMockEvent() {
-        return new Event("Testing", this.permanentTestEvent, "12:00pm, January 01, 2000","Outpost 19","11:59pm, December 1,2024","Testing event object, DO NOT REMOVE",false,false,20,20);
+        return new Event("Testing", this.permanentTestEvent, "12:00pm, January 01, 2000","Outpost 19","11:59pm, December 1,2024","Testing event object, DO NOT REMOVE",false,false,20,20, "");
     }
 
     public Event mockEvent() {
-        return new Event("Testing 2", "12:00pm, January 10, 2000","Outpost 16","11:59pm, December 1,2024","Temporary testing event object",false,false,20,20);
+        return new Event("Testing 2", "12:00pm, January 10, 2000","Outpost 16","11:59pm, December 1,2024","11:59pm, December 1,2024", "Temporary testing event object",false,false,20,20, "");
     }
 
     @Test

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.Entrant;
+import com.example.lotteryeventapp.ImageDataHolder;
 import com.example.lotteryeventapp.Organizer;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.lotteryeventapp.MainActivity;
@@ -48,6 +49,7 @@ public class F_EventInfo extends Fragment {
 
     private static final String KEY_EVENT_ID = "current_event_id";
     private String recoveredEventId;
+    private ImageView posterView;
 
     //role = 0 for entrant, role = 1 for organizer
 
@@ -92,6 +94,7 @@ public class F_EventInfo extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
         Log.i("CURRENT EVENT INFO ROLE", "Current EVENT INFO user role is: " + role);
+        posterView = view.findViewById(R.id.eventPoster);
 
         model = ((MainActivity) requireActivity()).getDataModel();
 
@@ -124,8 +127,30 @@ public class F_EventInfo extends Fragment {
                     Event fetchedEvent = (Event) obj;
                     model.setCurrentEvent(fetchedEvent);
                     event = fetchedEvent;
+                    String imageUid = event.getImage();
+                    if(!imageUid.isEmpty()) {
+                        model.getImage(imageUid, new DataModel.GetCallback() {
+                            @Override
+                            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-                    ensureUserAndSetupUI(view);
+                            }
+
+                            @Override
+                            public void onSuccess(Object obj) {
+                                Log.d("Firebase", "retrieved");
+                                ImageDataHolder image = (ImageDataHolder) obj;
+                                posterView.setImageBitmap(image.convertToBitmap());
+                                ensureUserAndSetupUI(view);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Firebase", "fail");
+                            }
+                        });
+                    }else{
+                        ensureUserAndSetupUI(view);
+                    }
                 }
 
                 @Override
@@ -138,7 +163,32 @@ public class F_EventInfo extends Fragment {
             });
         } else {
             event = model.getCurrentEvent();
-            ensureUserAndSetupUI(view);
+            String imageUid = event.getImage();
+            if(imageUid == null){
+                ensureUserAndSetupUI(view);
+            }else if(!imageUid.isEmpty()) {
+                model.getImage(imageUid, new DataModel.GetCallback() {
+                    @Override
+                    public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Object obj) {
+                        Log.d("Firebase", "retrieved");
+                        ImageDataHolder image = (ImageDataHolder) obj;
+                        posterView.setImageBitmap(image.convertToBitmap());
+                        ensureUserAndSetupUI(view);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("Firebase", "fail");
+                    }
+                });
+            }else{
+                ensureUserAndSetupUI(view);
+            }
         }
     }
 
@@ -179,6 +229,7 @@ public class F_EventInfo extends Fragment {
         }
     }
 
+
     private void setupUI(View view) {
         if (event == null) return;
 
@@ -205,7 +256,6 @@ public class F_EventInfo extends Fragment {
         myText = view.findViewById(R.id.waitingListSize);
         String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
         myText.setText(fraction);
-
 
         // Role specific ui
         if (role == 0) {

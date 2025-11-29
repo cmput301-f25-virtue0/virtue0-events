@@ -1,20 +1,29 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.ImageDataHolder;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
@@ -33,6 +42,9 @@ public class F_CreateEditEvent extends Fragment {
     private int type;
     private DataModel model;
     private Event event;
+    private ImageView posterUpload;
+    private ImageDataHolder imageHolder;
+
 
     private final Calendar eventDateCalendar = Calendar.getInstance();
 
@@ -71,6 +83,8 @@ public class F_CreateEditEvent extends Fragment {
         TextInputEditText etRegOpens = view.findViewById(R.id.etRegOpens);
         TextInputEditText etWhen = view.findViewById(R.id.etWhen);
         TextInputEditText etRegCloses = view.findViewById(R.id.etRegCloses);
+        this.posterUpload = view.findViewById(R.id.ivPoster);
+
 
         setupDateTimePicker(etWhen, eventDateCalendar);
         setupDateTimePicker(etRegOpens, regStartCalendar);
@@ -171,38 +185,82 @@ public class F_CreateEditEvent extends Fragment {
                     String organizer = model.getCurrentOrganizer().getUid();
 
                     if (type == 0) {
+
                         // create new event
                         Event makeEvent = new Event(title, dateTime, location,regStart, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit, organizer);
-                        model.setEvent(makeEvent, new DataModel.SetCallback() {
-                            @Override
-                            public void onSuccess(String msg) {
-                                Log.d("Firebase", "written");
-                                Organizer organizer = model.getCurrentOrganizer();
-                                organizer.addEvent(makeEvent.getUid());
-                                model.setOrganizer(organizer, new DataModel.SetCallback() {
-                                    @Override
-                                    public void onSuccess(String msg) {
-                                        Log.d("Firebase", "written");
+                        if(posterUpload.getDrawable()==null){
+                            model.setEvent(makeEvent, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "written");
+                                    Organizer organizer = model.getCurrentOrganizer();
+                                    organizer.addEvent(makeEvent.getUid());
+                                    model.setOrganizer(organizer, new DataModel.SetCallback() {
+                                        @Override
+                                        public void onSuccess(String msg) {
+                                            Log.d("Firebase", "written");
 
-                                    }
-                                    @Override
-                                    public void onError(Exception e) {
-                                        Log.e("Firebase", "fail");
-                                    }
-                                });
+                                        }
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("Firebase", "fail");
+                                        }
+                                    });
 
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e("Firebase", "fail");
-                            }
-                        });
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "fail");
+//                                    throw new RuntimeException();
+                                }
+                            });
+                        }else {
+                            ImageDataHolder image = new ImageDataHolder(posterUpload);
+
+                            model.setImage(image, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "written");
+                                    makeEvent.setImage(msg);
+                                    model.setEvent(makeEvent, new DataModel.SetCallback() {
+                                        @Override
+                                        public void onSuccess(String msg) {
+                                            Log.d("Firebase", "written");
+                                            Organizer organizer = model.getCurrentOrganizer();
+                                            organizer.addEvent(makeEvent.getUid());
+                                            model.setOrganizer(organizer, new DataModel.SetCallback() {
+                                                @Override
+                                                public void onSuccess(String msg) {
+                                                    Log.d("Firebase", "written");
+
+                                                }
+
+                                                @Override
+                                                public void onError(Exception e) {
+                                                    Log.e("Firebase", "fail");
+                                                }
+                                            });
+
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("Firebase", "fail");
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "fail");
+                                }
+                            });
+                        }
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
                         model.setCurrentEvent(makeEvent);
                         //View newly created event
                         ((MainActivity) requireActivity()).showFragment(F_EventInfo.newInstance(1));
-
                     } else {
                         // update existing event
                         event.setTitle(title);
@@ -215,8 +273,36 @@ public class F_CreateEditEvent extends Fragment {
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
                         event.setOrganizer(organizer);
+                        if(posterUpload.getDrawable()!=null) {
+                            ImageDataHolder image = new ImageDataHolder(posterUpload);
 
-                        Organizer currentOrganizer = model.getCurrentOrganizer();
+                            model.setImage(image, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "written");
+                                    event.setImage(msg);
+                                    model.setEvent(event, new DataModel.SetCallback() {
+                                        @Override
+                                        public void onSuccess(String msg) {
+                                            Log.d("Firebase", "written");
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("Firebase", "fail");
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "fail");
+                                }
+                            });
+                        }
+
+
+                            Organizer currentOrganizer = model.getCurrentOrganizer();
                         if (!currentOrganizer.getEvents().contains(event.getUid())) {
 
                             // Add it locally
@@ -265,7 +351,40 @@ public class F_CreateEditEvent extends Fragment {
 
             }
         });
+
+
+
+
+        ActivityResultLauncher<Intent> uploadImageResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            // There are no request codes
+                            Intent data = result.getData();
+                            Uri uploadedImage = data.getData();
+                            posterUpload.setImageURI(uploadedImage);
+                        }
+                    }
+                });
+
+
+        view.findViewById(R.id.emptyPosterState).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                uploadImageResultLauncher.launch(intent);
+            }
+        });
     }
+
+
+    // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
+
+
 
     private void setupDateTimePicker(TextInputEditText editText, Calendar calendar) {
         editText.setOnClickListener(v -> {

@@ -6,19 +6,18 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
-import android.util.Log;
+import android.os.Build;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.Blob;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ImageDataHolder {
-    byte[] imageBlob;
-    String uid;
+    Blob imageBlob;
+    String uid = "";
     final int MAX_SIZE_BYTES = 1048576;
 
     public ImageDataHolder(ImageView imageView) {
@@ -28,6 +27,14 @@ public class ImageDataHolder {
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
             bitmap = bitmapDrawable.getBitmap();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Check if version contains hardware bitmaps
+                if (bitmap.getConfig() == Bitmap.Config.HARDWARE || bitmap.getConfig() == null) {
+                    // Convert hardware bitmap to software bitmap
+                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                }
+            }
         }else if (drawable instanceof VectorDrawable) {
             bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
@@ -38,7 +45,7 @@ public class ImageDataHolder {
         }
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        this.imageBlob = stream.toByteArray();
+        this.imageBlob = Blob.fromBytes(stream.toByteArray());
         bitmap.recycle();
 
         if (this.exceedsMaxDocumentSize()) {
@@ -46,8 +53,16 @@ public class ImageDataHolder {
         }
     }
 
-    public ImageDataHolder(byte[] imageBlob) {
-        this.imageBlob = imageBlob;
+    public ImageDataHolder(Blob blob) {
+        this.imageBlob = blob;
+
+        if (this.exceedsMaxDocumentSize()) {
+            throw new UnsupportedOperationException("Image is too large.");
+        }
+    }
+
+    public ImageDataHolder(byte[] data) {
+        this.imageBlob = Blob.fromBytes(data);
 
         if (this.exceedsMaxDocumentSize()) {
             throw new UnsupportedOperationException("Image is too large.");
@@ -58,25 +73,19 @@ public class ImageDataHolder {
         this.uid = (String) data.get("uid");
 
         Object objectBlob = data.get("imageBlob");
-        if (objectBlob instanceof byte[]) {
-            this.imageBlob = (byte[]) objectBlob;
-        }else if (objectBlob instanceof Blob) {
-            Blob blob = (Blob) objectBlob;
-            this.imageBlob = blob.toBytes();
-        }else {
-            throw new UnsupportedOperationException("Image has blob stored in unsupported type");
-        }
+        this.imageBlob = (Blob) objectBlob;
 
         if (this.exceedsMaxDocumentSize()) {
             throw new UnsupportedOperationException("Image is too large.");
         }
     }
 
-    public Bitmap getBitmap() {
-        return BitmapFactory.decodeByteArray(this.imageBlob, 0, this.imageBlob.length);
+    public Bitmap convertToBitmap() {
+        byte[] data = this.imageBlob.toBytes();
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
-    private boolean exceedsMaxDocumentSize() {
+    public boolean exceedsMaxDocumentSize() {
         int byteSize = 0;
 
         String key1 = "uid";
@@ -85,17 +94,18 @@ public class ImageDataHolder {
 
         String key2 = "imageBlob";
         byteSize += key2.getBytes(StandardCharsets.UTF_8).length + 1;
-        byteSize += this.imageBlob.length;
+        byte[] data = this.imageBlob.toBytes();
+        byteSize += data.length;
 
         return byteSize > this.MAX_SIZE_BYTES;
     }
 
     // Getters and Setters
-    public byte[] getImageBlob() {
-        return imageBlob;
+    public Blob getImageBlob() {
+        return this.imageBlob;
     }
 
-    public void setImageBlob(byte[] blob) {
+    public void setImageBlob(Blob blob) {
         this.imageBlob = blob;
     }
 
