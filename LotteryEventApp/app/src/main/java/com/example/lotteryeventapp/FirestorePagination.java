@@ -44,7 +44,7 @@ public abstract class FirestorePagination {
     public void getNextPage(PaginationCallback cb) {
         if (this.pageNumber == 0) {
             AggregateQuery queryCount = this.baseQuery.count();
-            CountDownLatch latch = new CountDownLatch(1);
+//            CountDownLatch latch = new CountDownLatch(1);
             queryCount
                     .get(AggregateSource.SERVER)
                     .addOnCompleteListener(task -> {
@@ -59,17 +59,17 @@ public abstract class FirestorePagination {
                             }
 
                             Log.d("FirestorePagination", "Pagination Success: Calculated last page number");
-                            latch.countDown();
+//                            latch.countDown();
                         }else {
                             Log.e("FirestorePagination", "Pagination Failed: Could not calculate last page number");
-                            latch.countDown();
+//                            latch.countDown();
                         }
                     });
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+////                latch.await();
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
         }else if (this.lastPageNumber == this.pageNumber) {
             Log.d("FirestorePagination", "Pagination Success: Already on last page");
             cb.onGetPage(false, null);

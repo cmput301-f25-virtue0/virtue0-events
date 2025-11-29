@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.lotteryeventapp.AllEventsPagination;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.EventAdapter;
+import com.example.lotteryeventapp.FirestorePagination;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.Organizer;
 import com.example.lotteryeventapp.R;
@@ -159,15 +161,12 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
             swipeRefreshLayout.setRefreshing(true);
         }
 
-        model.getAllEvents(new DataModel.GetCallback() {
-            @Override
-            public <T extends Enum<T>> void onSuccess(Object obj, T type) { }
 
+        AllEventsPagination pagination = new AllEventsPagination(12);
+        pagination.getNextPage(new FirestorePagination.PaginationCallback() {
             @Override
-            public void onSuccess(Object obj) {
-                ArrayList<Event> eventData = (ArrayList<Event>) obj;
-                Log.d("Browse Events", "Retrieved " + eventData.size() + " events.");
-
+            public <T> void onGetPage(boolean hasResults, ArrayList<T> obs) {
+                ArrayList<Event> eventData = (ArrayList<Event>) obs;
                 if (adapter != null) {
                     adapter.setItems(eventData);
                     adapter.notifyDataSetChanged();
@@ -177,13 +176,34 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
 
             @Override
             public void onError(Exception e) {
-                Log.e("Firebase", "Failed to retrieve events: " + e.getMessage());
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Error loading events", Toast.LENGTH_SHORT).show();
-                }
-                swipeRefreshLayout.setRefreshing(false);
+
             }
-        }, forceRefresh);
+        });
+//        model.getAllEvents(new DataModel.GetCallback() {
+//            @Override
+//            public <T extends Enum<T>> void onSuccess(Object obj, T type) { }
+//
+//            @Override
+//            public void onSuccess(Object obj) {
+//                ArrayList<Event> eventData = (ArrayList<Event>) obj;
+//                Log.d("Browse Events", "Retrieved " + eventData.size() + " events.");
+//
+//                if (adapter != null) {
+//                    adapter.setItems(eventData);
+//                    adapter.notifyDataSetChanged();
+//                }
+//                swipeRefreshLayout.setRefreshing(false);
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                Log.e("Firebase", "Failed to retrieve events: " + e.getMessage());
+//                if (getContext() != null) {
+//                    Toast.makeText(getContext(), "Error loading events", Toast.LENGTH_SHORT).show();
+//                }
+//                swipeRefreshLayout.setRefreshing(false);
+//            }
+//        }, forceRefresh);
     }
 
     @Override
