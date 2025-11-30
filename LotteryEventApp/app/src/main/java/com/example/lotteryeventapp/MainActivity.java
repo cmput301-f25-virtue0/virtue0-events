@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
+import android.content.Context;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -24,6 +26,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import com.example.lotteryeventapp.DataModel;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.Firebase;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends AppCompatActivity {
     private DataModel model;
@@ -247,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public Entrant getEntrant() {
+    public Entrant getEntrant(){
         return this.entrant;
     }
 
