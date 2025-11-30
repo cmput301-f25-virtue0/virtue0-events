@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,16 +20,26 @@ import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
 import com.example.lotteryeventapp.ViewPagerAdapter;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 public class F_HomePage extends Fragment {
+
     private static final String ARG_ROLE = "role";
 
     private int role;
     private int currentTab = 0;
     private DataModel model;
+
+    private Set<Event.EventTag> activeFilters = new HashSet<>();
 
 
     public static F_HomePage newInstance(int role) {
@@ -120,6 +131,11 @@ public class F_HomePage extends Fragment {
                 scanCode();
             });
 
+            view.findViewById(R.id.filterButton).setOnClickListener(v -> {
+                showFilterDialog();
+            });
+
+
         } else if (role == 1) {
             view.findViewById(R.id.Notification).setVisibility(View.GONE);
             view.findViewById(R.id.Profile).setVisibility(View.GONE);
@@ -174,5 +190,70 @@ public class F_HomePage extends Fragment {
             });
         }
     });
+
+    private void showFilterDialog() {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.dialog_filter_events, null);
+
+        //Build the Dialog
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        //Setup UI
+        ChipGroup chipGroup = dialogView.findViewById(R.id.filterChipGroup);
+        Button btnApply = dialogView.findViewById(R.id.btnApplyFilter);
+        Button btnClear = dialogView.findViewById(R.id.btnClearFilter);
+
+        //Populate Chips
+        for (Event.EventTag tag : Event.EventTag.values()) {
+            if (tag == Event.EventTag.ALL) continue;
+
+            Chip chip = new Chip(requireContext());
+            chip.setText(tag.name());
+            chip.setCheckable(true);
+            chip.setClickable(true);
+
+            chip.setChipBackgroundColorResource(com.google.android.material.R.color.mtrl_choice_chip_background_color);
+            chip.setTextColor(getResources().getColorStateList(R.color.black, null)); //
+
+            // Pre-select if it was already active
+            if (activeFilters.contains(tag)) {
+                chip.setChecked(true);
+            }
+
+            chipGroup.addView(chip);
+        }
+
+        // Handle apply
+        btnApply.setOnClickListener(v -> {
+            activeFilters.clear();
+            // Loop through chips to see what is checked
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                Chip chip = (Chip) chipGroup.getChildAt(i);
+                if (chip.isChecked()) {
+                    // Convert text back to Enum
+                    activeFilters.add(Event.EventTag.valueOf(chip.getText().toString()));
+                }
+            }
+
+            applyFiltersToFragment();
+            dialog.dismiss();
+        });
+
+        // Handle Clear
+        btnClear.setOnClickListener(v -> {
+            activeFilters.clear();
+            applyFiltersToFragment();
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    private void applyFiltersToFragment() {
+        Toast.makeText(getContext(), "Filters Applied: " + activeFilters.size(), Toast.LENGTH_SHORT).show();
+    }
 
 }
