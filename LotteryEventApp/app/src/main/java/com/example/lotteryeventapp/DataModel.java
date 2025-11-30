@@ -163,7 +163,7 @@ public class DataModel extends TModel<TView>{
         imageRef.get()
                 .addOnSuccessListener(imageSnap -> {
                     if (imageSnap.exists()) {
-                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData());
+                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData(), imageSnap.getId());
 
                         Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
                         cb.onSuccess(image);
