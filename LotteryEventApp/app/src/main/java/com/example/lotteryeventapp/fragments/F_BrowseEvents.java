@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +43,9 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
     private View rootView;
 
     private String currentOrganizer;
+    private DataModel model;
+    private EventAdapter adapter;
+    private Spinner filterSpinner;
 
     public static F_BrowseEvents newInstance(int role) {
         F_BrowseEvents fragment = new F_BrowseEvents();
@@ -49,7 +54,46 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
         fragment.setArguments(args);
         return fragment;
     }
+    public F_BrowseEvents(DataModel model) {
+        this.model = model;
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        RecyclerView recyclerView = view.findViewById(R.id.events_recycler_view);
+        filterSpinner = view.findViewById(R.id.tag_filter_spinner);
+
+        adapter = new EventAdapter(model.getAllEvents());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        String[] tags = {"All", "Conference", "Workshop", "Social", "Charity"};
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, tags);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setAdapter(spinnerAdapter);
+
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedTag = tags[position];
+
+
+                ArrayList<Event> filteredList = (ArrayList<Event>) result;
+                adapter.updateData(filteredList);
+
+
+                adapter.updateData(filteredList);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +129,6 @@ public class F_BrowseEvents extends Fragment implements EventAdapter.OnEventClic
 
                 @Override
                 public void onSuccess(Object obj) {
-                    // Check if Fragment is still attached
                     if (isAdded() && getActivity() != null) {
 
                         Organizer fetchedOrganizer = (Organizer) obj;

@@ -133,12 +133,32 @@
                 tools:childrenDrawingOrderEnabled="true"
                 tools:ignore="MissingConstraints">
                 <com.google.android.material.chip.Chip
+                    android:id="+id/AllTag"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="false"
                     android:checkable="false"
                     tools:text="Beginner" />
                 <com.google.android.material.chip.Chip
+                    android:id="+id/Tag1"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:checkable="false"
+                    tools:text="Accessible" />
+                <com.google.android.material.chip.Chip
+                    android:id="+id/Tag2"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:checkable="false"
+                    tools:text="Beginner" />
+                <com.google.android.material.chip.Chip
+                    android:id="+id/Tag3"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="false"

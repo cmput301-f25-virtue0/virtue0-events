@@ -39,6 +39,7 @@ public class Event {
     private ArrayList<String> cancelled_list;
     private ArrayList<String> invited_list;
     private boolean drawn;
+    private List<String> tags;
 
     /**
      * Creates an Event
@@ -92,6 +93,7 @@ public class Event {
         this.invited_list = new ArrayList<>();
         this.drawn = false;
         this.organizer = organizer;
+        this.tags = new ArrayList<>();
     }
 
     public String getRegistration_start() {
@@ -121,6 +123,18 @@ public class Event {
         return uid;
     }
 
+    public void addTag(String tag) {
+        if (!tags.contains(tag)) {
+            tags.add(tag);
+        }
+    }
+    public List<String> getTags() { 
+        return tags;
+    }
+
+    public boolean hasTag(String tag) {
+        return tags.contains(tag);
+    }
 
     public String getTitle() {
         return title;

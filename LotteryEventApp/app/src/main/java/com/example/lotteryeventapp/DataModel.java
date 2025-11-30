@@ -40,6 +40,7 @@ public class DataModel extends TModel<TView>{
     private Notification currentNotification;
 
     private ArrayList<Event> cachedEvents = null;
+    private ArrayList<Event> allEvents;
 
     private ArrayList<View> views = new ArrayList<View>();
 
@@ -50,6 +51,7 @@ public class DataModel extends TModel<TView>{
         this.admins = db.collection("admins");
         this.events = db.collection("events");
         this.notifications = db.collection("notifications");
+        allEvents = new ArrayList<>();
         // add more as we go
 
         // Ignore below code chunk, saved for if snapshotListeners are needed at any point
@@ -232,7 +234,9 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
-
+    public ArrayList<Event> getAllEvents() {
+        return allEvents;
+    }
     public void setAdmin() {
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
@@ -244,7 +248,39 @@ public class DataModel extends TModel<TView>{
     public void deleteAdmin() {
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
+    /**
+     * Returns a list of events that contain the specified tag.
+     * If the tag is null or empty, returns all events.
+     */
+    public void getEventsByTag(String tag, GetCallback cb) {
+        // Case 1: If tag is "All", empty, or null, fetch all events
+        if (tag == null || tag.isEmpty() || tag.equals("All")) {
+            getAllEvents(cb, false); // Use your existing getAllEvents method
+            return;
+        }
 
+        Log.d("Firestore", "Querying events with tag: " + tag);
+
+        // Case 2: Query Firestore for specific tag
+        // Assumes your Event documents have a field named "tags" which is an array
+        this.events.whereArrayContains("tags", tag)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> filteredEvents = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Convert Firestore data to Event object
+                            EventDataHolder data = new EventDataHolder(document.getData(), document.getId());
+                            filteredEvents.add(data.createEventInstance());
+                        }
+                        Log.d("Firestore", "Found " + filteredEvents.size() + " events with tag: " + tag);
+                        cb.onSuccess(filteredEvents);
+                    } else {
+                        Log.e("Firestore", "Error querying events by tag", task.getException());
+                        cb.onError(task.getException());
+                    }
+                });
+    }
     /**
      * Adds or updates the given instance of Event to database. The event's unique id or an exception is passed to the callback.
      * @param event Event instance to be added to database
