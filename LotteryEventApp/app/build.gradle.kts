@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation(libs.firebase.firestore)
+    implementation(libs.play.services.location)
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.1")
     implementation(libs.appcompat)
@@ -52,4 +53,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.android.gms:play-services-maps:18.0.2")
+    implementation("com.google.android.gms:play-services-location:18.0.0")
 }

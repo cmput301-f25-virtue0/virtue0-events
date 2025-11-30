@@ -73,34 +73,57 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
         recyclerView = view.findViewById(R.id.rvNotification);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        Entrant entrant = model.getCurrentEntrant();
         notificationList = new ArrayList<>();
+
+
+
+
         if (getArguments().getInt(ARG_ROLE)==0) {
-            model.getUsableNotifications(model.getCurrentEntrant(), new DataModel.GetCallback() {
+            model.getEntrant(entrant.getUid(),new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Entrant updatedEntrant = (Entrant) obj;
+                    model.setCurrentEntrant(updatedEntrant);
+                    model.getUsableNotifications(model.getCurrentEntrant(), new DataModel.GetCallback() {
+                        @Override
+                        public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(Object obj) {
+                            Log.d("Firebase", "retrieved");
+                            ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
+                            adapter = new NotificationAdapter(notificationList, listener);
+
+                            recyclerView.setAdapter(adapter);
+
+                            MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+                            toolbar.setNavigationOnClickListener(v -> {
+                                ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
+
+                            });
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Log.e("Firebase", "fail");
+                        }
+                    });
+                }
+
                 @Override
                 public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
                 }
 
                 @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
-                    adapter = new NotificationAdapter(notificationList, listener);
-
-                    recyclerView.setAdapter(adapter);
-
-                    MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
-                    toolbar.setNavigationOnClickListener(v -> {
-                        ((MainActivity) requireActivity()).showFragment(F_HomePage.newInstance(0));
-
-                    });
-                }
-
-                @Override
                 public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
+                    Log.e("Entrant", "Error fetching Entrant", e);
                 }
             });
+
         }else if(getArguments().getInt(ARG_ROLE)==2){
             model.getAllNotifications(new DataModel.GetCallback() {
                 @Override
@@ -176,7 +199,7 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
 
     @Override
     public void onNotificationClick(Notification notification, int position) {
-        if (getArguments().getInt(ARG_ROLE) == 1) {
+        if (getArguments().getInt(ARG_ROLE) == 0) {
             if (!notification.isRead()) {
                 notification.markAsRead();
                 model.setNotification(notification, new DataModel.SetCallback() {
