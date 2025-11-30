@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <!-- Top bar -->
     <com.google.android.material.appbar.AppBarLayout
@@ -25,19 +26,32 @@
 
     </FrameLayout>
 
-    <com.google.android.material.appbar.AppBarLayout
+    <fragment
+        android:id="@+id/map_view"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent" />
+    <!--android:layout_constraintBottom_toBottomOf="@+id/mapContainer"
+    android:layout_constraintEnd_toEndOf="@+id/mapContainer"
+    android:layout_constraintStart_toStartOf="@+id/mapContainer"
+    android:layout_constraintTop_toTopOf="@+id/mapContainer"-->
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="@string/map"
-            app:titleTextColor="@color/white"
-            app:titleCentered="true"
-            app:navigationIcon="@drawable/back_arrow_sized"
-            app:navigationIconTint="@android:color/white"/>
-    </com.google.android.material.appbar.AppBarLayout>
+<com.google.android.material.appbar.AppBarLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="@string/map"
+        app:titleTextColor="@color/white"
+        app:titleCentered="true"
+        app:navigationIcon="@drawable/back_arrow_sized"
+        app:navigationIconTint="@android:color/white"/>
+</com.google.android.material.appbar.AppBarLayout>
+
+<!-- Map view -->
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

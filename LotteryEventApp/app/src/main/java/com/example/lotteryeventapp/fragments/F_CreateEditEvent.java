@@ -185,47 +185,78 @@ public class F_CreateEditEvent extends Fragment {
                     String organizer = model.getCurrentOrganizer().getUid();
 
                     if (type == 0) {
-                        ImageDataHolder image = new ImageDataHolder(posterUpload);
+
                         // create new event
                         Event makeEvent = new Event(title, dateTime, location,regStart, regDeadline,
                                 details, track_geo, true, waitlist_limit, attendee_limit, organizer);
+                        if(posterUpload.getDrawable()==null){
+                            model.setEvent(makeEvent, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "written");
+                                    Organizer organizer = model.getCurrentOrganizer();
+                                    organizer.addEvent(makeEvent.getUid());
+                                    model.setOrganizer(organizer, new DataModel.SetCallback() {
+                                        @Override
+                                        public void onSuccess(String msg) {
+                                            Log.d("Firebase", "written");
 
-                        model.setImage(image,new DataModel.SetCallback() {
-                            @Override
-                            public void onSuccess(String msg) {
-                                Log.d("Firebase", "written");
-                                makeEvent.setImage(msg);
-                                model.setEvent(makeEvent, new DataModel.SetCallback() {
-                                    @Override
-                                    public void onSuccess(String msg) {
-                                        Log.d("Firebase", "written");
-                                        Organizer organizer = model.getCurrentOrganizer();
-                                        organizer.addEvent(makeEvent.getUid());
-                                        model.setOrganizer(organizer, new DataModel.SetCallback() {
-                                            @Override
-                                            public void onSuccess(String msg) {
-                                                Log.d("Firebase", "written");
+                                        }
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("Firebase", "fail");
+                                        }
+                                    });
 
-                                            }
-                                            @Override
-                                            public void onError(Exception e) {
-                                                Log.e("Firebase", "fail");
-                                            }
-                                        });
+                                }
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "fail");
+//                                    throw new RuntimeException();
+                                }
+                            });
+                        }else {
+                            ImageDataHolder image = new ImageDataHolder(posterUpload);
 
-                                    }
-                                    @Override
-                                    public void onError(Exception e) {
-                                        Log.e("Firebase", "fail");
-                                    }
-                                });
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e("Firebase", "fail");
-                            }
-                        });
+                            model.setImage(image, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "written");
+                                    makeEvent.setImage(msg);
+                                    model.setEvent(makeEvent, new DataModel.SetCallback() {
+                                        @Override
+                                        public void onSuccess(String msg) {
+                                            Log.d("Firebase", "written");
+                                            Organizer organizer = model.getCurrentOrganizer();
+                                            organizer.addEvent(makeEvent.getUid());
+                                            model.setOrganizer(organizer, new DataModel.SetCallback() {
+                                                @Override
+                                                public void onSuccess(String msg) {
+                                                    Log.d("Firebase", "written");
 
+                                                }
+
+                                                @Override
+                                                public void onError(Exception e) {
+                                                    Log.e("Firebase", "fail");
+                                                }
+                                            });
+
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("Firebase", "fail");
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "fail");
+                                }
+                            });
+                        }
                         Toast.makeText(getContext(), "Event Created", Toast.LENGTH_SHORT).show();
                         model.setCurrentEvent(makeEvent);
                         //View newly created event
@@ -242,8 +273,36 @@ public class F_CreateEditEvent extends Fragment {
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
                         event.setOrganizer(organizer);
+                        if(posterUpload.getDrawable()!=null) {
+                            ImageDataHolder image = new ImageDataHolder(posterUpload);
 
-                        Organizer currentOrganizer = model.getCurrentOrganizer();
+                            model.setImage(image, new DataModel.SetCallback() {
+                                @Override
+                                public void onSuccess(String msg) {
+                                    Log.d("Firebase", "written");
+                                    event.setImage(msg);
+                                    model.setEvent(event, new DataModel.SetCallback() {
+                                        @Override
+                                        public void onSuccess(String msg) {
+                                            Log.d("Firebase", "written");
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            Log.e("Firebase", "fail");
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("Firebase", "fail");
+                                }
+                            });
+                        }
+
+
+                            Organizer currentOrganizer = model.getCurrentOrganizer();
                         if (!currentOrganizer.getEvents().contains(event.getUid())) {
 
                             // Add it locally

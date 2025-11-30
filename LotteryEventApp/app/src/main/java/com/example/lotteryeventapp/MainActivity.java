@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 import android.content.Context;
 import android.widget.Toast;
 
@@ -17,6 +18,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.lotteryeventapp.fragments.F_SelectRole;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import com.example.lotteryeventapp.DataModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -37,12 +46,12 @@ public class MainActivity extends AppCompatActivity {
     private Organizer organizer;
     private int activeHomePageTab = 0;
     private FusedLocationProviderClient fusedLocationClient;
-    private ArrayList<Double> entrantLocation = new ArrayList<>(Arrays.asList(0.0,0.0));
+    private ArrayList<Double> entrantLocation = new ArrayList<>(Arrays.asList(0.0, 0.0));
     private static final int PERMISSION_REQUEST_CODE = 123;
 
 
-
     private String deviceID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION,
         };
 
-
+        // much of this code is taken from GeeksforGeeks: https://www.geeksforgeeks.org/android/android-how-to-request-permissions-in-android-application/
         List<String> permissionsToRequest = new ArrayList<>();
 
         // Filter out the permissions that are not yet granted
@@ -79,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions();
@@ -98,12 +105,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
-                        if(location != null) {
+                        if (location != null) {
                             entrantLocation.set(0, location.getLongitude());
                             entrantLocation.set(1, location.getLatitude());
                             loadEntrant(deviceID);
                             loadOrganizer(deviceID);
-                        }else{
+                        } else {
                             entrantLocation.set(0, null);
                             entrantLocation.set(1, null);
                             loadEntrant(deviceID);
@@ -188,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public <T extends Enum<T>> void onSuccess(Object obj, T type) {
             }
+
             @Override
             public void onSuccess(Object obj) {
                 //if entrant does not exists (null), create new entrant
@@ -219,11 +227,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     public void createNewEntrant(String deviceID) {
         Log.d("EntrantLoad", "Creating new entrant for deviceID = " + deviceID);
 
         Entrant.Profile profile = new Entrant.Profile();
-        entrant = new Entrant(deviceID, profile,entrantLocation);
+        entrant = new Entrant(deviceID, profile, entrantLocation);
 
         Log.d("EntrantLoad", "About to call setEntrant for uid = " + entrant.getUid());
 

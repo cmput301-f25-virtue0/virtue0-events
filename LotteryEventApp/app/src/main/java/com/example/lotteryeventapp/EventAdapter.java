@@ -76,7 +76,32 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         h.tvTitle.setText(n(e.getTitle()));
         h.tvLocation.setText(n(e.getLocation()).toUpperCase());
         h.tvDate.setText(n(e.getDate_time()));
-        h.ivPoster.setImageResource(R.drawable.lottery); // placeholder
+        if(e.getImage()==null){
+            h.ivPoster.setImageResource(R.drawable.lottery);
+        }else if(e.getImage().isEmpty()){
+            h.ivPoster.setImageResource(R.drawable.lottery);
+        }else{
+            DataModel model = new DataModel();
+            model.getImage(e.getImage(), new DataModel.GetCallback() {
+                        @Override
+                        public void onSuccess(Object obj) {
+                            ImageDataHolder image = (ImageDataHolder) obj;
+                            h.ivPoster.setImageBitmap(image.convertToBitmap());
+
+                        }
+
+                        @Override
+                        public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+
+                        }
+                    });
+        }
+
 
         // Reset Visibility
         h.tvOwnerTag.setVisibility(View.GONE);

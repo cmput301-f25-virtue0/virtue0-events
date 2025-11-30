@@ -1,7 +1,9 @@
 package com.example.lotteryeventapp;
 
 import android.util.Log;
+
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -121,4 +123,5 @@ public class EntrantDataHolder {
     public void setLocation(ArrayList<Double> location) {
         this.location = location;
     }
+
 }

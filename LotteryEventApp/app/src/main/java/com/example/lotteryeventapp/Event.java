@@ -1,21 +1,11 @@
 package com.example.lotteryeventapp;
 
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FieldPath;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import com.example.lotteryeventapp.DataModel;
+
 
 /**
  * This class contains all of the information and functionality of an Event
@@ -71,7 +61,29 @@ public class Event {
         this.invited_list = new ArrayList<>();
         this.drawn = false;
         this.organizer = organizer;
+        this.image = "";
+    }
 
+    public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, String image){
+        this.title = title;
+        this.uid = uid;
+        this.date_time = date_time;
+        this.location = location;
+        this.registration_start = registration_start;
+        this.registration_deadline = registration_deadline;
+        this.details = details;
+        this.track_geolocation = track_geolocation;
+        this.will_automatically_redraw = will_automatically_redraw;
+        this.waitlist_limit = waitlist_limit;
+        this.attendee_limit = attendee_limit;
+        this.waitlist = new ArrayList<>();
+        this.attendee_list = new ArrayList<>();
+        this.cancelled_list = new ArrayList<>();
+        this.invited_list = new ArrayList<>();
+        this.drawn = false;
+        this.organizer = organizer;
+        this.image = image;
     }
 
     public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
@@ -93,8 +105,29 @@ public class Event {
         this.invited_list = new ArrayList<>();
         this.drawn = false;
         this.organizer = organizer;
+        this.image = "";
     }
-
+    public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer,String image){
+        this.title = title;
+        this.uid = "";
+        this.date_time = date_time;
+        this.location = location;
+        this.registration_start = registration_start;
+        this.registration_deadline = registration_deadline;
+        this.details = details;
+        this.track_geolocation = track_geolocation;
+        this.will_automatically_redraw = will_automatically_redraw;
+        this.waitlist_limit = waitlist_limit;
+        this.attendee_limit = attendee_limit;
+        this.waitlist = new ArrayList<>();
+        this.attendee_list = new ArrayList<>();
+        this.cancelled_list = new ArrayList<>();
+        this.invited_list = new ArrayList<>();
+        this.drawn = false;
+        this.organizer = organizer;
+        this.image = image;
+    }
     public String getRegistration_start() {
         return registration_start;
     }
@@ -626,7 +659,7 @@ public class Event {
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
     public void editEvent(String date_time, String location, String registration_start, String registration_deadline, String details,
-                          boolean track_geolocation, boolean will_automatically_redraw, int waitlist_limit, int attendee_limit){
+                          boolean track_geolocation, boolean will_automatically_redraw, int waitlist_limit, int attendee_limit,String image){
         setDate_time(date_time);
         setLocation(location);
         setRegistration_start(registration_start);
@@ -636,6 +669,7 @@ public class Event {
         setWillAutomaticallyRedraw(will_automatically_redraw);
         setWaitlist_limit(waitlist_limit);
         setAttendee_limit(attendee_limit);
+        setImage(image);
         DataModel model = new DataModel();
         model.setEvent(this, new DataModel.SetCallback() {
             @Override

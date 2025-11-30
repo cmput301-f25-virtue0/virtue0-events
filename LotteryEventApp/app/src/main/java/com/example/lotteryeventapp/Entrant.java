@@ -1,8 +1,7 @@
 package com.example.lotteryeventapp;
 
-import android.provider.Settings;
-import android.util.Log;
 
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class Entrant {
-    private Profile profile;
+    private Entrant.Profile profile;
     private final String uid;
     private ArrayList<String> notifications = new ArrayList<>();
     private boolean notificationOptOut = false;
@@ -36,7 +35,7 @@ public class Entrant {
      * @param profile a profile object containing contact information
      * @throws NullPointerException if id or profile is null
      */
-    public Entrant(String uid, Profile profile,ArrayList<Double> location) {
+    public Entrant(String uid, Entrant.Profile profile, ArrayList<Double> location) {
         this.uid = Objects.requireNonNull(uid, "uid");
         this.profile = Objects.requireNonNull(profile, "profile");
         this.location = location;
@@ -68,7 +67,7 @@ public class Entrant {
     /**
      * @return profile for this entrant
      */
-    public Profile getProfile() {
+    public Entrant.Profile getProfile() {
         return profile;
     }
 
@@ -323,5 +322,4 @@ public class Entrant {
             }
         });
     }
-
 }
