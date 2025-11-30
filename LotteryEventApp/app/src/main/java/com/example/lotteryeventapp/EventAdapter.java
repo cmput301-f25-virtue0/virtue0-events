@@ -20,7 +20,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     private String currentEntrantId;
 
-
+    /**
+     * listens for event to be clicked on
+     */
     public interface OnEventClickListener {
         void onEventClick(@NonNull Event event, int position);
         void onDeleteClick(Event delEvent, int delPosition);
@@ -31,7 +33,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public EventAdapter() { this.clickListener = null; }
 
-
+    /**
+     * array adapter for events
+     * @param initial list of events
+     * @param myRole your role, either entrants, organiser, or admin
+     * @param myId id of either organizer or entrant
+     */
     public EventAdapter(@NonNull List<Event> initial, int myRole, String myId) {
         items.addAll(initial);
         this.clickListener = null;
@@ -44,7 +51,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
-
+    /**
+     * array adapter for events
+     * @param initial list of events
+     * @param role your role, either entrants, organizer, or admin
+     * @param listener listener for event being clicked
+     * @param myId id of either organizer or entrant
+     */
     public EventAdapter(@NonNull List<Event> initial, int role, @NonNull OnEventClickListener listener, String myId) {
         items.addAll(initial);
         this.clickListener = listener;
@@ -57,12 +70,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
+    /**
+     * set items for adapter
+     * @param newItems new events for adapter
+     */
     public void setItems(@NonNull List<Event> newItems) {
         items.clear();
         items.addAll(newItems);
         notifyDataSetChanged();
     }
 
+    /**
+     * create list of events
+     * @param parent   The ViewGroup into which the new View will be added after it is bound to
+     *                 an adapter position.
+     * @param viewType The view type of the new View.
+     * @return returns list of view of events
+     */
     @NonNull @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -70,6 +94,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return new EventViewHolder(v, clickListener, items);
     }
 
+    /**
+     * binds holder to view
+     * @param h   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder h, int position) {
         Event e = items.get(position);
@@ -83,26 +113,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }else{
             DataModel model = new DataModel();
             model.getImage(e.getImage(), new DataModel.GetCallback() {
-                        @Override
-                        public void onSuccess(Object obj) {
-                            ImageDataHolder image = (ImageDataHolder) obj;
-                            h.ivPoster.setImageBitmap(image.convertToBitmap());
-
-                        }
-
-                        @Override
-                        public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-
-                        }
-                    });
+                @Override
+                public void onSuccess(Object obj) {
+                    ImageDataHolder image = (ImageDataHolder) obj;
+                    h.ivPoster.setImageBitmap(image.convertToBitmap());
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
         }
-
-
         // Reset Visibility
         h.tvOwnerTag.setVisibility(View.GONE);
         h.tvJoinedTag.setVisibility(View.GONE);
@@ -110,7 +133,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         if (role == 1 && currentOrganizerId != null && e.getOrganizer() != null && currentOrganizerId.equals(e.getOrganizer())) {
             h.tvOwnerTag.setVisibility(View.VISIBLE);
         }
-
         //entrant lane
         if (role == 0 && currentEntrantId != null) {
             boolean isWaitlisted = e.getWaitlist() != null && e.getWaitlist().contains(currentEntrantId);
@@ -155,6 +177,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
+    /**
+     * count how many events there are
+     * @return amount of events
+     */
     @Override
     public int getItemCount() { return items.size(); }
 

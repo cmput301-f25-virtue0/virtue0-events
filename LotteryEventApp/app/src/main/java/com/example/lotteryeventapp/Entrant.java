@@ -23,7 +23,7 @@ public class Entrant {
     private ArrayList<String> invitedEvents = new ArrayList<>();
 
     private ArrayList<String> attendedEvents = new ArrayList<>();
-    private ArrayList<Double> location = new ArrayList<>(2) ;
+    private ArrayList<Double> location;
 
 
 
@@ -40,18 +40,32 @@ public class Entrant {
         this.location = location;
     }
 
+    /**
+     * get list of those attending the event
+     * @return list of those attending event
+     */
     public ArrayList<String> getAttendedEvents() {
         return attendedEvents;
     }
-
+    /**
+     * set list of those attending the event
+     * @param attendedEvents list of those attending the event
+     */
     public void setAttendedEvents(ArrayList<String> attendedEvents) {
         this.attendedEvents = attendedEvents;
     }
-
+    /**
+     * get list of those invited to the event
+     * @return list of those invited to the event
+     */
     public ArrayList<String> getInvitedEvents() {
         return invitedEvents;
     }
 
+    /**
+     * get list of those invited to the event
+     * @param invitedEvents list of those invited to event
+     */
     public void setInvitedEvents(ArrayList<String> invitedEvents) {
         this.invitedEvents = invitedEvents;
     }
@@ -76,38 +90,10 @@ public class Entrant {
     public ArrayList<String> getNotifications() {
         return notifications;
     }
-    public ArrayList<Notification> getUsableNotifications() throws InterruptedException {
-        DataModel model = new DataModel();
-        ArrayList<Notification> notifications = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(getNotifications().size());
-        for (String notification_id: getNotifications()) {
-            model.getNotification(notification_id, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-                    Notification notification = (Notification) obj;
-                    notifications.add(notification);
-                    latch.countDown();
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
 
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    latch.countDown();
-                }
-            });
-
-
-        }
-        latch.await();
-        return notifications;
-    }
 
     /**
+     * deletes notification
      * @param notification to remove notification
      */
     public void removeNotification(String notification) {
@@ -149,11 +135,17 @@ public class Entrant {
         this.notificationOptOut = out;
     }
 
-
+    /**
+     * gets location of entrant
+     * @return location of entrant
+     */
     public ArrayList<Double> getLocation() {
         return location;
     }
-
+    /**
+     * sets location of entrant
+     * @param location location of entrant
+     */
     public void setLocation(ArrayList<Double> location) {
         this.location = location;
     }
@@ -183,14 +175,26 @@ public class Entrant {
             setPhone("");
         }
 
+        /**
+         * gets the name from profile
+         * @return name from profile
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * gets email from profile
+         * @return email from profile
+         */
         public String getEmail() {
             return email;
         }
 
+        /**
+         * gets phone from profile
+         * @return phone from profile
+         */
         public String getPhone() {
             return phone;
         }
@@ -270,40 +274,71 @@ public class Entrant {
         return Objects.hash(uid);
     }
 
+    /**
+     * add event to waitlisted events
+     * @param eventId event to be added to waitlisted events
+     */
     public void addWaitlistedEvent(String eventId) {
         if (!waitlistedEvents.contains(eventId)) {
             waitlistedEvents.add(eventId);
         }
     }
 
+    /**
+     * remove event from waitlisted event
+     * @param eventId event to be removed
+     */
     public void removeWaitlistedEvent(String eventId) {
         waitlistedEvents.remove(eventId);
     }
 
+    /**
+     * get waitlisted events
+     * @return waitlisted events
+     */
     public ArrayList<String> getWaitlistedEvents() {
         return waitlistedEvents;
     }
-
+    /**
+     * add event to invited events
+     * @param eventId event to be added to invited events
+     */
     public void addInvitedEvent(String eventId) {
         if (!invitedEvents.contains(eventId)) {
             invitedEvents.add(eventId);
         }
     }
-
+    /**
+     * remove event from invited events
+     * @param eventId event to be removed
+     */
     public void removeInvitedEvent(String eventId) {
         invitedEvents.remove(eventId);
     }
-
+    /**
+     * get waitlisted events
+     * @return waitlisted events
+     */
     public void addAttendedEvent(String eventId) {
         if (!attendedEvents.contains(eventId)) {
             attendedEvents.add(eventId);
         }
     }
 
+    /**
+     * remove an event from the attending list
+     * @param eventId event to be removed
+     */
     public void removeAttendedEvent(String eventId) {
         attendedEvents.remove(eventId);
     }
 
+    /**
+     * update info in profile
+     * @param name name to be updated
+     * @param email email to be updated
+     * @param phone phone to be updated
+     */
     public void updateProfile(String name, String email, String phone) {
         profile.setName(name);
         profile.setEmail(email);
