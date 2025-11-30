@@ -834,5 +834,31 @@ public class DataModel extends TModel<TView>{
         });
 
     }
+    public void getEventsByTag(String tag, GetCallback cb) {
+        if (tag == null || tag.isEmpty() || tag.equalsIgnoreCase("All")) {
+            getAllEvents(cb, false);
+            return;
+        }
+        String dbTag = tag.toUpperCase();
+        Log.d("Firestore", "Querying events with tag: " + dbTag);
+        this.events.whereArrayContains("tags", dbTag)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Event> filteredEvents = new ArrayList<>();
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            EventDataHolder data = new EventDataHolder(document.getData(), document.getId());
+                            filteredEvents.add(data.createEventInstance());
+                        }
+
+                        Log.d("Firestore", "Found " + filteredEvents.size() + " events with tag: " + dbTag);
+                        cb.onSuccess(filteredEvents);
+                    } else {
+                        Log.e("Firestore", "Error querying events by tag", task.getException());
+                        cb.onError(task.getException());
+                    }
+                });
+    }
 
 }
