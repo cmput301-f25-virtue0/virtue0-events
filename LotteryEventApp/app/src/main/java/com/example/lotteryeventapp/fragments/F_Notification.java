@@ -13,8 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lotteryeventapp.AllEventsPagination;
+import com.example.lotteryeventapp.AllNotificationsPagination;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.FirestorePagination;
 import com.example.lotteryeventapp.Invitation;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.Messaging;
@@ -75,6 +79,7 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
 
         Entrant entrant = model.getCurrentEntrant();
         notificationList = new ArrayList<>();
+        adapter = new NotificationAdapter(notificationList, listener);
 
 
 
@@ -95,7 +100,8 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
                         public void onSuccess(Object obj) {
                             Log.d("Firebase", "retrieved");
                             ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
-                            adapter = new NotificationAdapter(notificationList, listener);
+                            adapter.setItems(notificationList);
+//                            adapter = new NotificationAdapter(notificationList, listener);
 
                             recyclerView.setAdapter(adapter);
 
@@ -125,31 +131,64 @@ public class F_Notification extends Fragment implements NotificationAdapter.OnNo
             });
 
         }else if(getArguments().getInt(ARG_ROLE)==2){
-            model.getAllNotifications(new DataModel.GetCallback() {
+            AllNotificationsPagination pagination = new AllNotificationsPagination(12);
+            pagination.getNextPage(new FirestorePagination.PaginationCallback() {
                 @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
-                }
-
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
-                    adapter = new NotificationAdapter(notificationList, listener);
-
+                public <T> void onGetPage(boolean hasResults, ArrayList<T> obs) {
+                    ArrayList<Notification> notificationData = (ArrayList<Notification>) obs;
+                    adapter.setItems(notificationData);
+                    adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
 
-                    MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
-                    toolbar.setNavigationOnClickListener(v -> {
-                        ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
-                    });
+
+
+
+
+
+//                    if (adapter != null) {
+//                        adapter.setItems(notificationData);
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                    swipeRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
+                    throw new RuntimeException(e);
                 }
             });
+            MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+            toolbar.setNavigationOnClickListener(v -> {
+                ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+            });
+
+
+
+//            model.getAllNotifications(new DataModel.GetCallback() {
+//                @Override
+//                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+//
+//                }
+//
+//                @Override
+//                public void onSuccess(Object obj) {
+//                    Log.d("Firebase", "retrieved");
+//                    ArrayList<Notification> notificationList = (ArrayList<Notification>) obj;
+//                    adapter = new NotificationAdapter(notificationList, listener);
+//
+//                    recyclerView.setAdapter(adapter);
+//
+//                    MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+//                    toolbar.setNavigationOnClickListener(v -> {
+//                        ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+//                    });
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("Firebase", "fail");
+//                }
+//            });
         }
 
 

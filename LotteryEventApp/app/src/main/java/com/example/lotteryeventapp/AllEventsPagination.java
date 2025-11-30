@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class AllEventsPagination extends FirestorePagination {
-
     public AllEventsPagination(int pageSize) {
         super();
         this.pageSize = pageSize;

@@ -13,10 +13,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lotteryeventapp.AllEntrantsPagination;
+import com.example.lotteryeventapp.AllEventsPagination;
+import com.example.lotteryeventapp.AllOrganizersPagination;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.FirestorePagination;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.Organizer;
+import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.tabs.TabLayout;
 
@@ -84,11 +90,13 @@ public class F_ProfilesList extends Fragment {
     }
 
     private void loadEntrants() {
-        model.getAllEntrants(new DataModel.ListCallback<Entrant>() {
+        AllEntrantsPagination pagination = new AllEntrantsPagination(10);
+        pagination.getNextPage(new FirestorePagination.PaginationCallback() {
             @Override
-            public void onSuccess(List<Entrant> list) {
+            public <T> void onGetPage(boolean hasResults, ArrayList<T> obs) {
+                ArrayList<Entrant> entrantData = (ArrayList<Entrant>) obs;
                 List<ProfileRow> rows = new ArrayList<>();
-                for (Entrant e : list) {
+                for (Entrant e : entrantData) {
                     String name = e.getProfile() != null ? e.getProfile().getName() : "";
                     String email = e.getProfile() != null ? e.getProfile().getEmail() : "";
                     rows.add(new ProfileRow(
@@ -98,24 +106,27 @@ public class F_ProfilesList extends Fragment {
                             "Entrant"
                     ));
                 }
+
                 adapter.updateData(rows);
+
             }
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(requireContext(),
-                        "Failed to load entrants",
-                        Toast.LENGTH_SHORT).show();
+                throw new RuntimeException(e);
             }
         });
     }
 
     private void loadOrganizers() {
-        model.getAllOrganizers(new DataModel.ListCallback<Organizer>() {
+
+        AllOrganizersPagination pagination = new AllOrganizersPagination(10);
+        pagination.getNextPage(new FirestorePagination.PaginationCallback() {
             @Override
-            public void onSuccess(List<Organizer> list) {
+            public <T> void onGetPage(boolean hasResults, ArrayList<T> obs) {
+                ArrayList<Organizer> organizerData = (ArrayList<Organizer>) obs;
                 List<ProfileRow> rows = new ArrayList<>();
-                for (Organizer o : list) {
+                for (Organizer o : organizerData) {
                     // If Organizer has profile later, you can show more details
                     rows.add(new ProfileRow(
                             o.getUid(),
@@ -125,14 +136,16 @@ public class F_ProfilesList extends Fragment {
                     ));
                 }
                 adapter.updateData(rows);
+
+
+
             }
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(requireContext(),
-                        "Failed to load organizers",
-                        Toast.LENGTH_SHORT).show();
+                throw new RuntimeException(e);
             }
+
         });
     }
 
