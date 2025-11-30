@@ -200,7 +200,7 @@ public class DataModel extends TModel<TView>{
         imageRef.get()
                 .addOnSuccessListener(imageSnap -> {
                     if (imageSnap.exists()) {
-                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData());
+                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData(),imageId);
 
                         Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
                         cb.onSuccess(image);
@@ -361,8 +361,24 @@ public class DataModel extends TModel<TView>{
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
 
-    public void getAdmin() {
-        throw new UnsupportedOperationException("Admin not implemented yet");
+    public void getAdmin(String deviceId, GetCallback cb) {
+        DocumentReference adminRef = this.admins.document(deviceId);
+        adminRef.get()
+                .addOnSuccessListener(adminSnap -> {
+                    if (adminSnap.exists()) {
+                        AdminDataHolder adminData = new AdminDataHolder(adminSnap.getData(), deviceId);
+
+                        Log.d("Firestore", "Firestore fetch succeeded: Admin " + deviceId);
+                        cb.onSuccess(adminData);
+                    }else {
+                        Log.e("Firestore", "Firestore fetch failed: Admin " + deviceId + " does not exist");
+                        cb.onError(new RuntimeException("Organizer does not exist"));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Firestore fetch failed: Admin " + deviceId + "\n" + e.getMessage());
+                    cb.onError(e);
+                });
     }
 
     public void deleteAdmin() {
@@ -469,6 +485,8 @@ public class DataModel extends TModel<TView>{
      * @param cb call back for getting from database
      * @param forceRefresh will it force a refresh
      */
+
+    @Deprecated
     public void getAllEvents(GetCallback cb, boolean forceRefresh){
 
         // Check cache first
@@ -774,7 +792,30 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
+    public void getUsableEvents(Organizer organizer, GetCallback cb){
+        List eventsIds = organizer.getEvents();
+//        ArrayList<> filterObjects = new ArrayList<>;
+        ArrayList<Event> events = new ArrayList<>();
 
+//        Filter filter = Filter.equalTo(FieldPath.documentId(), entrants);
+        this.events.whereIn(FieldPath.documentId(),   eventsIds)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                EventDataHolder data = new EventDataHolder(document.getData(),document.getId());
+                                events.add(data.createEventInstance());
+                            }
+                            cb.onSuccess(events);
+                        } else {
+                            Log.d("Firestore", "Error getting documents: ", task.getException());
+                            cb.onError(task.getException());
+                        }
+                    }
+                });
+    }
     public interface ListCallback<T> {
         /**
          * Called on successful fetch of a list from the database
@@ -898,10 +939,32 @@ public class DataModel extends TModel<TView>{
                 .addOnFailureListener(cb::onError);
     }
 
-    /**
-     * get all notifications
-     * @param cb get callback for retrieving from database
-     */
+
+    public void getAllEntrants(GetCallback cb) {
+        this.entrants.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<Entrant> entrantList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    try {
+                        EntrantDataHolder data = new EntrantDataHolder(document.getData(), document.getId());
+                        Entrant entrant = data.createEntrantInstance();
+
+                        if (entrant != null) {
+                            entrantList.add(entrant);
+                        }
+                    } catch (Exception e) {
+                        Log.e("DataModel", "Skipping invalid entrant doc: " + document.getId());
+                    }
+                }
+                cb.onSuccess(entrantList);
+            } else {
+                Log.e("DataModel", "Error getting all entrants", task.getException());
+                cb.onError(task.getException());
+            }
+        });
+    }
+
+
     public void getAllNotifications(GetCallback cb) {
         this.notifications.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

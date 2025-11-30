@@ -113,19 +113,40 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }else{
             DataModel model = new DataModel();
             model.getImage(e.getImage(), new DataModel.GetCallback() {
-                @Override
-                public void onSuccess(Object obj) {
-                    ImageDataHolder image = (ImageDataHolder) obj;
-                    h.ivPoster.setImageBitmap(image.convertToBitmap());
-                }
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-                }
-                @Override
-                public void onError(Exception e) {
-                }
-            });
+                        @Override
+                        public void onSuccess(Object obj) {
+                            ImageDataHolder image = (ImageDataHolder) obj;
+                            if(image == null){
+                                e.setImage("");
+                                model.setEvent(e, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String id) {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+
+                                    }
+                                });
+                            }else {
+                                h.ivPoster.setImageBitmap(image.convertToBitmap());
+                            }
+                        }
+
+                        @Override
+                        public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+
+                        }
+                    });
         }
+
+
         // Reset Visibility
         h.tvOwnerTag.setVisibility(View.GONE);
         h.tvJoinedTag.setVisibility(View.GONE);
@@ -133,6 +154,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         if (role == 1 && currentOrganizerId != null && e.getOrganizer() != null && currentOrganizerId.equals(e.getOrganizer())) {
             h.tvOwnerTag.setVisibility(View.VISIBLE);
         }
+
         //entrant lane
         if (role == 0 && currentEntrantId != null) {
             boolean isWaitlisted = e.getWaitlist() != null && e.getWaitlist().contains(currentEntrantId);

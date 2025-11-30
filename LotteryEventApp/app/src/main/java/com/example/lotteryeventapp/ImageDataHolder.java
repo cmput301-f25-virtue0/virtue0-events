@@ -81,12 +81,8 @@ public class ImageDataHolder {
         }
     }
 
-    /**
-     * construct ImageDataHolder from map from database
-     * @param data data from database
-     */
-    public ImageDataHolder(Map<String, Object> data) {
-        this.uid = (String) data.get("uid");
+    public ImageDataHolder(Map<String, Object> data, String uid) {
+        this.uid = uid;
 
         Object objectBlob = data.get("imageBlob");
         this.imageBlob = (Blob) objectBlob;

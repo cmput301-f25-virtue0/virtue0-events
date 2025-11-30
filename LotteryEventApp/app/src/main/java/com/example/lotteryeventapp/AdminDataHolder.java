@@ -1,7 +1,11 @@
 package com.example.lotteryeventapp;
 
+import java.util.Map;
+
 public class AdminDataHolder {
-    public AdminDataHolder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    String uid;
+
+    public AdminDataHolder(Map<String, Object> data, String deviceId) {
+        this.uid = uid;
     }
 }

@@ -16,10 +16,10 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
      */
     public interface OnImageClickListener {
         void onImageClick(String imageLabel, int position);
-        void onDeleteClick(String imageLabel, int position);
+        void onDeleteClick(ImageDataHolder imageLabel, int position);
     }
 
-    private final List<String> items = new ArrayList<>();
+    private final List<ImageDataHolder> items = new ArrayList<>();
     private final OnImageClickListener clickListener;
 
     /**
@@ -27,7 +27,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
      * @param initialData list of uids of images
      * @param listener image click listener
      */
-    public ImageListAdapter(@NonNull List<String> initialData, @NonNull OnImageClickListener listener) {
+    public ImageListAdapter(@NonNull List<ImageDataHolder> initialData, @NonNull OnImageClickListener listener) {
         items.addAll(initialData);
         this.clickListener = listener;
     }
@@ -55,16 +55,17 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
      */
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder h, int position) {
-        String imageLabel = items.get(position);
+        ImageDataHolder image = items.get(position);
 
-        h.tvLabel.setText(imageLabel);
+        h.tvLabel.setText(image.getUid());
+        h.ivThumb.setImageBitmap(image.convertToBitmap());
 
         h.itemView.setOnClickListener(v -> {
-            clickListener.onImageClick(imageLabel, h.getBindingAdapterPosition());
+            clickListener.onImageClick(image.getUid(), h.getBindingAdapterPosition());
         });
 
         h.ivDelete.setOnClickListener(v -> {
-            clickListener.onDeleteClick(imageLabel, h.getBindingAdapterPosition());
+            clickListener.onDeleteClick(image, h.getBindingAdapterPosition());
         });
     }
 
@@ -76,10 +77,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
     public int getItemCount() {
         return items.size();
     }
-
-    /**
-     * ImageViewHolder
-     */
+    public void setItems(@NonNull List<ImageDataHolder> newItems) {
+        items.clear();
+        items.addAll(newItems);
+        notifyDataSetChanged();
+    }
     static class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView ivThumb;
         TextView tvLabel;

@@ -616,5 +616,128 @@ public class Event {
     public void setDrawn(boolean drawn) {
         this.drawn = drawn;
     }
+    public ArrayList<Entrant> getUsableWaitList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getWaitlistAmount());
+        for (String entrant_id: getWaitlist()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
+
+    public ArrayList<Entrant> getUsableAttendeeList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getAttendee_list().size());
+        for (String entrant_id: getAttendee_list()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
+
+    public ArrayList<Entrant> getUsableCancelledList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getAttendee_list().size());
+        for (String entrant_id: getAttendee_list()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
+
+    public ArrayList<Entrant> getUsableInvitedList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getInvited_list().size());
+        for (String entrant_id: getInvited_list()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
 
 }
