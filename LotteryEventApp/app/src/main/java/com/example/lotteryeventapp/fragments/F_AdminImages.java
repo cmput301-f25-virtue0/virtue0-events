@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import java.util.List;
 public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageClickListener {
     private int role;
     private DataModel model;
+    ImageListAdapter adapter = new ImageListAdapter(new ArrayList<>(), this);
+
 
     public static F_AdminImages newInstance(int myRole){
         F_AdminImages fragment = new F_AdminImages();
@@ -67,8 +70,7 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
 //                "Event Poster 3.jpg"
 //        );
 //        F_AdminImages listener = this;
-        ArrayList<ImageDataHolder> data = new ArrayList<>();
-        ImageListAdapter adapter = new ImageListAdapter(data, this);
+//        ArrayList<ImageDataHolder> data = new ArrayList<>();
 
         AllImagesPagination pagination = new AllImagesPagination(12);
         pagination.getNextPage(new FirestorePagination.PaginationCallback() {
@@ -111,9 +113,19 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
     }
 
     @Override
-    public void onDeleteClick(String imageLabel, int position) {
+    public void onDeleteClick(ImageDataHolder image, int position) {
+        model.deleteImage(image, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                adapter.notifyDataSetChanged();
+            }
 
-        Toast.makeText(requireContext(), "Delete: " + imageLabel, Toast.LENGTH_SHORT).show();
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+//        Toast.makeText(requireContext(), "Delete: " + imageLabel, Toast.LENGTH_SHORT).show();
         // TODO: Add code to delete the image from firestore and maybe refresh adapter
     }
 }

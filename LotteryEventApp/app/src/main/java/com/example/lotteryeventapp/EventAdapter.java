@@ -86,8 +86,22 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                         @Override
                         public void onSuccess(Object obj) {
                             ImageDataHolder image = (ImageDataHolder) obj;
-                            h.ivPoster.setImageBitmap(image.convertToBitmap());
+                            if(image == null){
+                                e.setImage("");
+                                model.setEvent(e, new DataModel.SetCallback() {
+                                    @Override
+                                    public void onSuccess(String id) {
 
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+
+                                    }
+                                });
+                            }else {
+                                h.ivPoster.setImageBitmap(image.convertToBitmap());
+                            }
                         }
 
                         @Override

@@ -14,7 +14,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
 
     public interface OnImageClickListener {
         void onImageClick(String imageLabel, int position);
-        void onDeleteClick(String imageLabel, int position);
+        void onDeleteClick(ImageDataHolder imageLabel, int position);
     }
 
     private final List<ImageDataHolder> items = new ArrayList<>();
@@ -45,7 +45,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
         });
 
         h.ivDelete.setOnClickListener(v -> {
-            clickListener.onDeleteClick(image.getUid(), h.getBindingAdapterPosition());
+            clickListener.onDeleteClick(image, h.getBindingAdapterPosition());
         });
     }
 
