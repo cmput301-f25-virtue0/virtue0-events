@@ -31,6 +31,13 @@ public class Event {
     private boolean drawn;
     private String image;
 
+    public enum EventTag {
+        ALL, SPORT, ACADEMIC, ARTS, MUSIC, GAMING, TECHNOLOGY, CRAFTS, OUTDOORS,
+        COOKING, CLASS, SOCIAL, COMPETITIVE, WORKSHOP, CHARITY, HOLIDAY, CAREER
+    }
+
+    private ArrayList<EventTag> tags;
+
     /**
      * Creates an Event
      * @param date_time date and time of the Event
@@ -43,7 +50,7 @@ public class Event {
      * @param attendee_limit maximum amount of Entrant that will attend the event
      */
     public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
-                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
+                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, ArrayList<EventTag> tags){
         this.title = title;
         this.uid = uid;
         this.date_time = date_time;
@@ -62,10 +69,18 @@ public class Event {
         this.drawn = false;
         this.organizer = organizer;
         this.image = "";
+
+        //If null or empty, default to ALL
+        if (tags == null || tags.isEmpty()) {
+            this.tags = new ArrayList<>();
+            this.tags.add(EventTag.ALL);
+        } else {
+            this.tags = tags;
+        }
     }
 
     public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
-                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, String image){
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, String image, ArrayList<EventTag> tags){
         this.title = title;
         this.uid = uid;
         this.date_time = date_time;
@@ -84,10 +99,17 @@ public class Event {
         this.drawn = false;
         this.organizer = organizer;
         this.image = image;
+
+        if (tags == null || tags.isEmpty()) {
+            this.tags = new ArrayList<>();
+            this.tags.add(EventTag.ALL);
+        } else {
+            this.tags = tags;
+        }
     }
 
     public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
-                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer){
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, ArrayList<EventTag> tags){
         this.title = title;
         this.uid = "";
         this.date_time = date_time;
@@ -106,9 +128,16 @@ public class Event {
         this.drawn = false;
         this.organizer = organizer;
         this.image = "";
+
+        if (tags == null || tags.isEmpty()) {
+            this.tags = new ArrayList<>();
+            this.tags.add(EventTag.ALL);
+        } else {
+            this.tags = tags;
+        }
     }
     public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
-                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer,String image){
+                 boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer,String image, ArrayList<EventTag> tags){
         this.title = title;
         this.uid = "";
         this.date_time = date_time;
@@ -127,6 +156,27 @@ public class Event {
         this.drawn = false;
         this.organizer = organizer;
         this.image = image;
+
+        if (tags == null || tags.isEmpty()) {
+            this.tags = new ArrayList<>();
+            this.tags.add(EventTag.ALL);
+        } else {
+            this.tags = tags;
+        }
+    }
+
+    public ArrayList<EventTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(ArrayList<EventTag> tags) {
+        // Enforce default on setter as well
+        if (tags == null || tags.isEmpty()) {
+            this.tags = new ArrayList<>();
+            this.tags.add(EventTag.ALL);
+        } else {
+            this.tags = tags;
+        }
     }
     public String getRegistration_start() {
         return registration_start;
@@ -671,6 +721,7 @@ public class Event {
         setAttendee_limit(attendee_limit);
         setImage(image);
         DataModel model = new DataModel();
+        setTags(tags);
         model.setEvent(this, new DataModel.SetCallback() {
             @Override
             public void onSuccess(String msg) {
