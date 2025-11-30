@@ -48,9 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private ArrayList<Double> entrantLocation = new ArrayList<>(Arrays.asList(0.0, 0.0));
     private static final int PERMISSION_REQUEST_CODE = 123;
-
-
     private String deviceID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
                 permissionsToRequest.add(permission);
             }
         }
-
         // If there are permissions that need to
         // be requested, ask the user for them
         if (!permissionsToRequest.isEmpty()) {
@@ -84,20 +82,13 @@ public class MainActivity extends AppCompatActivity {
             );
         } else {
             // All permissions are already granted
-            Toast.makeText(this, "All permissions already granted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Location permissions already granted", Toast.LENGTH_SHORT).show();
         }
 
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions();
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-//            public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                                                      int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         fusedLocationClient.getLastLocation()
