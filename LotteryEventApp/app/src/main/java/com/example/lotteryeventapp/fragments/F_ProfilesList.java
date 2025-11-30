@@ -15,20 +15,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Entrant;
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.ImageListAdapter;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.Organizer;
+import com.example.lotteryeventapp.OrganizerListAdapter;
+import com.example.lotteryeventapp.ProfileListAdapter;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class F_ProfilesList extends Fragment {
+public class F_ProfilesList extends Fragment implements ProfileListAdapter.OnProfileClickListener, OrganizerListAdapter.OnOrganizerClickListener {
 
     private DataModel model;
     private RecyclerView rvProfiles;
     private TabLayout tabProfiles;
-    private ProfileListAdapter adapter;
+    private ProfileListAdapter entrantAdapter;
+    private OrganizerListAdapter organizerAdapter;
+
 
     public F_ProfilesList() {
         // empty constructor
@@ -60,8 +66,9 @@ public class F_ProfilesList extends Fragment {
 
         // RecyclerView
         rvProfiles.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new ProfileListAdapter(new ArrayList<>());
-        rvProfiles.setAdapter(adapter);
+        entrantAdapter = new ProfileListAdapter(new ArrayList<>(),this);
+        organizerAdapter = new OrganizerListAdapter(new ArrayList<>(),this);
+
 
         tabProfiles.addTab(tabProfiles.newTab().setText("Entrants"));
         tabProfiles.addTab(tabProfiles.newTab().setText("Organizers"));
@@ -72,8 +79,10 @@ public class F_ProfilesList extends Fragment {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if ("Entrants".contentEquals(tab.getText())) {
+                    rvProfiles.setAdapter(entrantAdapter);
                     loadEntrants();
                 } else {
+                    rvProfiles.setAdapter(organizerAdapter);
                     loadOrganizers();
                 }
             }
@@ -87,18 +96,7 @@ public class F_ProfilesList extends Fragment {
         model.getAllEntrants(new DataModel.ListCallback<Entrant>() {
             @Override
             public void onSuccess(List<Entrant> list) {
-                List<ProfileRow> rows = new ArrayList<>();
-                for (Entrant e : list) {
-                    String name = e.getProfile() != null ? e.getProfile().getName() : "";
-                    String email = e.getProfile() != null ? e.getProfile().getEmail() : "";
-                    rows.add(new ProfileRow(
-                            e.getUid(),
-                            name,
-                            email,
-                            "Entrant"
-                    ));
-                }
-                adapter.updateData(rows);
+                entrantAdapter.setItems(list);
             }
 
             @Override
@@ -114,17 +112,8 @@ public class F_ProfilesList extends Fragment {
         model.getAllOrganizers(new DataModel.ListCallback<Organizer>() {
             @Override
             public void onSuccess(List<Organizer> list) {
-                List<ProfileRow> rows = new ArrayList<>();
-                for (Organizer o : list) {
-                    // If Organizer has profile later, you can show more details
-                    rows.add(new ProfileRow(
-                            o.getUid(),
-                            "",    // name unknown for now
-                            "",
-                            "Organizer"
-                    ));
-                }
-                adapter.updateData(rows);
+
+                organizerAdapter.setItems(list);
             }
 
             @Override
@@ -135,6 +124,263 @@ public class F_ProfilesList extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onProfileClick(Organizer organizer, int position) {
+
+    }
+
+    @Override
+    public void onDeleteClick(Organizer organizer, int position) {
+        ArrayList<String> events = organizer.getEvents();
+        for(String event: events) {
+            deleteEvent(event);
+        }
+        model.deleteOrganizer(organizer, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onProfileClick(Entrant entrant, int position) {
+
+    }
+
+    @Override
+    public void onDeleteClick(Entrant entrant, int position) {
+        deleteEntrantFromWaitlist(entrant);
+        deleteEntrantfromInvitedList(entrant);
+        deleteEntrantFromAttendeeList(entrant);
+        model.deleteEntrant(entrant, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+    }
+    private void deleteEntrantFromWaitlist(Entrant entrant){
+        ArrayList<String> waitlistedEvents = entrant.getWaitlistedEvents();
+        for(String eventId: waitlistedEvents){
+            model.getEvent(eventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Event event = (Event) obj;
+                    if(event != null) {
+                        event.waitlistRemove(entrant.getUid());
+                        model.setEvent(event, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String id) {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+    private void deleteEntrantfromInvitedList(Entrant entrant){
+        ArrayList<String> invitedlistedEvents = entrant.getInvitedEvents();
+        for(String eventId: invitedlistedEvents){
+            model.getEvent(eventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Event event = (Event) obj;
+                    if(event != null) {
+                        event.invitedListRemove(entrant.getUid());
+                        model.setEvent(event, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String id) {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+    private void deleteEntrantFromAttendeeList(Entrant entrant){
+        ArrayList<String> attendeelistedEvents = entrant.getAttendedEvents();
+        for(String eventId: attendeelistedEvents){
+            model.getEvent(eventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Event event = (Event) obj;
+                    if(event != null) {
+                        event.attendeeListRemove(entrant.getUid());
+                        model.setEvent(event, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String id) {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+    private void deleteEvent(String event){
+        model.getEvent(event, new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+                Event deletingEvent = (Event) obj;
+                if(deletingEvent != null) {
+                    deleteEventFromLists(deletingEvent);
+                    model.deleteEvent(deletingEvent, new DataModel.DeleteCallback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                        }
+                    });
+                }
+            }
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+    }
+    private void deleteEventFromLists(Event obj){
+        deleteEventFromWaitlist(obj);
+        deleteEventFromInvitedList(obj);
+        deleteEventFromAttendingList(obj);
+    }
+    private void deleteEventFromWaitlist(Event event){
+        ArrayList<String> waitlist = event.getWaitlist();
+        for(String entrantId: waitlist){
+            model.getEntrant(entrantId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Entrant entrant = (Entrant) obj;
+                    if(entrant != null) {
+                        entrant.removeWaitlistedEvent(event.getUid());
+                        model.setEntrant(entrant, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String id) {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+
+    }
+    private void deleteEventFromInvitedList(Event event){
+        ArrayList<String> invitedList = event.getInvited_list();
+        for(String entrantId: invitedList){
+            model.getEntrant(entrantId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Entrant entrant = (Entrant) obj;
+                    if(entrant != null) {
+                        entrant.removeInvitedEvent(event.getUid());
+                        model.setEntrant(entrant, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String id) {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+    private void deleteEventFromAttendingList(Event event){
+        ArrayList<String> attendingList = event.getAttendee_list();
+        for(String entrantId: attendingList){
+            model.getEntrant(entrantId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Entrant entrant = (Entrant) obj;
+                    if(entrant != null) {
+                        entrant.removeAttendedEvent(event.getUid());
+                        model.setEntrant(entrant, new DataModel.SetCallback() {
+                            @Override
+                            public void onSuccess(String id) {
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+
 
     static class ProfileRow {
         String uid;
@@ -150,72 +396,83 @@ public class F_ProfilesList extends Fragment {
         }
     }
 
-    static class ProfileListAdapter extends RecyclerView.Adapter<ProfileViewHolder> {
+//    static class ProfileListAdapter extends RecyclerView.Adapter<ProfileViewHolder> {
+//
+//
+//        private final List<ProfileRow> items;
+//
+//        ProfileListAdapter(List<ProfileRow> items) {
+//            this.items = items;
+//        }
+//
+//        void updateData(List<ProfileRow> newItems) {
+//            items.clear();
+//            items.addAll(newItems);
+//            notifyDataSetChanged();
+//        }
+//
+//        @NonNull
+//        @Override
+//        public ProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+//                                                    int viewType) {
+//            View itemView = LayoutInflater.from(parent.getContext())
+//                    .inflate(R.layout.admin_profile_item, parent, false);
+//            itemView.findViewById(R.id.ivDelete).setOnClickListener(v -> {
+//
+//            });
+//            return new ProfileViewHolder(itemView);
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(@NonNull ProfileViewHolder holder,
+//                                     int position) {
+//            ProfileRow row = items.get(position);
+//
+//            String line1;
+//            if (!row.name.isEmpty()) {
+//                line1 = row.name;
+//            } else {
+//                line1 = row.uid;
+//            }
+//
+//            String line2;
+//            if (!row.email.isEmpty()) {
+//                line2 = "Email: " + row.email;
+//            } else {
+//                line2 = "UID: " + row.uid;
+//            }
+//
+//            holder.bind(line1, line2);
+//
+//
+//
+//        }
+//
+//
+//        @Override
+//        public int getItemCount() {
+//            return items.size();
+//        }
+//    }
+//
+//
+//    static class ProfileViewHolder extends RecyclerView.ViewHolder {
+//
+//        private final android.widget.TextView text1;
+//        private final android.widget.TextView text2;
+//
+//        ProfileViewHolder(@NonNull View itemView) {
+//            super(itemView);
+//            text1 = itemView.findViewById(R.id.tvName);
+//            text2 = itemView.findViewById(R.id.tvEmail);
+//        }
+//
+//        void bind(String line1, String line2) {
+//            text1.setText(line1);
+////
+//            text2.setText(line2);
+//        }
+//    }
 
-        private final List<ProfileRow> items;
 
-        ProfileListAdapter(List<ProfileRow> items) {
-            this.items = items;
-        }
-
-        void updateData(List<ProfileRow> newItems) {
-            items.clear();
-            items.addAll(newItems);
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public ProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                                    int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(android.R.layout.simple_list_item_2, parent, false);
-            return new ProfileViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ProfileViewHolder holder,
-                                     int position) {
-            ProfileRow row = items.get(position);
-
-            String line1;
-            if (!row.name.isEmpty()) {
-                line1 = row.name;
-            } else {
-                line1 = row.uid;
-            }
-
-            String line2;
-            if (!row.email.isEmpty()) {
-                line2 = "Email: " + row.email;
-            } else {
-                line2 = "UID: " + row.uid;
-            }
-
-            holder.bind(line1, line2);
-        }
-
-        @Override
-        public int getItemCount() {
-            return items.size();
-        }
-    }
-
-
-    static class ProfileViewHolder extends RecyclerView.ViewHolder {
-
-        private final android.widget.TextView text1;
-        private final android.widget.TextView text2;
-
-        ProfileViewHolder(@NonNull View itemView) {
-            super(itemView);
-            text1 = itemView.findViewById(android.R.id.text1);
-            text2 = itemView.findViewById(android.R.id.text2);
-        }
-
-        void bind(String line1, String line2) {
-            text1.setText(line1);
-            text2.setText(line2);
-        }
-    }
 }
