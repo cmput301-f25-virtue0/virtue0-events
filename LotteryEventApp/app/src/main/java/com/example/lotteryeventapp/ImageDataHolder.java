@@ -15,11 +15,18 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * Images of posters for Events
+ */
 public class ImageDataHolder {
     Blob imageBlob;
     String uid = "";
     final int MAX_SIZE_BYTES = 1048576;
 
+    /**
+     * construct ImageDataHolder from an ImageView
+     * @param imageView ImageView ImageDataHolder is constructed by
+     */
     public ImageDataHolder(ImageView imageView) {
         Drawable drawable = imageView.getDrawable();
 
@@ -53,6 +60,10 @@ public class ImageDataHolder {
         }
     }
 
+    /**
+     * Construct ImageDataHolder from Blob
+     * @param blob Blob ImageDataHolder is based on
+     */
     public ImageDataHolder(Blob blob) {
         this.imageBlob = blob;
 
@@ -61,6 +72,10 @@ public class ImageDataHolder {
         }
     }
 
+    /**
+     * construct ImageDataHolder from byte array
+     * @param data byte array ImageDataHolder is constructed from
+     */
     public ImageDataHolder(byte[] data) {
         this.imageBlob = Blob.fromBytes(data);
 
@@ -69,6 +84,11 @@ public class ImageDataHolder {
         }
     }
 
+    /**
+     * constructs ImageDataHolder from map from database
+     * @param data data from database
+     * @param uid uid of ImageDataHolder
+     */
     public ImageDataHolder(Map<String, Object> data, String uid) {
         this.uid = uid;
 
@@ -80,11 +100,19 @@ public class ImageDataHolder {
         }
     }
 
+    /**
+     * converts ImageDataHolder into a bitmap
+     * @return Bitmap based on ImageDataHolder
+     */
     public Bitmap convertToBitmap() {
         byte[] data = this.imageBlob.toBytes();
         return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
+    /**
+     * Image is larger than allowed image size
+     * @return whether ImageDataHolder is too large
+     */
     public boolean exceedsMaxDocumentSize() {
         int byteSize = 0;
 
@@ -100,19 +128,32 @@ public class ImageDataHolder {
         return byteSize > this.MAX_SIZE_BYTES;
     }
 
-    // Getters and Setters
+    /**
+     * get blob of ImageDataHolder
+     * @return blob of ImageDataHolder
+     */
     public Blob getImageBlob() {
         return this.imageBlob;
     }
-
+    /**
+     * set blob of ImageDataHolder
+     * @param blob blob of ImageDataHolder
+     */
     public void setImageBlob(Blob blob) {
         this.imageBlob = blob;
     }
 
+    /**
+     * get uid of ImageDataHolder
+     * @return uid of ImageDataHolder
+     */
     public String getUid() {
         return this.uid;
     }
-
+    /**
+     * set uid of ImageDataHolder
+     * @param uid uid of ImageDataHolder
+     */
     public void setUid(String uid) {
         this.uid = uid;
     }

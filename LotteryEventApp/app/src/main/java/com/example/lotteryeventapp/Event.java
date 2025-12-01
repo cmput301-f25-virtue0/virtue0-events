@@ -39,15 +39,19 @@ public class Event {
     private ArrayList<EventTag> tags;
 
     /**
-     * Creates an Event
+     * Creates an Event without an image
+     * @param title title of event
+     * @param uid uid of event
      * @param date_time date and time of the Event
      * @param location location of the Event
+     * @param registration_start registration start time of event
      * @param registration_deadline registration deadline of an event
      * @param details details and information about an Event such as: topic, difficulty, age range etc.
      * @param track_geolocation whether the Event would like to track the waitlist Entrants location
      * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
      * @param waitlist_limit maximum amount of Entrants in a waitlist
      * @param attendee_limit maximum amount of Entrant that will attend the event
+     * @param organizer organizer of event
      */
     public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
                   boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, ArrayList<EventTag> tags){
@@ -79,6 +83,22 @@ public class Event {
         }
     }
 
+    /**
+     * create event with an image
+     * @param title title of event
+     * @param uid uid of event
+     * @param date_time date and time of the Event
+     * @param location location of the Event
+     * @param registration_start registration start time of event
+     * @param registration_deadline registration deadline of an event
+     * @param details details and information about an Event such as: topic, difficulty, age range etc.
+     * @param track_geolocation whether the Event would like to track the waitlist Entrants location
+     * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
+     * @param waitlist_limit maximum amount of Entrants in a waitlist
+     * @param attendee_limit maximum amount of Entrant that will attend the event
+     * @param organizer organizer of event
+     * @param image image of poster for event
+     */
     public Event(String title, String uid, String date_time, String location, String registration_start,String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, String image, ArrayList<EventTag> tags){
         this.title = title;
@@ -108,6 +128,20 @@ public class Event {
         }
     }
 
+    /**
+     * Create an event without an image or uid
+     * @param title title of event
+     * @param date_time date and time of the Event
+     * @param location location of the Event
+     * @param registration_start registration start time of event
+     * @param registration_deadline registration deadline of an event
+     * @param details details and information about an Event such as: topic, difficulty, age range etc.
+     * @param track_geolocation whether the Event would like to track the waitlist Entrants location
+     * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
+     * @param waitlist_limit maximum amount of Entrants in a waitlist
+     * @param attendee_limit maximum amount of Entrant that will attend the event
+     * @param organizer organizer of event
+     */
     public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer, ArrayList<EventTag> tags){
         this.title = title;
@@ -136,6 +170,22 @@ public class Event {
             this.tags = tags;
         }
     }
+
+    /**
+     * Create event without a uid
+     * @param title title of event
+     * @param date_time date and time of the Event
+     * @param location location of the Event
+     * @param registration_start registration start time of event
+     * @param registration_deadline registration deadline of an event
+     * @param details details and information about an Event such as: topic, difficulty, age range etc.
+     * @param track_geolocation whether the Event would like to track the waitlist Entrants location
+     * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
+     * @param waitlist_limit maximum amount of Entrants in a waitlist
+     * @param attendee_limit maximum amount of Entrant that will attend the event
+     * @param organizer organizer of event
+     * @param image image of poster for event
+     */
     public Event(String title, String date_time, String location, String registration_start, String registration_deadline, String details,
                  boolean track_geolocation,boolean will_automatically_redraw, int waitlist_limit, int attendee_limit, String organizer,String image, ArrayList<EventTag> tags){
         this.title = title;
@@ -178,38 +228,64 @@ public class Event {
             this.tags = tags;
         }
     }
+
+    /**
+     * get registration start time
+     * @return registration start time
+     */
     public String getRegistration_start() {
         return registration_start;
     }
-
+    /**
+     * set registration start time of Event
+     * @param registration_start registration start time of event
+     */
     public void setRegistration_start(String registration_start) {
         this.registration_start = registration_start;
     }
 
-
+    /**
+     * get organizer of the event
+     * @return organizer of the event
+     */
     public String getOrganizer() {
         return organizer;
     }
-
+    /**
+     * set organizer of Event
+     * @param organizer organizer of event
+     */
     public void setOrganizer(String organizer) {
         this.organizer = organizer;
     }
 
-
+    /**
+     * set uid of Event
+     * @param uid uid of event
+     */
 
     public void setUid(String uid) {
         this.uid = uid;
     }
-
+    /**
+     * get uid of the event
+     * @return uid of the event
+     */
     public String getUid() {
         return uid;
     }
 
-
+    /**
+     * get title of the event
+     * @return title of the event
+     */
     public String getTitle() {
         return title;
     }
-
+    /**
+     * set title of Event
+     * @param title title of event
+     */
     public void setTitle(String title) {
         this.title = title;
     }
@@ -294,11 +370,18 @@ public class Event {
         this.track_geolocation = track_geolocation;
     }
 
-
+    /**
+     * will the event automatically redraw
+     * @return whether the event will automatically redraw
+     */
     public boolean willAutomaticallyRedraw() {
         return will_automatically_redraw;
     }
 
+    /**
+     * set whether event will automatically redraw from waitlist
+     * @param will_automatically_redraw will event automatically redraw from waitlist
+     */
     public void setWillAutomaticallyRedraw(boolean will_automatically_redraw) {
         this.will_automatically_redraw = will_automatically_redraw;
     }
@@ -341,10 +424,18 @@ public class Event {
         this.attendee_limit = attendee_limit;
     }
 
+    /**
+     * gets image for event
+     * @return image for event
+     */
     public String getImage() {
         return image;
     }
 
+    /**
+     * sets image for event
+     * @param image image for event
+     */
     public void setImage(String image) {
         this.image = image;
     }
@@ -355,36 +446,7 @@ public class Event {
      */
     public ArrayList<String> getWaitlist() { return waitlist; }
 
-    public ArrayList<Entrant> getUsableWaitList() throws InterruptedException {
-        DataModel model = new DataModel();
-        ArrayList<Entrant> entrants = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(getWaitlistAmount());
-        for (String entrant_id: getWaitlist()) {
-            model.getEntrant(entrant_id, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    Entrant entrant = (Entrant) obj;
-                    entrants.add(entrant);
-                    latch.countDown();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    latch.countDown();
-                }
-            });
-
-
-        }
-        latch.await();
-        return entrants;
-    }
 
     /**
      * gets the list of Entrants attending the Event
@@ -394,36 +456,7 @@ public class Event {
         return attendee_list;
     }
 
-    public ArrayList<Entrant> getUsableAttendeeList() throws InterruptedException {
-        DataModel model = new DataModel();
-        ArrayList<Entrant> entrants = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(getAttendee_list().size());
-        for (String entrant_id: getAttendee_list()) {
-            model.getEntrant(entrant_id, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    Entrant entrant = (Entrant) obj;
-                    entrants.add(entrant);
-                    latch.countDown();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    latch.countDown();
-                }
-            });
-
-
-        }
-        latch.await();
-        return entrants;
-    }
     /**
      * gets the list of Entrants who cancelled
      * @return list of Entrants who cancelled
@@ -431,72 +464,14 @@ public class Event {
     public ArrayList<String> getCancelled_list() {
         return cancelled_list;
     }
-    public ArrayList<Entrant> getUsableCancelledList() throws InterruptedException {
-        DataModel model = new DataModel();
-        ArrayList<Entrant> entrants = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(getAttendee_list().size());
-        for (String entrant_id: getAttendee_list()) {
-            model.getEntrant(entrant_id, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    Entrant entrant = (Entrant) obj;
-                    entrants.add(entrant);
-                    latch.countDown();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    latch.countDown();
-                }
-            });
-
-
-        }
-        latch.await();
-        return entrants;
-    }
     /**
      * gets the invited list containing Entrants who have been drawn
      * but haven't confirmed attendance and invites are pending
      * @return list of invited Entrants invited to the Event
      */
     public ArrayList<String> getInvited_list() { return invited_list; }
-    public ArrayList<Entrant> getUsableInvitedList() throws InterruptedException {
-        DataModel model = new DataModel();
-        ArrayList<Entrant> entrants = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(getInvited_list().size());
-        for (String entrant_id: getInvited_list()) {
-            model.getEntrant(entrant_id, new DataModel.GetCallback() {
-                @Override
-                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
 
-                }
-                @Override
-                public void onSuccess(Object obj) {
-                    Log.d("Firebase", "retrieved");
-                    Entrant entrant = (Entrant) obj;
-                    entrants.add(entrant);
-                    latch.countDown();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e("Firebase", "fail");
-                    latch.countDown();
-                }
-            });
-
-
-        }
-        latch.await();
-        return entrants;
-    }
     public void invitedListAdd(String entrant){
         invited_list.add(entrant);
     }
@@ -541,15 +516,20 @@ public class Event {
     public void cancelledListAdd(String entrant) {
         cancelled_list.add(entrant);
     }
+
+    /**
+     * remove entrant from cancelledlist
+     * @param entrant entrant being removed from cancelled list
+     */
     public void cancelledListRemove(String entrant){
         cancelled_list.remove(entrant);
     }
-
-
     /**
      * Conducts a lottery draw: randomly selects a number of entrants from
      * the waitlist (up to available attendee spots), removes them from the waitlist,
      * and moves them to the invited list.
+     * Then it sends an invitation to all of the entrants that are invited to join the event,
+     * and sends a rejection to entrants who were not invited to join the event
      */
     public void doLottery() throws InterruptedException {
         if (waitlist.isEmpty()) {
@@ -621,9 +601,7 @@ public class Event {
             model.getUsableInvitedListEntrants(this, new DataModel.GetCallback() {
                 @Override
                 public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
                 }
-
                 @Override
                 public void onSuccess(Object obj) {
                     Log.d("Firebase", "retrieved");
@@ -641,14 +619,12 @@ public class Event {
                                     public void onSuccess(String msg) {
                                         Log.d("Firebase", "written");
                                     }
-
                                     @Override
                                     public void onError(Exception e) {
                                         Log.e("Firebase", "fail");
                                     }
                                 });
                             }
-
                             @Override
                             public void onError(Exception e) {
                                 Log.e("Firebase", "fail");
@@ -657,17 +633,12 @@ public class Event {
 
                     }
                 }
-
                 @Override
                 public void onError(Exception e) {
                     Log.e("Firebase", "fail");
                 }
             });
         }
-
-
-
-//            Event event = this;
         model.setEvent(this, new DataModel.SetCallback() {
             @Override
             public void onSuccess(String msg) {
@@ -678,7 +649,6 @@ public class Event {
                 Log.e("Firebase", "fail");
             }
         });
-//        rejection_latch.await();
         drawn = true;
     }
     /**
@@ -698,28 +668,11 @@ public class Event {
     }
 
     /**
-     * edits the information about an existing Event
-     * @param date_time date and time of the Event
-     * @param location location of the Event
-     * @param registration_deadline registration deadline of an event
-     * @param details details and information about an Event such as: topic, difficulty, age range etc.
-     * @param track_geolocation whether the Event would like to track the waitlist Entrants location
-     * @param will_automatically_redraw whether the Event will immediately redraw an Entrant from the waitlist to be added to the invited list
-     * @param waitlist_limit maximum amount of Entrants in a waitlist
-     * @param attendee_limit maximum amount of Entrant that will attend the event
+     * retrieves waitlist of Entrants rather than just their uids
+     * @return ArrayList of entrants of waitlist from this event
+     * @throws InterruptedException when latch doesn't unlatch
      */
-    public void editEvent(String date_time, String location, String registration_start, String registration_deadline, String details,
-                          boolean track_geolocation, boolean will_automatically_redraw, int waitlist_limit, int attendee_limit,String image){
-        setDate_time(date_time);
-        setLocation(location);
-        setRegistration_start(registration_start);
-        setRegistration_deadline(registration_deadline);
-        setDetails(details);
-        setTrack_geolocation(track_geolocation);
-        setWillAutomaticallyRedraw(will_automatically_redraw);
-        setWaitlist_limit(waitlist_limit);
-        setAttendee_limit(attendee_limit);
-        setImage(image);
+    public ArrayList<Entrant> getUsableWaitList() throws InterruptedException {
         DataModel model = new DataModel();
         setTags(tags);
         model.setEvent(this, new DataModel.SetCallback() {
@@ -732,5 +685,138 @@ public class Event {
                 Log.e("Firebase", "fail");
             }
         });
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getWaitlistAmount());
+        for (String entrant_id: getWaitlist()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
     }
+    /**
+     * retrieves attendee list of Entrants rather than just their uids
+     * @return ArrayList of entrants of attendee list from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
+    public ArrayList<Entrant> getUsableAttendeeList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getAttendee_list().size());
+        for (String entrant_id: getAttendee_list()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
+    /**
+     * retrieves cancelled list of Entrants rather than just their uids
+     * @return ArrayList of entrants of cancelled list from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
+    public ArrayList<Entrant> getUsableCancelledList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getAttendee_list().size());
+        for (String entrant_id: getAttendee_list()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
+    /**
+     * retrieves invited list of Entrants rather than just their uids
+     * @return ArrayList of entrants of invited list from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
+    public ArrayList<Entrant> getUsableInvitedList() throws InterruptedException {
+        DataModel model = new DataModel();
+        ArrayList<Entrant> entrants = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(getInvited_list().size());
+        for (String entrant_id: getInvited_list()) {
+            model.getEntrant(entrant_id, new DataModel.GetCallback() {
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                }
+                @Override
+                public void onSuccess(Object obj) {
+                    Log.d("Firebase", "retrieved");
+                    Entrant entrant = (Entrant) obj;
+                    entrants.add(entrant);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Firebase", "fail");
+                    latch.countDown();
+                }
+            });
+
+
+        }
+        latch.await();
+        return entrants;
+    }
+
 }

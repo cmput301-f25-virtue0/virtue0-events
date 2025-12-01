@@ -41,6 +41,9 @@ public class DataModel extends TModel<TView>{
 
     private ArrayList<View> views = new ArrayList<View>();
 
+    /**
+     * Constructor of DataModel
+     */
     public DataModel() {
         this.db = FirebaseFirestore.getInstance();
         this.entrants = db.collection("entrants");
@@ -112,32 +115,64 @@ public class DataModel extends TModel<TView>{
         void onError(Exception e);
     }
 
+    /**
+     * gets the current entrant
+     * @return the current entrant
+     */
     public Entrant getCurrentEntrant() {
         return currentEntrant;
     }
+    /**
+     * sets the current entrant
+     */
     public void setCurrentEntrant(Entrant thisEntrant) {
         currentEntrant = thisEntrant;
     }
+    /**
+     * gets the current notification
+     * @return the current notification
+     */
     public Notification getCurrentNotification() {
         return currentNotification;
     }
+    /**
+     * sets the current notification
+     */
     public void setCurrentNotification(Notification thisNotification) {
         currentNotification = thisNotification;
     }
-
+    /**
+     * gets the current organizer
+     * @return the current organizer
+     */
     public Organizer getCurrentOrganizer() {
         return currentOrg;
     }
+    /**
+     * sets the current organizer
+     */
     public void setCurrentOrganizer(Organizer thisOrg) {
         currentOrg = thisOrg;
     }
+    /**
+     * gets the current event
+     * @return the current event
+     */
     public Event getCurrentEvent() {
         return currentEvent;
     }
+    /**
+     * sets the current event
+     */
     public void setCurrentEvent(Event thisEvent) {
         currentEvent = thisEvent;
     }
 
+    /**
+     * adds image to the database
+     * @param image image to be added
+     * @param cb set callback for adding to database
+     */
     public void setImage(ImageDataHolder image, SetCallback cb) {
         if (!image.getUid().isEmpty()) {
             // Existing image
@@ -158,12 +193,17 @@ public class DataModel extends TModel<TView>{
         }
     }
 
+    /**
+     * retrieves image from data base
+     * @param imageId the uid of the image from the database
+     * @param cb the get callback for getting the image
+     */
     public void getImage(String imageId, GetCallback cb) {
         DocumentReference imageRef = this.images.document(imageId);
         imageRef.get()
                 .addOnSuccessListener(imageSnap -> {
                     if (imageSnap.exists()) {
-                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData(), imageSnap.getId());
+                        ImageDataHolder image = new ImageDataHolder(imageSnap.getData(),imageId);
 
                         Log.d("Firestore", "Firestore fetch succeeded: Image " + imageId);
                         cb.onSuccess(image);
@@ -178,6 +218,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * deletes image from data base
+     * @param image uid of image to be deleted from database
+     * @param cb delete callback for deleting image
+     */
     public void deleteImage(ImageDataHolder image, DeleteCallback cb) {
         DocumentReference imageRef = this.images.document(image.getUid());
         imageRef.delete()
@@ -191,6 +236,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * add or edit entrant to database
+     * @param entrant entrant to be added/edited to database
+     * @param cb set callback for adding to database
+     */
     public void setEntrant(Entrant entrant, SetCallback cb) {
         EntrantDataHolder data = new EntrantDataHolder(entrant);
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
@@ -205,6 +255,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * gets entrant from database based on uid
+     * @param deviceId uid of entrant (based on device id)
+     * @param cb get callback for retrieving from database
+     */
     public void getEntrant(String deviceId, GetCallback cb) {
         DocumentReference entrantRef = this.entrants.document(deviceId);
         entrantRef.get()
@@ -225,6 +280,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * deletes entrant from database
+     * @param entrant entrant to be deleted
+     * @param cb delete call back for deleting from database
+     */
     public void deleteEntrant(Entrant entrant, DeleteCallback cb) {
         DocumentReference entrantRef = this.entrants.document(entrant.getUid());
         entrantRef.delete()
@@ -238,8 +298,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
-    // Can throw an exception outside of callback
-    // I don't remember what this above comment was referring to :facepalm:
+    /**
+     * adds or edits organizer to database
+     * @param organizer organizer to be added or edited
+     * @param cb set callback for adding/editing database
+     */
     public void setOrganizer(Organizer organizer, SetCallback cb) {
         OrganizerDataHolder data = new OrganizerDataHolder(organizer);
         DocumentReference organizerRef = this.organizers.document(organizer.getUid());
@@ -254,6 +317,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * retrieve organizer from database
+     * @param deviceId uid of retrieved organizer
+     * @param cb get callback for retrieving from database
+     */
     public void getOrganizer(String deviceId, GetCallback cb) {
         DocumentReference organizerRef = this.organizers.document(deviceId);
         organizerRef.get()
@@ -274,6 +342,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * delete organizer from database
+     * @param organizer organizer to be deleted
+     * @param cb delete callback for deleting from database
+     */
     public void deleteOrganizer(Organizer organizer, DeleteCallback cb) {
         DocumentReference organizerRef = this.organizers.document(organizer.getUid());
         organizerRef.delete()
@@ -286,11 +359,17 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
-
+    /**
+     * Adds or updates the given instance of Admin to database. The Admin's unique id or an exception is passed to the callback.
+     */
     public void setAdmin() {
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
-
+    /**
+     * Attempts to retrieve an Admin from the database. The retrieved Admin or an exception is passed to the callback.
+     * @param deviceId Admin's device's id
+     * @param cb instance of GetCallback
+     */
     public void getAdmin(String deviceId, GetCallback cb) {
         DocumentReference adminRef = this.admins.document(deviceId);
         adminRef.get()
@@ -311,6 +390,9 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * delete Admin
+     */
     public void deleteAdmin() {
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
@@ -375,6 +457,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * delete event from database
+     * @param event event to be deleted
+     * @param cb delete callback for deleting form database
+     */
     public void deleteEvent(Event event, DeleteCallback cb) {
 
         // Check if the event object itself is null
@@ -440,6 +527,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * add notification to database
+     * @param notif notification to be added
+     * @param cb set callback for adding to database
+     */
     public void setNotification(Notification notif, SetCallback cb) {
         NotificationDataHolder data;
         if (notif instanceof Invitation) {
@@ -480,6 +572,11 @@ public class DataModel extends TModel<TView>{
         }
     }
 
+    /**
+     * get notification from database
+     * @param notifId uid of notification to be retrieved
+     * @param cb get callback for retrieving from database
+     */
     public void getNotification(String notifId, GetCallback cb) {
         DocumentReference notifRef = this.notifications.document(notifId);
         notifRef.get()
@@ -516,6 +613,11 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * delete notification from database
+     * @param notif notification to be deleted
+     * @param cb delete callback for deleting from database
+     */
     public void deleteNotification(Notification notif, DeleteCallback cb) {
         DocumentReference notifRef = this.notifications.document(notif.getUid());
         notifRef.delete()
@@ -529,13 +631,27 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * cleares the events cache
+     */
     public void clearEventsCache() {
         this.cachedEvents = null;
         Log.d("DataModel", "Events cache cleared.");
     }
 
+    /**
+     * retrievs all events from database
+     * @param cb get callback for retrieving from database
+     */
+    public void getAllEvents(DataModel.GetCallback cb) {
+        getAllEvents(cb, false);
+    }
 
-
+    /**
+     * retrieves entrants using uids in waitlist in an event
+     * @param event event that has waitlist of uids
+     * @param cb get callback for retrieving from database
+     */
     public void getUsableWaitlistEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getWaitlist();
 
@@ -568,7 +684,11 @@ public class DataModel extends TModel<TView>{
                     });
     }
 
-
+    /**
+     * retrieves entrants using uids in cancelledlist in an event
+     * @param event event that has cancelledlist of uids
+     * @param cb get callback for retrieving from database
+     */
     public void getUsableCancelledEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getCancelled_list();
 
@@ -600,7 +720,11 @@ public class DataModel extends TModel<TView>{
                         }
                     });
     }
-
+    /**
+     * retrieves entrants using uids in invitedlist in an event
+     * @param event event that has invitedlist of uids
+     * @param cb get callback for retrieving from database
+     */
     public void getUsableInvitedListEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getInvited_list();
 //        ArrayList<> filterObjects = new ArrayList<>;
@@ -632,7 +756,11 @@ public class DataModel extends TModel<TView>{
                     });
         }
     }
-
+    /**
+     * retrieves notifications using uids in notifications in an entrant
+     * @param entrant entrant storing uids
+     * @param cb get callback for retrieving from database
+     */
     public void getUsableNotifications(Entrant entrant, DataModel.GetCallback cb){
         List notificationIds = entrant.getNotifications();
         ArrayList<Notification> notifications = new ArrayList<>();
@@ -669,6 +797,12 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
+
+    /**
+     * retrieves an ArrayList of Events from an Organizer
+     * @param organizer Organizer of Events
+     * @param cb GetCallback for retrieving from database
+     */
     public void getUsableEvents(Organizer organizer, GetCallback cb){
         List eventsIds = organizer.getEvents();
 //        ArrayList<> filterObjects = new ArrayList<>;
@@ -707,6 +841,10 @@ public class DataModel extends TModel<TView>{
         void onError(Exception e);
     }
 
+    /**
+     * retrieve all entrants
+     * @param cb listcallback for getting entrants list
+     */
     public void getAllEntrants(ListCallback<Entrant> cb) {
         this.entrants
                 .get()
@@ -726,6 +864,11 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
+
+    /**
+     * get all organizers
+     * @param cb list callback for retrieving organizers
+     */
     public void getAllOrganizers(ListCallback<Organizer> cb) {
         this.organizers
                 .get()
@@ -747,7 +890,11 @@ public class DataModel extends TModel<TView>{
     }
 
 
-
+    /**
+     * get entrants dependant on the ids
+     * @param entrantIds list of uids to retrieve from database
+     * @param cb get callback for retrieving form database
+     */
     public void getEntrantsByIds(List<String> entrantIds, GetCallback cb) {
         if (entrantIds == null || entrantIds.isEmpty()) {
             cb.onSuccess(new ArrayList<Entrant>());
@@ -786,6 +933,11 @@ public class DataModel extends TModel<TView>{
         }
     }
 
+    /**
+     * updates the entrant profile
+     * @param entrant entrant to have profile updated
+     * @param cb set callback for setting database
+     */
     public void updateEntrantProfile(Entrant entrant, SetCallback cb) {
         Map<String, Object> data = new HashMap<>();
         data.put("name",  entrant.getProfile().getName());
@@ -798,7 +950,10 @@ public class DataModel extends TModel<TView>{
                 .addOnFailureListener(cb::onError);
     }
 
-
+    /**
+     * retrieves all Entrants
+     * @param cb GetCallback for retrieving from database
+     */
     public void getAllEntrants(GetCallback cb) {
         this.entrants.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -823,7 +978,10 @@ public class DataModel extends TModel<TView>{
         });
     }
 
-
+    /**
+     * retrieves all Notifications
+     * @param cb GetCallback for retrieving from database
+     */
     public void getAllNotifications(GetCallback cb) {
         this.notifications.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

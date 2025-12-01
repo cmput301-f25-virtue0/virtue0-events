@@ -1,6 +1,7 @@
 package com.example.lotteryeventapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,18 +13,24 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.lotteryeventapp.AllImagesPagination;
+import com.example.lotteryeventapp.FirestorePagination;
+import com.example.lotteryeventapp.ImageDataHolder;
 import com.example.lotteryeventapp.ImageListAdapter;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageClickListener {
     private int role;
     private DataModel model;
+    ImageListAdapter adapter = new ImageListAdapter(new ArrayList<>(), this);
+
 
     public static F_AdminImages newInstance(int myRole){
         F_AdminImages fragment = new F_AdminImages();
@@ -57,20 +64,46 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         // mock data
-        List<String> data = Arrays.asList(
-                "Event Poster 1.jpg",
-                "Profile Picture 2.png",
-                "Event Poster 3.jpg"
-        );
+//        List<String> data = Arrays.asList(
+//                "Event Poster 1.jpg",
+//                "Profile Picture 2.png",
+//                "Event Poster 3.jpg"
+//        );
+//        F_AdminImages listener = this;
+//        ArrayList<ImageDataHolder> data = new ArrayList<>();
+
+        AllImagesPagination pagination = new AllImagesPagination(12);
+        pagination.getNextPage(new FirestorePagination.PaginationCallback() {
+            @Override
+            public <T> void onGetPage(boolean hasResults, ArrayList<T> obs) {
+                ArrayList<ImageDataHolder> imageData = (ArrayList<ImageDataHolder>) obs;
+                adapter.setItems(imageData);
+//                ImageListAdapter adapter = new ImageListAdapter(imageData, listener);
+
+                adapter.notifyDataSetChanged();
 
 
-        ImageListAdapter adapter = new ImageListAdapter(data, this);
+            }
+            @Override
+            public void onError(Exception e) {
+                throw new RuntimeException(e);
+//                Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
         rv.setAdapter(adapter);
-
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmImage);
         toolbar.setNavigationOnClickListener(v -> {
             ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
         });
+//        ImageListAdapter adapter = new ImageListAdapter(data, this);
+//        rv.setAdapter(adapter);
+//
+//        MaterialToolbar toolbar = view.findViewById(R.id.toolbarAdmImage);
+//        toolbar.setNavigationOnClickListener(v -> {
+//            ((MainActivity) requireActivity()).showFragment(F_AdminHomePage.newInstance(2));
+//        });
     }
 
     @Override
@@ -80,8 +113,19 @@ public class F_AdminImages extends Fragment implements ImageListAdapter.OnImageC
     }
 
     @Override
-    public void onDeleteClick(String imageLabel, int position) {
-        Toast.makeText(requireContext(), "Delete: " + imageLabel, Toast.LENGTH_SHORT).show();
+    public void onDeleteClick(ImageDataHolder image, int position) {
+        model.deleteImage(image, new DataModel.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+//        Toast.makeText(requireContext(), "Delete: " + imageLabel, Toast.LENGTH_SHORT).show();
         // TODO: Add code to delete the image from firestore and maybe refresh adapter
     }
 }

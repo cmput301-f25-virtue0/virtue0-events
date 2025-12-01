@@ -7,9 +7,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
+/**
+ * retrieves a select amount of Events from the Database
+ */
 public class AllEventsPagination extends FirestorePagination {
-
+    /**
+     * constructs an AllEventsPagination with given pageSize
+     * @param pageSize number of events
+     */
     public AllEventsPagination(int pageSize) {
         super();
         this.pageSize = pageSize;
