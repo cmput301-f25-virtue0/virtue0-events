@@ -29,6 +29,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         void onNotificationClick(Notification notification, int position);
     }
 
+    /**
+     * ArrayListAdapter for notifications
+     * @param initial initial data for list of notifications
+     * @param listener click listener of notification
+     */
     public NotificationAdapter(@NonNull List<Notification> initial, @NonNull OnNotificationClickListener listener) {
         items.addAll(initial);
         this.clickListener = listener;
@@ -83,6 +88,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
+    /**
+     * get number of notifications
+     * @return number of notifications
+     */
     @Override
     public int getItemCount() {
         return items.size();

@@ -15,6 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * Images of posters for Events
+ */
 public class ImageDataHolder {
     Blob imageBlob;
     String uid = "";
@@ -81,6 +84,11 @@ public class ImageDataHolder {
         }
     }
 
+    /**
+     * constructs ImageDataHolder from map from database
+     * @param data data from database
+     * @param uid uid of ImageDataHolder
+     */
     public ImageDataHolder(Map<String, Object> data, String uid) {
         this.uid = uid;
 

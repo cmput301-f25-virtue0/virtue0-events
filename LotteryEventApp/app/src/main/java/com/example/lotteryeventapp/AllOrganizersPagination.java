@@ -9,8 +9,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
+/**
+ * retrieves a select amount of Organizers from the Database
+ */
 public class AllOrganizersPagination extends FirestorePagination {
+    /**
+     * constructs an AllOrganizerPagination with given pageSize
+     * @param pageSize number of Organizers
+     */
     public AllOrganizersPagination(int pageSize) {
         super();
         this.pageSize = pageSize;
@@ -23,7 +29,11 @@ public class AllOrganizersPagination extends FirestorePagination {
         this.forwardQuery = query.limit(pageSize);
         this.backQuery = query.limit(pageSize);
     }
-
+    /**
+     * creates a new page of Organizers
+     * @param snapshot snapshot from collection
+     * @param cb callback for retrieving pagination from the database
+     */
     @Override
     protected void createPage(QuerySnapshot snapshot, PaginationCallback cb) {
         ArrayList<Organizer> organizers = new ArrayList<>();

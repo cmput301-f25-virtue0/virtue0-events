@@ -255,6 +255,11 @@ public class Entrant {
             }
         });
     }
+
+    /**
+     * delete Entrant from waitlisted Events
+     *  used when deleting Entrant
+     */
     private void deleteEntrantFromWaitlistedEvent(){
         DataModel model = new DataModel();
         ArrayList<String> waitlistedEvents = this.waitlistedEvents;
@@ -283,6 +288,10 @@ public class Entrant {
             });
         }
     }
+    /**
+     * delete Entrant from attendee Events
+     *  used when deleting Entrant
+     */
     private void deleteEntrantFromAttendeeEvent(){
         DataModel model = new DataModel();
         ArrayList<String> attendingEvents = this.attendedEvents;
@@ -311,6 +320,10 @@ public class Entrant {
             });
         }
     }
+    /**
+     * delete Entrant from invited Events
+     *  used when deleting Entrant
+     */
     private void deleteEntrantFromInvitedEvent(){
         DataModel model = new DataModel();
         ArrayList<String> invitedEvents = this.invitedEvents;

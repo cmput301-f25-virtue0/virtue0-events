@@ -1,5 +1,8 @@
 package com.example.lotteryeventapp;
 
+/**
+ * This class represents messaging between Organizers and Entrants
+ */
 public class Messaging extends Notification{
     /**
      * constructs messaging

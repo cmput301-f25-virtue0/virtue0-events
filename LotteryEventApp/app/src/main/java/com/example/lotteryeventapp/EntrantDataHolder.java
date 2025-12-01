@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * intermediary between database and Entrant
+ */
 public class EntrantDataHolder {
     private String name;
     private String email;

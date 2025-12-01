@@ -77,6 +77,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Imag
     public int getItemCount() {
         return items.size();
     }
+
+    /**
+     * sets items for ImageList
+     * @param newItems new items for list of images
+     */
     public void setItems(@NonNull List<ImageDataHolder> newItems) {
         items.clear();
         items.addAll(newItems);

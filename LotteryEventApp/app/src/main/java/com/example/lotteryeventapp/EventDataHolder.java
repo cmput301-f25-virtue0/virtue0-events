@@ -3,7 +3,9 @@ package com.example.lotteryeventapp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * intermediary between database and Event
+ */
 public class EventDataHolder {
     private String title;
     private String uid;
