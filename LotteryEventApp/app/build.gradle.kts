@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-    implementation(files("C:\\Users\\Katie\\AppData\\Local\\Android\\Sdk\\platforms\\android-36\\android.jar"))
 
     implementation(libs.firebase.firestore)
     implementation(libs.play.services.location)
