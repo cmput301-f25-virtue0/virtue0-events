@@ -1,5 +1,6 @@
 package com.example.lotteryeventapp.fragments;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,11 +13,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.lotteryeventapp.CaptureAct;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.EventAdapter;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.R;
 import com.example.lotteryeventapp.ViewPagerAdapter;
@@ -27,8 +30,13 @@ import com.google.android.material.tabs.TabLayout;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class F_HomePage extends Fragment {
@@ -40,6 +48,9 @@ public class F_HomePage extends Fragment {
     private DataModel model;
 
     private Set<Event.EventTag> activeFilters = new HashSet<>();
+    private Date filterStartDate = null;
+    private Date filterEndDate = null;
+    private final SimpleDateFormat DATE_FMT_DISPLAY = new SimpleDateFormat("MMM d, yyyy", Locale.US);
 
 
     public static F_HomePage newInstance(int role) {
@@ -203,8 +214,16 @@ public class F_HomePage extends Fragment {
 
         //Setup UI
         ChipGroup chipGroup = dialogView.findViewById(R.id.filterChipGroup);
+        Button btnStartDate = dialogView.findViewById(R.id.btnFilterStartDate);
+        Button btnEndDate = dialogView.findViewById(R.id.btnFilterEndDate);
+
         Button btnApply = dialogView.findViewById(R.id.btnApplyFilter);
         Button btnClear = dialogView.findViewById(R.id.btnClearFilter);
+
+        btnStartDate.setText(filterStartDate == null ? "Earliest Event Date" : DATE_FMT_DISPLAY.format(filterStartDate));
+        btnEndDate.setText(filterEndDate == null ? "Latest Event Date" : DATE_FMT_DISPLAY.format(filterEndDate));
+
+
 
         //Populate Chips
         for (Event.EventTag tag : Event.EventTag.values()) {
@@ -216,7 +235,7 @@ public class F_HomePage extends Fragment {
             chip.setClickable(true);
 
             chip.setChipBackgroundColorResource(com.google.android.material.R.color.mtrl_choice_chip_background_color);
-            chip.setTextColor(getResources().getColorStateList(R.color.black, null)); //
+            chip.setTextColor(getResources().getColorStateList(R.color.black, null));
 
             // Pre-select if it was already active
             if (activeFilters.contains(tag)) {
@@ -225,6 +244,23 @@ public class F_HomePage extends Fragment {
 
             chipGroup.addView(chip);
         }
+
+        btnStartDate.setOnClickListener(v -> pickDate(true, btnStartDate));
+        btnEndDate.setOnClickListener(v -> pickDate(false, btnEndDate));
+
+        btnApply.setOnClickListener(v -> {
+            activeFilters.clear();
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                Chip chip = (Chip) chipGroup.getChildAt(i);
+                if (chip.isChecked()) activeFilters.add(Event.EventTag.valueOf(chip.getText().toString()));
+            }
+            if (filterStartDate != null && filterEndDate != null && filterStartDate.after(filterEndDate)) {
+                Toast.makeText(getContext(), "Start date cannot be after end date", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            applyFiltersToFragment();
+            dialog.dismiss();
+        });
 
         // Handle apply
         btnApply.setOnClickListener(v -> {
@@ -238,6 +274,11 @@ public class F_HomePage extends Fragment {
                 }
             }
 
+            if (filterStartDate != null && filterEndDate != null && filterStartDate.after(filterEndDate)) {
+                Toast.makeText(getContext(), "Start date cannot be after end date", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             applyFiltersToFragment();
             dialog.dismiss();
         });
@@ -245,6 +286,8 @@ public class F_HomePage extends Fragment {
         // Handle Clear
         btnClear.setOnClickListener(v -> {
             activeFilters.clear();
+            filterStartDate = null;
+            filterEndDate = null;
             applyFiltersToFragment();
             dialog.dismiss();
         });
@@ -252,8 +295,53 @@ public class F_HomePage extends Fragment {
         dialog.show();
     }
 
-    private void applyFiltersToFragment() {
-        Toast.makeText(getContext(), "Filters Applied: " + activeFilters.size(), Toast.LENGTH_SHORT).show();
+    private void pickDate(boolean isStart, Button button) {
+        Calendar c = Calendar.getInstance();
+        if (isStart && filterStartDate != null) c.setTime(filterStartDate);
+        else if (!isStart && filterEndDate != null) c.setTime(filterEndDate);
+
+        new DatePickerDialog(requireContext(), (view, year, month, day) -> {
+            Calendar selected = Calendar.getInstance();
+            selected.set(year, month, day);
+
+            // Set time to start/end of day for accurate comparison
+            if (isStart) {
+                selected.set(Calendar.HOUR_OF_DAY, 0);
+                selected.set(Calendar.MINUTE, 0);
+                selected.set(Calendar.SECOND, 0);
+                filterStartDate = selected.getTime();
+                button.setText(DATE_FMT_DISPLAY.format(filterStartDate));
+            } else {
+                selected.set(Calendar.HOUR_OF_DAY, 23);
+                selected.set(Calendar.MINUTE, 59);
+                selected.set(Calendar.SECOND, 59);
+                filterEndDate = selected.getTime();
+                button.setText(DATE_FMT_DISPLAY.format(filterEndDate));
+            }
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    private void applyFiltersToFragment() {
+        List<Fragment> fragments = getChildFragmentManager().getFragments();
+        boolean found = false;
+
+        for (Fragment f : fragments) {
+            if (f != null && f.isResumed() && f.getView() != null) {
+                View rvView = f.getView().findViewById(R.id.rvEvents);
+                if (rvView instanceof RecyclerView) {
+                    RecyclerView.Adapter adapter = ((RecyclerView) rvView).getAdapter();
+                    if (adapter instanceof EventAdapter) {
+                        ((EventAdapter) adapter).applyFilter(activeFilters, filterStartDate, filterEndDate);
+                        found = true;
+                    }
+                }
+            }
+        }
+
+        if (found) {
+            Toast.makeText(getContext(), "Filters Applied", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Could not apply filters (No list visible)", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

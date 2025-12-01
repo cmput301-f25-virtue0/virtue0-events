@@ -23,6 +23,10 @@ public class AllEventsPagination extends FirestorePagination {
         this.backQuery = query.limit(pageSize);
     }
 
+    public AllEventsPagination(int pageSize, Query customQuery) {
+        super(pageSize, customQuery);
+    }
+
     @Override
     protected void createPage(QuerySnapshot snapshot, PaginationCallback cb) {
         ArrayList<Event> events = new ArrayList<>();

@@ -405,7 +405,6 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
-    @Deprecated
     public void getAllEvents(GetCallback cb, boolean forceRefresh){
 
         // Check cache first
@@ -535,9 +534,7 @@ public class DataModel extends TModel<TView>{
         Log.d("DataModel", "Events cache cleared.");
     }
 
-    public void getAllEvents(DataModel.GetCallback cb) {
-        getAllEvents(cb, false);
-    }
+
 
     public void getUsableWaitlistEntrants(Event event, DataModel.GetCallback cb){
         List entrantsIds = event.getWaitlist();
