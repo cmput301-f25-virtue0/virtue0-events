@@ -19,12 +19,15 @@ import com.example.lotteryeventapp.Event;
 import com.example.lotteryeventapp.Entrant;
 import com.example.lotteryeventapp.ImageDataHolder;
 import com.example.lotteryeventapp.Organizer;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.R;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -256,6 +259,9 @@ public class F_EventInfo extends Fragment {
         myText = view.findViewById(R.id.waitingListSize);
         String fraction = event.getWaitlistAmount() + "/" + event.getWaitlist_limit();
         myText.setText(fraction);
+
+        // Display Tags
+        displayTags(event);
 
         // Role specific ui
         if (role == 0) {
@@ -714,5 +720,35 @@ public class F_EventInfo extends Fragment {
                 }
             }
         });
+    }
+
+
+    private void displayTags(Event event) {
+        ChipGroup chipGroup = getView().findViewById(R.id.tagGroup);
+        chipGroup.removeAllViews(); // Clear existing chips to prevent duplicates if refreshing
+
+        ArrayList<Event.EventTag> tags = event.getTags();
+
+        if (tags != null) {
+            for (Event.EventTag tag : tags) {
+                // Create a new Chip instance
+                Chip chip = new Chip(getContext());
+
+                // Configure the Chip text
+                chip.setText(formatEnumName(tag.name()));
+
+                chip.setClickable(false);
+                chip.setCheckable(false);
+
+                // Add to the layout
+                chipGroup.addView(chip);
+            }
+        }
+    }
+
+    // Helper to make "ACADEMIC" look like "Academic"
+    private String formatEnumName(String name) {
+        if (name == null || name.isEmpty()) return "";
+        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }
 }

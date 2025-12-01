@@ -27,11 +27,11 @@ public class AllEventsPagination extends FirestorePagination {
         this.forwardQuery = query.limit(pageSize);
         this.backQuery = query.limit(pageSize);
     }
-    /**
-     * creates a new page of Events
-     * @param snapshot snapshot from collection
-     * @param cb callback for retrieving pagination from the database
-     */
+
+    public AllEventsPagination(int pageSize, Query customQuery) {
+        super(pageSize, customQuery);
+    }
+
     @Override
     protected void createPage(QuerySnapshot snapshot, PaginationCallback cb) {
         ArrayList<Event> events = new ArrayList<>();

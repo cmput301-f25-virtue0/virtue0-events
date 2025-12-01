@@ -28,6 +28,8 @@ public class EventDataHolder {
 
     private String organizer;
 
+    private ArrayList<String> tags = new ArrayList<>();
+
     /**
      * create an EventDataHolder based on given event
      * @param event event that EventDataHolder is based on
@@ -51,7 +53,17 @@ public class EventDataHolder {
         this.drawn = event.isDrawn();
         this.organizer = event.getOrganizer();
         this.image = event.getImage();
-//        this.redraw = event.isDrawn();
+
+        if (event.getTags() != null) {
+            for (Event.EventTag tag : event.getTags()) {
+                this.tags.add(tag.name());
+            }
+        }
+        // If empty, add ALL
+        if (this.tags.isEmpty()) {
+            this.tags.add(Event.EventTag.ALL.name());
+        }
+
     }
 
     /**
@@ -308,6 +320,10 @@ public class EventDataHolder {
         this.image = image;
     }
 
+    public ArrayList<String> getTags() {
+        return tags;
+    }
+
     /**
      * create EventDataHolder based on data map from database
      * @param data info from database
@@ -348,6 +364,13 @@ public class EventDataHolder {
             this.invitedList.add((String) o);
         }
 
+        List<Object> loadedTags = (List<Object>) data.get("tags");
+        if (loadedTags != null) {
+            for (Object o : loadedTags) {
+                this.tags.add((String) o);
+            }
+        }
+
         this.drawn = (Boolean) data.get("drawn");
     }
 
@@ -356,8 +379,22 @@ public class EventDataHolder {
      * @return Event based on EventDataHolder
      */
     public Event createEventInstance() {
+
+        ArrayList<Event.EventTag> eventTags = new ArrayList<>();
+
+        //Convert string to enum
+        if (this.tags != null) {
+            for (String s : this.tags) {
+                try {
+                    eventTags.add(Event.EventTag.valueOf(s));
+                } catch (IllegalArgumentException e) {
+                    // Default to ALL
+                }
+            }
+        }
+
         Event event = new Event(this.title, this.uid, this.dateTime, this.location, this.registrationStart, this.registrationDeadline, this.details,
-                this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit, this.organizer);
+                this.trackGeolocation, this.willAutomaticallyRedraw, this.waitlistLimit, this.attendeeLimit, this.organizer, eventTags);
 
         event.getWaitlist().addAll(this.waitlist);
         event.getAttendee_list().addAll(this.attendeeList);
@@ -366,6 +403,8 @@ public class EventDataHolder {
         event.setOrganizer(organizer);
         event.setImage(this.image);
         event.setDrawn(this.drawn);
+
+
 
         return event;
     }

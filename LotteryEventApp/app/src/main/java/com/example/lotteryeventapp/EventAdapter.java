@@ -1,7 +1,7 @@
-// EventAdapter.java
 package com.example.lotteryeventapp;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +10,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private int role;
     private String currentOrganizerId;
-
     private String currentEntrantId;
 
+    private static final String EVENT_DATE_FORMAT = "EEE, MMM d, yyyy 'at' h:mm a";
     /**
      * listens for event to be clicked on
      */
@@ -29,18 +35,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
     private final List<Event> items = new ArrayList<>();
+    private final List<Event> allItems = new ArrayList<>();
     private final OnEventClickListener clickListener;
 
     public EventAdapter() { this.clickListener = null; }
 
-    /**
-     * array adapter for events
-     * @param initial list of events
-     * @param myRole your role, either entrants, organiser, or admin
-     * @param myId id of either organizer or entrant
-     */
     public EventAdapter(@NonNull List<Event> initial, int myRole, String myId) {
         items.addAll(initial);
+        this.allItems.addAll(initial);
         this.clickListener = null;
         this.role = myRole;
 
@@ -61,6 +63,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public EventAdapter(@NonNull List<Event> initial, int role, @NonNull OnEventClickListener listener, String myId) {
         items.addAll(initial);
         this.clickListener = listener;
+        this.allItems.addAll(initial);
         this.role = role;
 
         if (role == 1) {
@@ -77,6 +80,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void setItems(@NonNull List<Event> newItems) {
         items.clear();
         items.addAll(newItems);
+        allItems.clear();
+        allItems.addAll(newItems);
         notifyDataSetChanged();
     }
 
@@ -106,46 +111,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         h.tvTitle.setText(n(e.getTitle()));
         h.tvLocation.setText(n(e.getLocation()).toUpperCase());
         h.tvDate.setText(n(e.getDate_time()));
-        if(e.getImage()==null){
+
+        if (e.getImage() == null || e.getImage().isEmpty()) {
             h.ivPoster.setImageResource(R.drawable.lottery);
-        }else if(e.getImage().isEmpty()){
-            h.ivPoster.setImageResource(R.drawable.lottery);
-        }else{
+        } else {
             DataModel model = new DataModel();
             model.getImage(e.getImage(), new DataModel.GetCallback() {
-                        @Override
-                        public void onSuccess(Object obj) {
-                            ImageDataHolder image = (ImageDataHolder) obj;
-                            if(image == null){
-                                e.setImage("");
-                                model.setEvent(e, new DataModel.SetCallback() {
-                                    @Override
-                                    public void onSuccess(String id) {
+                @Override
+                public void onSuccess(Object obj) {
+                    ImageDataHolder image = (ImageDataHolder) obj;
+                    h.ivPoster.setImageBitmap(image.convertToBitmap());
+                }
 
-                                    }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) { }
 
-                                    @Override
-                                    public void onError(Exception e) {
-
-                                    }
-                                });
-                            }else {
-                                h.ivPoster.setImageBitmap(image.convertToBitmap());
-                            }
-                        }
-
-                        @Override
-                        public <T extends Enum<T>> void onSuccess(Object obj, T type) {
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-
-                        }
-                    });
+                @Override
+                public void onError(Exception e) { }
+            });
         }
-
 
         // Reset Visibility
         h.tvOwnerTag.setVisibility(View.GONE);
@@ -155,37 +139,33 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             h.tvOwnerTag.setVisibility(View.VISIBLE);
         }
 
-        //entrant lane
+        // Entrant lane
         if (role == 0 && currentEntrantId != null) {
             boolean isWaitlisted = e.getWaitlist() != null && e.getWaitlist().contains(currentEntrantId);
             boolean isAttending = e.getAttendee_list() != null && e.getAttendee_list().contains(currentEntrantId);
             boolean isInvited = e.getInvited_list() != null && e.getInvited_list().contains(currentEntrantId);
             boolean isCancelled = e.getCancelled_list() != null && e.getCancelled_list().contains(currentEntrantId);
 
-
             if (isAttending) {
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
                 h.tvJoinedTag.setText("ATTENDING");
                 h.tvJoinedTag.setBackgroundColor(Color.parseColor("#4CAF50")); // Green
-            }
-            else if (isInvited) {
+            } else if (isInvited) {
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
                 h.tvJoinedTag.setText("INVITED");
                 h.tvJoinedTag.setBackgroundColor(Color.parseColor("#FF9800")); // Orange
-            }
-            else if (isWaitlisted) {
+            } else if (isWaitlisted) {
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
                 h.tvJoinedTag.setText("WAITLISTED");
                 h.tvJoinedTag.setBackgroundColor(Color.GRAY); // Default Gray
-            }
-            else if (isCancelled) {
+            } else if (isCancelled) {
                 h.tvJoinedTag.setVisibility(View.VISIBLE);
                 h.tvJoinedTag.setText("CANCELLED");
                 h.tvJoinedTag.setBackgroundColor(Color.parseColor("#F44336")); // Red
             }
         }
 
-        //admin lane
+        // Admin lane
         if (role == 2) {
             h.btnDelete.setVisibility(View.VISIBLE);
             h.btnDelete.setOnClickListener(v -> {
@@ -193,8 +173,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     clickListener.onDeleteClick(e, h.getBindingAdapterPosition());
                 }
             });
-                }
-         else {
+        } else {
             h.btnDelete.setVisibility(View.INVISIBLE);
         }
     }
@@ -211,11 +190,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         ImageView ivPoster;
         TextView tvTitle, tvLocation, tvDate;
         Button btnDelete;
-
         TextView tvOwnerTag;
-
         TextView tvJoinedTag;
-
 
         EventViewHolder(@NonNull View itemView,
                         @NonNull OnEventClickListener listener,
@@ -229,8 +205,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             tvOwnerTag = itemView.findViewById(R.id.tvOwnerTag);
             tvJoinedTag = itemView.findViewById(R.id.tvTag);
 
-
-
             itemView.setOnClickListener(v -> {
                 if (listener == null) return;
                 int pos = getBindingAdapterPosition();
@@ -241,7 +215,68 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
+
+    //The following function is from Microsoft, Gemini, "How to filter events based on Event Date," Dec 1st, 2025
+    public void applyFilter(Set<Event.EventTag> tags, Date startDate, Date endDate) {
+        items.clear();
+
+        // If no filters, show all
+        if ((tags == null || tags.isEmpty()) && startDate == null && endDate == null) {
+            items.addAll(allItems);
+            notifyDataSetChanged();
+            return;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat(EVENT_DATE_FORMAT, Locale.US);
+        sdf.setLenient(true); // Allow flexibility in parsing
+
+        for (Event event : allItems) {
+            boolean matchesTags = true;
+            boolean matchesDate = true;
+
+            // Check tags
+            if (tags != null && !tags.isEmpty()) {
+                matchesTags = false;
+                if (event.getTags() != null) {
+                    for (Event.EventTag t : event.getTags()) {
+                        if (tags.contains(t)) {
+                            matchesTags = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Check date range
+            if (startDate != null && endDate != null) {
+                if (event.getDate_time() == null) {
+                    matchesDate = false;
+                } else {
+                    try {
+                        // Trim removes leading/trailing spaces which often cause parse errors
+                        String dateStr = event.getDate_time().trim();
+                        Date eventDate = sdf.parse(dateStr);
+
+                        if (eventDate != null) {
+                            // Check if eventDate is outside the range
+                            if (eventDate.before(startDate) || eventDate.after(endDate)) {
+                                matchesDate = false;
+                            }
+                        }
+                    } catch (ParseException e) {
+                        // Log the error to debug exact format mismatches
+                        Log.e("FilterError", "Failed to parse date: '" + event.getDate_time() + "' Expected format: " + EVENT_DATE_FORMAT);
+                        matchesDate = false;
+                    }
+                }
+            }
+
+            if (matchesTags && matchesDate) {
+                items.add(event);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
     private static String n(String s) { return s == null ? "" : s; }
 }
-
-

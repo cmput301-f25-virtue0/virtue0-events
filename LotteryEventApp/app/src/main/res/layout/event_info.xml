@@ -66,8 +66,8 @@
 
             <ImageView
             android:id="@+id/eventPoster"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="fill_parent"
+            android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="centerCrop"
             android:contentDescription="event_poster"
@@ -130,23 +130,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:singleLine="true"
-                app:singleSelection="false"
-                app:chipSpacingHorizontal="6dp"
-                tools:childrenDrawingOrderEnabled="true"
-                tools:ignore="MissingConstraints">
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:checkable="false"
-                    tools:text="Beginner" />
-                <com.google.android.material.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="false"
-                    android:checkable="false"
-                    tools:text="Accessible" />
+                app:singleLine="false"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="4dp">
+
             </com.google.android.material.chip.ChipGroup>
 
             <TextView

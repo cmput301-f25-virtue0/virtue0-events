@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -20,6 +21,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import com.example.lotteryeventapp.DataModel;
 import com.example.lotteryeventapp.Event;
@@ -34,6 +36,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import org.w3c.dom.Text;
 
 import java.util.Objects;
+import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -53,6 +56,12 @@ public class F_CreateEditEvent extends Fragment {
     private final Calendar regDeadlineCalendar = Calendar.getInstance();
 
     private final String DATE_FORMAT = "EEE, MMM d, yyyy 'at' h:mm a";
+
+    private ArrayList<Event.EventTag> selectedTags = new ArrayList<>();
+
+    private TextView tvSelectedTags;
+    private Button btnSelectTags;
+    private boolean[] selectedBooleanArray;
 
     public static F_CreateEditEvent newInstance(int myType) {
         F_CreateEditEvent fragment = new F_CreateEditEvent();
@@ -89,6 +98,40 @@ public class F_CreateEditEvent extends Fragment {
         setupDateTimePicker(etWhen, eventDateCalendar);
         setupDateTimePicker(etRegOpens, regStartCalendar);
         setupDateTimePicker(etRegCloses, regDeadlineCalendar);
+
+        tvSelectedTags = view.findViewById(R.id.tv_selected_tags);
+        btnSelectTags = view.findViewById(R.id.btn_select_tags);
+
+        Event.EventTag[] allTags = Event.EventTag.values();
+        ArrayList<String> tagNameList = new ArrayList<>();
+        ArrayList<Event.EventTag> tagValueList = new ArrayList<>();
+
+        for (Event.EventTag tag : allTags) {
+            if (tag != Event.EventTag.ALL) {
+                tagNameList.add(tag.name());
+                tagValueList.add(tag);
+            }
+        }
+        String[] tagNames = tagNameList.toArray(new String[0]);
+        selectedBooleanArray = new boolean[tagNames.length];
+
+        btnSelectTags.setOnClickListener(v -> {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Select Tags")
+                    .setMultiChoiceItems(tagNames, selectedBooleanArray, (dialog, which, isChecked) -> {
+                        selectedBooleanArray[which] = isChecked;
+                        Event.EventTag tag = tagValueList.get(which);
+                        if (isChecked) {
+                            if (!selectedTags.contains(tag)) selectedTags.add(tag);
+                            selectedTags.remove(Event.EventTag.ALL); // Remove Default if specific tag chosen
+                        } else {
+                            selectedTags.remove(tag);
+                        }
+                    })
+                    .setPositiveButton("OK", (dialog, which) -> updateSelectedTagsText())
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
 
 
         //If editing, fill out information with existing event info
@@ -131,6 +174,16 @@ public class F_CreateEditEvent extends Fragment {
             mySwitch.setChecked(event.willTrack_geolocation()); // Use getter
             Button finalize = view.findViewById(R.id.btnFinalize);
             finalize.setText("Update Event");
+
+            selectedTags = new ArrayList<>(event.getTags());
+            // Sync the booleans for the dialog
+            for (int i = 0; i < tagValueList.size(); i++) {
+                if (selectedTags.contains(tagValueList.get(i))) {
+                    selectedBooleanArray[i] = true;
+                }
+            }
+            updateSelectedTagsText();
+
         } else {
             // This is "create" mode
             toolbar.setTitle("Create Event");
@@ -188,7 +241,7 @@ public class F_CreateEditEvent extends Fragment {
 
                         // create new event
                         Event makeEvent = new Event(title, dateTime, location,regStart, regDeadline,
-                                details, track_geo, true, waitlist_limit, attendee_limit, organizer);
+                                details, track_geo, true, waitlist_limit, attendee_limit, organizer, selectedTags);
                         if(posterUpload.getDrawable()==null){
                             model.setEvent(makeEvent, new DataModel.SetCallback() {
                                 @Override
@@ -273,6 +326,8 @@ public class F_CreateEditEvent extends Fragment {
                         event.setWaitlist_limit(waitlist_limit);
                         event.setTrack_geolocation(track_geo); // Use setter
                         event.setOrganizer(organizer);
+                        event.setTags(selectedTags);
+
                         if(posterUpload.getDrawable()!=null) {
                             ImageDataHolder image = new ImageDataHolder(posterUpload);
 
@@ -439,6 +494,21 @@ public class F_CreateEditEvent extends Fragment {
         } catch (Exception e) {
             // If parsing fails (e.g. old data format), just leave calendar as 'now'
             Log.w("DateParse", "Could not parse date: " + dateString);
+        }
+    }
+
+    private void updateSelectedTagsText() {
+        if (selectedTags.isEmpty() || (selectedTags.size() == 1 && selectedTags.contains(Event.EventTag.ALL))) {
+            tvSelectedTags.setText("Tags: Default (ALL)");
+        } else {
+            StringBuilder sb = new StringBuilder("Tags: ");
+            for (Event.EventTag tag : selectedTags) {
+                if (tag != Event.EventTag.ALL) {
+                    sb.append(tag.name()).append(", ");
+                }
+            }
+            if (sb.length() > 6) sb.setLength(sb.length() - 2);
+            tvSelectedTags.setText(sb.toString());
         }
     }
 }
