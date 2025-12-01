@@ -215,6 +215,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
+
+    //The following function is from Microsoft, Gemini, "How to filter events based on Event Date," Dec 1st, 2025
     public void applyFilter(Set<Event.EventTag> tags, Date startDate, Date endDate) {
         items.clear();
 
