@@ -40,12 +40,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public EventAdapter() { this.clickListener = null; }
 
-    /**
-     * array adapter for events
-     * @param initial list of events
-     * @param myRole your role, either entrants, organiser, or admin
-     * @param myId id of either organizer or entrant
-     */
     public EventAdapter(@NonNull List<Event> initial, int myRole, String myId) {
         items.addAll(initial);
         this.allItems.addAll(initial);
@@ -123,26 +117,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         } else {
             DataModel model = new DataModel();
             model.getImage(e.getImage(), new DataModel.GetCallback() {
-                        @Override
-                        public void onSuccess(Object obj) {
-                            ImageDataHolder image = (ImageDataHolder) obj;
-                            if(image == null){
-                                e.setImage("");
-                                model.setEvent(e, new DataModel.SetCallback() {
-                                    @Override
-                                    public void onSuccess(String id) {
+                @Override
+                public void onSuccess(Object obj) {
+                    ImageDataHolder image = (ImageDataHolder) obj;
+                    h.ivPoster.setImageBitmap(image.convertToBitmap());
+                }
 
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-
-                                    }
-                                });
-                            }else {
-                                h.ivPoster.setImageBitmap(image.convertToBitmap());
-                            }
-                        }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) { }
 
                 @Override
                 public void onError(Exception e) { }
