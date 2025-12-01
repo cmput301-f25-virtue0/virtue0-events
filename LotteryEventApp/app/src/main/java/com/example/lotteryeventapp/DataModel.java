@@ -41,6 +41,9 @@ public class DataModel extends TModel<TView>{
 
     private ArrayList<View> views = new ArrayList<View>();
 
+    /**
+     * Constructor of DataModel
+     */
     public DataModel() {
         this.db = FirebaseFirestore.getInstance();
         this.entrants = db.collection("entrants");
@@ -356,11 +359,17 @@ public class DataModel extends TModel<TView>{
                     cb.onError(e);
                 });
     }
-
+    /**
+     * Adds or updates the given instance of Admin to database. The Admin's unique id or an exception is passed to the callback.
+     */
     public void setAdmin() {
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
-
+    /**
+     * Attempts to retrieve an Admin from the database. The retrieved Admin or an exception is passed to the callback.
+     * @param deviceId Admin's device's id
+     * @param cb instance of GetCallback
+     */
     public void getAdmin(String deviceId, GetCallback cb) {
         DocumentReference adminRef = this.admins.document(deviceId);
         adminRef.get()
@@ -381,6 +390,9 @@ public class DataModel extends TModel<TView>{
                 });
     }
 
+    /**
+     * delete Admin
+     */
     public void deleteAdmin() {
         throw new UnsupportedOperationException("Admin not implemented yet");
     }
@@ -792,6 +804,12 @@ public class DataModel extends TModel<TView>{
                     }
                 });
     }
+
+    /**
+     * retrieves an ArrayList of Events from an Organizer
+     * @param organizer Organizer of Events
+     * @param cb GetCallback for retrieving from database
+     */
     public void getUsableEvents(Organizer organizer, GetCallback cb){
         List eventsIds = organizer.getEvents();
 //        ArrayList<> filterObjects = new ArrayList<>;
@@ -939,7 +957,10 @@ public class DataModel extends TModel<TView>{
                 .addOnFailureListener(cb::onError);
     }
 
-
+    /**
+     * retrieves all Entrants
+     * @param cb GetCallback for retrieving from database
+     */
     public void getAllEntrants(GetCallback cb) {
         this.entrants.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -964,7 +985,10 @@ public class DataModel extends TModel<TView>{
         });
     }
 
-
+    /**
+     * retrieves all Notifications
+     * @param cb GetCallback for retrieving from database
+     */
     public void getAllNotifications(GetCallback cb) {
         this.notifications.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

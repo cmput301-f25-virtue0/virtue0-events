@@ -6,13 +6,21 @@ package com.example.lotteryeventapp;
 public class Rejection extends Notification{
     /**
      * A rejection from the Event indicating the Entrant was not chosen from the waitlist
+     * @param uid uid of Rejection
      * @param event the Event the Entrant was rejected from
      * @param entrant the Entrant the Event rejected
+     * @param msg message of Rejection
      */
     public Rejection(String uid, String event, String entrant, String msg){
         super(uid, event, entrant, msg);
     }
 
+    /**
+     * construct Rejection without uid
+     * @param event the Event the Entrant was rejected from
+     * @param entrant the Entrant the Event rejected
+     * @param msg message of Rejection
+     */
     public Rejection(String event, String entrant, String msg){
         super(event, entrant, msg);
     }

@@ -10,8 +10,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
+/**
+ * retrieves a select amount of Notifications from the Database
+ */
 public class AllNotificationsPagination extends FirestorePagination {
+    /**
+     * constructs an AllNotificationPagination with given pageSize
+     * @param pageSize number of Notifications
+     */
     public AllNotificationsPagination(int pageSize) {
         super();
         this.pageSize = pageSize;
@@ -24,7 +30,11 @@ public class AllNotificationsPagination extends FirestorePagination {
         this.forwardQuery = query.limit(pageSize);
         this.backQuery = query.limit(pageSize);
     }
-
+    /**
+     * creates a new page of Notifications
+     * @param snapshot snapshot from collection
+     * @param cb callback for retrieving pagination from the database
+     */
     @Override
     protected void createPage(QuerySnapshot snapshot, PaginationCallback cb) {
         ArrayList<Notification> notifs = new ArrayList<>();

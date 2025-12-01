@@ -23,7 +23,7 @@ public class OrganizerListAdapter extends RecyclerView.Adapter<OrganizerListAdap
 
     /**
      * Constructor for the adapter.
-     * @param initialData The initial list of Entrants to display.
+     * @param initialData The initial list of Organizers to display.
      * @param listener A listener to handle item clicks and delete clicks.
      */
     public OrganizerListAdapter(@NonNull List<Organizer> initialData, @NonNull OnOrganizerClickListener listener) {
@@ -33,7 +33,7 @@ public class OrganizerListAdapter extends RecyclerView.Adapter<OrganizerListAdap
 
     /**
      * Updates the list with new data.
-     * @param newItems The new list of Entrants.
+     * @param newItems The new list of Organizers.
      */
     public void setItems(@NonNull List<Organizer> newItems) {
         items.clear();
@@ -65,13 +65,17 @@ public class OrganizerListAdapter extends RecyclerView.Adapter<OrganizerListAdap
         });
     }
 
+    /**
+     * get number of Organizers
+     * @return number of Organizers
+     */
     @Override
     public int getItemCount() {
         return items.size();
     }
 
     /**
-     * ViewHolder for the profile item.
+     * ViewHolder for the organizer item.
      */
     static class OrganizerViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;

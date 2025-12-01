@@ -616,6 +616,12 @@ public class Event {
     public void setDrawn(boolean drawn) {
         this.drawn = drawn;
     }
+
+    /**
+     * retrieves waitlist of Entrants rather than just their uids
+     * @return ArrayList of entrants of waitlist from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
     public ArrayList<Entrant> getUsableWaitList() throws InterruptedException {
         DataModel model = new DataModel();
         ArrayList<Entrant> entrants = new ArrayList<>();
@@ -646,7 +652,11 @@ public class Event {
         latch.await();
         return entrants;
     }
-
+    /**
+     * retrieves attendee list of Entrants rather than just their uids
+     * @return ArrayList of entrants of attendee list from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
     public ArrayList<Entrant> getUsableAttendeeList() throws InterruptedException {
         DataModel model = new DataModel();
         ArrayList<Entrant> entrants = new ArrayList<>();
@@ -677,7 +687,11 @@ public class Event {
         latch.await();
         return entrants;
     }
-
+    /**
+     * retrieves cancelled list of Entrants rather than just their uids
+     * @return ArrayList of entrants of cancelled list from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
     public ArrayList<Entrant> getUsableCancelledList() throws InterruptedException {
         DataModel model = new DataModel();
         ArrayList<Entrant> entrants = new ArrayList<>();
@@ -708,7 +722,11 @@ public class Event {
         latch.await();
         return entrants;
     }
-
+    /**
+     * retrieves invited list of Entrants rather than just their uids
+     * @return ArrayList of entrants of invited list from this event
+     * @throws InterruptedException when latch doesn't unlatch
+     */
     public ArrayList<Entrant> getUsableInvitedList() throws InterruptedException {
         DataModel model = new DataModel();
         ArrayList<Entrant> entrants = new ArrayList<>();

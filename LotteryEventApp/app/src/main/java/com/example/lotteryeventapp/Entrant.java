@@ -240,6 +240,9 @@ public class Entrant {
      */
     public void deleteProfile() {
         DataModel model = new DataModel();
+        deleteEntrantFromWaitlistedEvent();
+        deleteEntrantFromAttendeeEvent();
+        deleteEntrantFromInvitedEvent();
         model.deleteEntrant(this, new DataModel.DeleteCallback() {
             @Override
             public void onSuccess() {
@@ -253,6 +256,102 @@ public class Entrant {
         });
     }
 
+    /**
+     * delete Entrant from waitlisted Events
+     *  used when deleting Entrant
+     */
+    private void deleteEntrantFromWaitlistedEvent(){
+        DataModel model = new DataModel();
+        ArrayList<String> waitlistedEvents = this.waitlistedEvents;
+        Entrant entrant = this;
+        for(String eventId: waitlistedEvents){
+            model.getEvent(eventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Event event = (Event) obj;
+                    event.waitlistRemove(entrant.uid);
+                    model.setEvent(event, new DataModel.SetCallback() {
+                        @Override
+                        public void onSuccess(String id) {
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                        }
+                    });
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+    /**
+     * delete Entrant from attendee Events
+     *  used when deleting Entrant
+     */
+    private void deleteEntrantFromAttendeeEvent(){
+        DataModel model = new DataModel();
+        ArrayList<String> attendingEvents = this.attendedEvents;
+        Entrant entrant = this;
+        for(String eventId: attendingEvents){
+            model.getEvent(eventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Event event = (Event) obj;
+                    event.attendeeListRemove(entrant.uid);
+                    model.setEvent(event, new DataModel.SetCallback() {
+                        @Override
+                        public void onSuccess(String id) {
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                        }
+                    });
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
+    /**
+     * delete Entrant from invited Events
+     *  used when deleting Entrant
+     */
+    private void deleteEntrantFromInvitedEvent(){
+        DataModel model = new DataModel();
+        ArrayList<String> invitedEvents = this.invitedEvents;
+        Entrant entrant = this;
+        for(String eventId: invitedEvents){
+            model.getEvent(eventId, new DataModel.GetCallback() {
+                @Override
+                public void onSuccess(Object obj) {
+                    Event event = (Event) obj;
+                    event.invitedListRemove(entrant.uid);
+                    model.setEvent(event, new DataModel.SetCallback() {
+                        @Override
+                        public void onSuccess(String id) {
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                        }
+                    });
+                }
+                @Override
+                public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+                }
+                @Override
+                public void onError(Exception e) {
+                }
+            });
+        }
+    }
 
     /**
      * Compare two user if needed(maybe for duplicate)

@@ -4,12 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.lotteryeventapp.Event;
+import com.example.lotteryeventapp.ImageDataHolder;
 import com.example.lotteryeventapp.MainActivity;
 import com.example.lotteryeventapp.Invitation;
 import com.example.lotteryeventapp.DataModel;
@@ -43,7 +46,45 @@ public class F_Acceptance extends Fragment {
 
         this.notif = (Invitation) this.model.getCurrentNotification();
 
+        model.getEvent(this.notif.getEvent(), new DataModel.GetCallback() {
+            @Override
+            public void onSuccess(Object obj) {
+                Event event = (Event) obj;
+                ImageView posterPreview = view.findViewById(R.id.eventPreviewImage);
+                if(event.getImage()!=null){
+                    if(!event.getImage().isEmpty()){
+                        model.getImage(event.getImage(), new DataModel.GetCallback() {
+                            @Override
+                            public void onSuccess(Object obj) {
+                                ImageDataHolder image = (ImageDataHolder) obj;
+                                posterPreview.setImageBitmap(image.convertToBitmap());
+                            }
 
+                            @Override
+                            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            @Override
+            public <T extends Enum<T>> void onSuccess(Object obj, T type) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
         // Detect button presses
         view.findViewById(R.id.backArrowAccept).setOnClickListener(new View.OnClickListener() {
             @Override

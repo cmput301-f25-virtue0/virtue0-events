@@ -1,7 +1,9 @@
 package com.example.lotteryeventapp;
 
 import java.util.Map;
-
+/**
+ * intermediary between database and Invitation
+ */
 public class InvitationDataHolder extends NotificationDataHolder{
     /**
      * constructs InvitationDataHolder based on Invitation object

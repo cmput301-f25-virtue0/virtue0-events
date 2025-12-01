@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * retrieves select amount of values from database
+ */
 public abstract class FirestorePagination {
     protected Query baseQuery;
     protected Query forwardQuery;
@@ -25,6 +28,11 @@ public abstract class FirestorePagination {
 
     }
 
+    /**
+     * create a pagination
+     * @param pageSize the number of items on each page
+     * @param query query
+     */
     protected FirestorePagination(int pageSize, Query query) {
         this.pageSize = pageSize;
         this.baseQuery = query;
@@ -32,19 +40,27 @@ public abstract class FirestorePagination {
         this.backQuery = query.limit(pageSize);
     }
 
+
     public interface PaginationCallback {
         <T> void onGetPage(boolean hasResults, ArrayList<T> obs);
         void onError(Exception e);
     }
 
+    /**
+     * get number of items per page
+     * @return number of items per page
+     */
     public int getPageNumber() {
         return this.pageNumber;
     }
 
+    /**
+     * gets next page of values
+     * @param cb PaginationCallback for retrieving pages of values
+     */
     public void getNextPage(PaginationCallback cb) {
         if (this.pageNumber == 0) {
             AggregateQuery queryCount = this.baseQuery.count();
-//            CountDownLatch latch = new CountDownLatch(1);
             queryCount
                     .get(AggregateSource.SERVER)
                     .addOnCompleteListener(task -> {
@@ -59,17 +75,11 @@ public abstract class FirestorePagination {
                             }
 
                             Log.d("FirestorePagination", "Pagination Success: Calculated last page number");
-//                            latch.countDown();
                         }else {
                             Log.e("FirestorePagination", "Pagination Failed: Could not calculate last page number");
-//                            latch.countDown();
                         }
                     });
-//            try {
-////                latch.await();
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
+
         }else if (this.lastPageNumber == this.pageNumber) {
             Log.d("FirestorePagination", "Pagination Success: Already on last page");
             cb.onGetPage(false, null);
@@ -103,6 +113,10 @@ public abstract class FirestorePagination {
                 });
     }
 
+    /**
+     * gets previous page
+     * @param cb PaginationCallback retrieves page of values
+     */
     public void getPreviousPage(PaginationCallback cb) {
         if (this.pageNumber == 0) {
             Log.d("FirestorePagination", "Pagination Success: No pages have been fetched");
@@ -132,6 +146,10 @@ public abstract class FirestorePagination {
                 });
     }
 
+    /**
+     * updates queries
+     * @param snapshot query snapshot
+     */
     private void updateQueries(QuerySnapshot snapshot) {
         List<DocumentSnapshot> docList = snapshot.getDocuments();
         DocumentSnapshot currentPageFirstSnapshot = docList.get(0);
@@ -140,5 +158,10 @@ public abstract class FirestorePagination {
         this.backQuery = this.baseQuery.endBefore(currentPageFirstSnapshot).limit(this.pageSize);
     }
 
+    /**
+     * creates a page
+     * @param snapshot QuerySnapshot
+     * @param cb PaginationCallback for retrieving page of values
+     */
     abstract void createPage(QuerySnapshot snapshot, PaginationCallback cb);
 }
